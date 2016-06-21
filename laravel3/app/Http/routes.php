@@ -30,3 +30,7 @@ Route::get('projectone','PagesController@home');
 Route::get('cards/{id}', 'CardsController@showCard');
 
 Route::get('myjs','SymbolContoller@throwSymbols');
+
+Route::get('download',function(){
+	return URI('www.google.com');
+});
