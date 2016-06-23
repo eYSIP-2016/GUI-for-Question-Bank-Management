@@ -31,6 +31,9 @@ Route::get('cards/{id}', 'CardsController@showCard');
 
 Route::get('myjs','SymbolContoller@throwSymbols');
 
-Route::get('download',function(){
-	return URI('www.google.com');
+Route::get('testhome', function () {
+	$option="";
+    return view('GUI_Q_Bank_Views.User_Acc_Home_Page',compact('option'));
 });
+
+Route::get('testhome/{option}','NavController@sendOption');
