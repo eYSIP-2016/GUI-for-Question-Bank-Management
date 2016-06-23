@@ -33,21 +33,28 @@ body{
 	margin-right: 80px;
 	margin-top: 20px;
 	font-family: Open Sans Light;
+  padding: 20px;
 }
 
 #left_bar{
-	padding: 10px;
+	padding: 12px;
 	float: left;
 	overflow: hidden;
 	font-style: italic;
-	width: 75%;
+	width: 25%;
 }
 
 #right_bar{
-	padding:10px;
+	padding:12px;
 	float: left;
 	overflow: hidden;
 	width: 70%;
+  background-color: snow;
+  margin-top: 12px;
+  border-left-style:solid;
+  border-left-width: 4px;
+  border-left-color: #004d99; 
+  margin-bottom: 45px;
 }
 
 
@@ -104,13 +111,74 @@ body{
 }
 
 #right_bar input[type=text] {
-    width: 100px;
+    width: 350px;
     height: 30px;
     padding: 12px 20px;
     margin: 8px ;
     display: inline-block;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     border-radius: 0px;
     border-left-color: #3385ff; 
     box-sizing: border-box;
+}
+
+#right_bar textarea {
+    padding: 12px 20px;
+    margin: 10px ;
+    display: inline-block;
+    border: 2px solid #ccc;
+    border-radius: 0px;
+    border-left-color: #3385ff; 
+    box-sizing: border-box;
+}
+
+#right_bar .custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 12px 20px;
+    height:30px;
+    margin: 10px ;
+    cursor: pointer;
+}
+
+.taglist{
+    list-style-type: none;
+}
+
+.tagitem{
+    display: inline-block;
+    border-style: solid;
+    border-width: 1.5px;
+    border-color:  #0066ff;
+    background-color: #f2f2f2;
+    color:#1a1a1a;
+    padding: 2px;
+    border-radius: 4px;
+    font-size: small;
+}
+
+input[type=submit]{
+    font-family:inherit;
+    font-size:100%;
+    padding:.5em 1em;
+    color: white;
+    border:1px solid #999;
+    border:0 rgba(0,0,0,0);
+    background-color:#0066ff;;
+    text-decoration:none;
+    border-radius:2px;
+}
+
+input[type=submit]:hover,input[type=submit]:focus{
+    background-color: white;
+    color:#0066ff;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #0066ff;
+}
+
+
+input[type=submit]:active{
+    box-shadow:0 0 0 1px rgba(0,0,0,.15) inset,0 0 6px rgba(0,0,0,.2) inset;
+    border-color:#000\9
 }
