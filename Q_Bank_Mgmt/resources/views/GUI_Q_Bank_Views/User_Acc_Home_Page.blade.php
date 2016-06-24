@@ -28,7 +28,7 @@
 
 				{!! Form::label('Q_diagram','Diagram') !!}<br>
 				{!! Form::file('Q_diagram') !!}<br><br>
-				<button onclick="makePreview()">Preview</button>
+				<!--<button onclick="makePreview()">Preview</button>-->
 
 				Tags<br>
 				<ul class="taglist">
