@@ -13,8 +13,8 @@ class NavController extends Controller
     //
     public function sendOption($option){
     	if($option==="compose"){
-    		$tags=['algoriths','hello','world','lotr'];
-    		return view('GUI_Q_Bank_Views.User_Acc_Home_Page',compact('option','tags'));
+    		$symbols=DB::table('math_symbols')->get();
+    		return view('GUI_Q_Bank_Views.User_Acc_Home_Page',compact('option','symbols'));
     	}
     	return view('GUI_Q_Bank_Views.User_Acc_Home_Page',compact('option'));
     }

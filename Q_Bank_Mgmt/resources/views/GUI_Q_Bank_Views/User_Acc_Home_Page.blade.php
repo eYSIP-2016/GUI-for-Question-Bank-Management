@@ -1,6 +1,7 @@
 @extends('GUI_Q_Bank_Views.userAccLayout')
-
 @section('nav_bar')
+	
+	<!--This section views the Home page of the user which views his/her questions-->
 	@if($option==="Home"||$option==="")
 	<li><a class="active" href="http://localhost/testhome/Home">Home</a></li>
 		@section('view_section')
@@ -10,6 +11,8 @@
 	<li><a href="http://localhost/testhome/Home">Home</a></li>
 	@endif
 
+
+	<!--This Section Views the compose Question Page-->
 	@if($option==="compose")
 	<li><a class="active" href="http://localhost/testhome/compose">Compose</a></li>
 		@section('view_section')
@@ -18,13 +21,14 @@
 
 				{!! Form::label('Q_desc','description') !!}<br>
 				{!! Form::textarea('Q_desc','',array('rows'=>'10','cols'=>'70','required'=>'required')) !!}<br><br>
+				
 
 				{!! Form::label('Q_exp','Mathematical Expressions') !!}<br>
 				{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70')) !!}<br><br>
 
 				{!! Form::label('Q_diagram','Diagram') !!}<br>
 				{!! Form::file('Q_diagram') !!}<br><br>
-
+				<button onclick="makePreview()">Preview</button>
 
 				Tags<br>
 				<ul class="taglist">
@@ -35,7 +39,16 @@
 					@endforeach
 				</ul>
 				<br>
-				<center>{!! Form::submit('Submit') !!}</center>
+				<center>
+					<ul style="list-style-type:none;">
+						<li style="display:inline;padding:20px;">
+							{!! Form::submit('Submit') !!}
+						</li>
+						<li style="display:inline;padding:20px;">
+							{!! Form::reset('Reset') !!}
+						</li>
+					</ul>
+				</center>
 			{!! Form::close() !!}
 		@stop
 	@else
