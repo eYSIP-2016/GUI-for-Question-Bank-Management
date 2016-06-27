@@ -3,21 +3,26 @@
     <head>
         <title>Laravel</title>
         <link href="/css/GUI_QBank/home_page.css" rel="stylesheet" type="text/css">
+       
+
+
     </head>
     <body>
     <div id="layout" class="pure-g">
         <div class="sidebar pure-u-1">
             <div class="header">
                 <h1 class="brand-title">Sign In</h1><br>
-                <form>
-                    <label for="email">Email</label><br>
-                    <input id="email" type="email" placeholder="Email"><br>
+                <!--form-->
+                {!! Form::open(array('class' => 'form-inline', 'method' => 'POST', 'route' => array('credentials')  )) !!}
 
-                    <label for="password">Password</label><br>
-                    <input id="password" type="password" placeholder="Password"><br>
+                    {!! Form::label('uname', 'Username') !!} <br>
+                    {!! Form::text('uname', Input::old('uname'), array('placeholder' => 'Enter Username')) !!}<br>
 
-                    <input type="submit" name="Sign In">
-                </form>
+                    {!! Form::label('password', 'Password') !!}<br>
+                    {{ Form::password('password' ,array('placeholder' => 'Enter Password')) }}<br>
+                    
+                    {!! Form::submit('Sign In', array('class' => 'btn btn-danger')) !!}
+                    {!! Form::close() !!}
             </div>
         </div>
     </div>
@@ -35,3 +40,9 @@
     </div>
     </body>
 </html>
+
+
+
+
+
+ 

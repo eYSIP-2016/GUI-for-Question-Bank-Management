@@ -21,19 +21,33 @@ Route::get('welcomeGUI',function(){
 	return view('GUI_Q_Bank_Views.Welcome_page_GUI_Q_Bank');
 });
 
-Route::get('cards','CardsController@index');
+Route::post('credentials', [
+    'as' => 'credentials', 'uses' => 'UserController@doLogin'
+]);
 
-Route::get('about','PagesController@about');
+Route::get('authenticate/{users}', [
+    'as' => 'authenticate', 'uses' => 'UserController@authenticate'
+]);
 
-Route::get('projectone','PagesController@home');
+//Route::get('cards','CardsController@index');
 
-Route::get('cards/{id}', 'CardsController@showCard');
+//Route::get('about','PagesController@about');
 
-Route::get('myjs','SymbolContoller@throwSymbols');
+//Route::get('projectone','PagesController@home');
 
-Route::get('testhome', function () {
+//Route::get('cards/{id}', 'CardsController@showCard');
+
+//Route::get('myjs','SymbolContoller@throwSymbols');
+
+Route::get('testhome',[ 
+	'as' => 'testhome', function () {
 	$option="";
     return view('GUI_Q_Bank_Views.User_Acc_Home_Page',compact('option'));
-});
+}]);
 
 Route::get('testhome/{option}','NavController@sendOption');
+Route::resource('users','UserController');
+//Route::resource('authenticate','UserController@authenticate');
+Route::bind('', function($value, $route) {
+	return App\User::whereSlug($value)->first();
+});
