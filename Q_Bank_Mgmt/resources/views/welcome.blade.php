@@ -3,6 +3,18 @@
     <head>
         <title>Laravel</title>
 
+        <script type="text/javascript">
+            
+            function makePreview(textAreaId,previewId,hiddenID){
+                var latexCode = document.getElementById(textAreaId).value;
+                var link="https://latex.codecogs.com/gif.latex?";
+                var linkToImage=link.concat("",latexCode.replace("\s+","&nbsp;"));
+                document.getElementById(previewId).setAttribute("src",linkToImage);
+                document.getElementById(hiddenID).setAttribute("value",linkToImage);
+            } 
+
+        </script>
+
         <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
 
         <style>
@@ -36,10 +48,20 @@
         </style>
     </head>
     <body>
-        <div class="container">
-            <div class="content">
-                <div class="title">Laravel 5</div>
-            </div>
-        </div>
+        {!! Form::open(['url' => '/']) !!}
+
+                {!! Form::label('Q_exp','Mathematical Expressions') !!}<br>
+
+                {!! Form::hidden('hiddenId','https://latex.codecogs.com/gif.latex?\int&space;\bigcap',array('id' => 'hiddenId')) !!}
+
+                {!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70')) !!}<br>
+
+                {!! Form::button('Make Prevew', array( 'onClick'=>"makePreview('Q_exp','previewId','hiddenId')")) !!}
+
+                <img src="" width="auto" height="auto" id="previewId">
+
+                {!! Form::submit('Submit') !!}
+
+        {!! Form::close() !!}
     </body>
 </html>

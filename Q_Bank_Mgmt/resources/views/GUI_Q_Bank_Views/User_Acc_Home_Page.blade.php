@@ -19,30 +19,54 @@
 			<h2 style="color:#737373;font-style:italic;">Create Your Question</h2>
 			{!! Form::open() !!}
 
-				{!! Form::label('Q_desc','description') !!}<br>
-				{!! Form::textarea('Q_desc','',array('rows'=>'10','cols'=>'70','required'=>'required')) !!}<br><br>
+				{!! Form::label('Q_desc','Description') !!}<br>
+				{!! Form::textarea('Q_desc','',array('rows'=>'10','cols'=>'70','required'=>'required')) !!}<br>
+
+				<div class="math_keyboard">
+				<ul style="list-style-type:none;">
+					@foreach($symbols as $symbol)
+					<li style="display:inline-block;">
+							{!! Form::button($symbol->code, array( 'onClick'=>"addTextAtCaret('Q_desc', $symbol->code)")) !!}
+
+					</li>
+					@endforeach
+				</ul>
+				</div>
 				
 
 				{!! Form::label('Q_exp','Mathematical Expressions') !!}<br>
-				{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70')) !!}<br><br>
+				{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70')) !!}<br>
+				{!! Form::button('Make Prevew', array( 'onClick'=>"makePreview('Q_exp','previewId')")) !!}
+
+				<img src="" width="auto" height="auto" id="previewId">
 
 				{!! Form::label('Q_diagram','Diagram') !!}<br>
 				{!! Form::file('Q_diagram') !!}<br><br>
 				<!--<button onclick="makePreview()">Preview</button>-->
 
-				Tags<br>
+				
+				{!! Form::label('tag_List','Tags') !!}
 				<ul class="taglist">
 					@foreach($tags as $tag)
 						<li class="tagitem">
-							{!! Form::checkbox($tag,$tag)!!}{{$tag}}
+							{!! Form::checkbox('tag_List',$tag->name) !!}{{$tag->name}}
 						</li>
 					@endforeach
 				</ul>
 				<br>
+
+				{!! Form::label('difficulty','Difficulty') !!}<br>
+				{!! Form::radio('difficulty','easy',array('required'=>'required')) !!}Easy
+				{!! Form::radio('difficulty','medium') !!}Medium
+				{!! Form::radio('difficulty','hard') !!}Hard<br><br>
+
+				{!! Form::label('timeRequired','Time Required',array('required'=>'required')) !!}
+				{!!Form::number('timeRequired')!!}<br>
+
 				<center>
 					<ul style="list-style-type:none;">
 						<li style="display:inline;padding:20px;">
-							{!! Form::submit('Submit') !!}
+							{!! Form::submit('Submit',array('id'=>'checkBtn')) !!}
 						</li>
 						<li style="display:inline;padding:20px;">
 							{!! Form::reset('Reset') !!}
