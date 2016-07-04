@@ -1,0 +1,9 @@
+\beamer@endinputifotherversion {3.36pt}
+\beamer@sectionintoc {1}{Overview of Project}{2}{0}{1}
+\beamer@sectionintoc {2}{Features}{3}{0}{2}
+\beamer@sectionintoc {3}{Overview of Task}{4}{0}{3}
+\beamer@sectionintoc {4}{Task Accomplised}{5}{0}{4}
+\beamer@sectionintoc {5}{Snapshots}{6}{0}{5}
+\beamer@sectionintoc {6}{Challenges Faced}{7}{0}{6}
+\beamer@sectionintoc {7}{Future Plans}{8}{0}{7}
+\beamer@sectionintoc {8}{Thank You}{9}{0}{8}

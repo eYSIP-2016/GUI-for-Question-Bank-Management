@@ -22,23 +22,99 @@
 				{!! Form::label('Q_desc','Description') !!}<br>
 				{!! Form::textarea('Q_desc','',array('rows'=>'10','cols'=>'70','required'=>'required')) !!}<br>
 
-				<div class="math_keyboard">
-				<ul style="list-style-type:none;">
-					@foreach($symbols as $symbol)
-					<li style="display:inline-block;">
-							{!! Form::button($symbol->code, array( 'onClick'=>"addTextAtCaret('Q_desc', $symbol->code)")) !!}
-
-					</li>
-					@endforeach
+				<ul class="tab">
+				  @foreach($symbol_group as $group)
+					  <?php
+					  	$first='<li><a href="#" class="tablinks" onclick="openCity(event, \'';
+					  	$second='\')">';
+					  	$last='</a></li>';
+					  ?>
+					  {!!html_entity_decode($first.$group.$second.$group.$last)!!}
+				  @endforeach
 				</ul>
+				@foreach($symbol_group as $group)
+					
+					<?php 
+						$first = '<div id="';
+						$last = '" class="tabcontent">';
+						?>
+					{!!html_entity_decode($first.$group.$last)!!}
+					@if($group==="Set Algebra")
+						<div class="math_keyboard">
+						<ul style="list-style-type:none;">
+							@foreach($symbols_1 as $symbol)
+							<li style="display:inline-block;">
+									{!! Form::button($symbol->code, array( 'onClick'=>"addTextAtCaret('Q_desc', $symbol->code)")) !!}
+							</li>
+							@endforeach
+						</ul>
+						</div>
+					@elseif($group==="Calculus")
+						<div class="math_keyboard">
+						<ul style="list-style-type:none;">
+							@foreach($symbols_2 as $symbol)
+							<li style="display:inline-block;">
+									{!! Form::button($symbol->code, array( 'onClick'=>"addTextAtCaret('Q_desc', $symbol->code)")) !!}
+							</li>
+							@endforeach
+						</ul>
+						</div>
+					@elseif($group==="Boolean Algebra")
+						<div class="math_keyboard">
+						<ul style="list-style-type:none;">
+							@foreach($symbols_3 as $symbol)
+							<li style="display:inline-block;">
+									{!! Form::button($symbol->code, array( 'onClick'=>"addTextAtCaret('Q_desc', $symbol->code)")) !!}
+							</li>
+							@endforeach
+						</ul>
+						</div>
+					@elseif($group==="Arithmetic")
+						<div class="math_keyboard">
+						<ul style="list-style-type:none;">
+							@foreach($symbols_4 as $symbol)
+							<li style="display:inline-block;">
+									{!! Form::button($symbol->code, array( 'onClick'=>"addTextAtCaret('Q_desc', $symbol->code)")) !!}
+							</li>
+							@endforeach
+						</ul>
+						</div>
+					@elseif($group==="Geometry")
+						<div class="math_keyboard">
+						<ul style="list-style-type:none;">
+							@foreach($symbols_5 as $symbol)
+							<li style="display:inline-block;">
+									{!! Form::button($symbol->code, array( 'onClick'=>"addTextAtCaret('Q_desc', $symbol->code)")) !!}
+							</li>
+							@endforeach
+						</ul>
+						</div>
+					@else
+						<div class="math_keyboard">
+						<ul style="list-style-type:none;">
+							@foreach($symbols_6 as $symbol)
+							<li style="display:inline-block;">
+									{!! Form::button($symbol->code, array( 'onClick'=>"addTextAtCaret('Q_desc', $symbol->code)")) !!}
+							</li>
+							@endforeach
+						</ul>
+						</div>
+					@endif
+					</div>
+				@endforeach
+				<br><br>
+			
+				{!! Form::label('no_questions','Options') !!}<br>
+				{!! Form::number('no_questions','',array( 'min'=>'2','max' => '6','id'=>'no_questions')) !!}
+				{!! Form::button('Make Options', array( 'onClick'=>"makeOptions()")) !!}
+				<div id="container">
 				</div>
-				
 
 				{!! Form::label('Q_exp','Mathematical Expressions') !!}<br>
 				{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70')) !!}<br>
 				{!! Form::button('Make Prevew', array( 'onClick'=>"makePreview('Q_exp','previewId')")) !!}
 
-				<img src="" width="auto" height="auto" id="previewId">
+				<img src="" width="auto" height="auto" id="previewId"><br><br>
 
 				{!! Form::label('Q_diagram','Diagram') !!}<br>
 				{!! Form::file('Q_diagram') !!}<br><br>

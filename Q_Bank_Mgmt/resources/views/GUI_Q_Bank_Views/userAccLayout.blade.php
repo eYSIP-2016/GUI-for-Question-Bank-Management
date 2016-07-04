@@ -12,11 +12,25 @@
 			      checked = $("input[type=checkbox]:checked").length;
 
 			      if(!checked) {
-			        alert("You must check at least one checkbox.");
+			        alert("Choose at least one tag");
 			        return false;
 			      }
 			    });
 			});
+
+			function openCity(evt, cityName) {
+			    var i, tabcontent, tablinks;
+			    tabcontent = document.getElementsByClassName("tabcontent");
+			    for (i = 0; i < tabcontent.length; i++) {
+			        tabcontent[i].style.display = "none";
+			    }
+			    tablinks = document.getElementsByClassName("tablinks");
+			    for (i = 0; i < tablinks.length; i++) {
+			        tablinks[i].className = tablinks[i].className.replace(" active", "");
+			    }
+			    document.getElementById(cityName).style.display = "block";
+			    evt.currentTarget.className += " active";
+			}
 
 			function addTextAtCaret(textAreaId, text) {
 			    var textArea = document.getElementById(textAreaId);
@@ -42,6 +56,49 @@
 				var linkToImage=link.concat("",latexCode.replace("\s+","&nbsp;"));
 				document.getElementById(previewId).setAttribute("src",linkToImage);
 			} 
+
+			function makeOptions(){
+					var number = document.getElementById("no_questions").value;
+		            // Container <div> where dynamic content will be placed
+			            if(number>1&&number<7){
+				        var container = document.getElementById("container");
+
+		            // Clear previous contents of the container
+			            while (container.hasChildNodes()) {
+			                container.removeChild(container.lastChild);
+			            }
+		            
+		            for (i=0;i<number;i++){
+		                // Append a node with a random text
+		                container.appendChild(document.createTextNode(" Member " + (i+1)));
+		                // Create an <input> element, set its type and name attributes
+		                var input = document.createElement("input");
+		                input.type = "text";
+		                input.name = "member" + i;
+		                input.required = "required";
+		                container.appendChild(input);
+		                // Append a line break 
+		                container.appendChild(document.createElement("br"));
+		            }
+
+		            container.appendChild(document.createTextNode(" Choose the answer: "));
+		            
+		            for (i=0;i<number;i++){
+		                // Append a node with a random text
+		                container.appendChild(document.createTextNode((i+1) + "."));
+		                // Create an <input> element, set its type and name attributes
+		                var input = document.createElement("input");
+		                input.type = "radio";
+		                input.name = "answer";
+		                input.value = i;
+		                input.required = "required";
+		                container.appendChild(input);
+		            }
+		        }
+		        else{
+		        	alert("Choose a number first :)");
+		        }
+			}
 		</script>
 	</head>
 <body>

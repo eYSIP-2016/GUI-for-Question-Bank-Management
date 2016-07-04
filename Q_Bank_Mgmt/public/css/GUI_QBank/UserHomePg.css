@@ -80,7 +80,7 @@ body{
   border-bottom: white;
   border-bottom-style: solid;
   border-bottom-width:0px;
-  transition: border-bottom 0.5s linear, border-style 1s linear, border-width 1s linear;
+  transition: border-bottom 0.5s linear, border-style 0.5s linear, border-width 0.5s linear;
 }
 
 .mainmenu a.active{
@@ -110,7 +110,7 @@ body{
     font-weight: italic bold;
 }
 
-#right_bar input[type=text] {
+#right_bar input[type=text],input[type=number]{
     width: 350px;
     height: 30px;
     padding: 12px 20px;
@@ -186,6 +186,58 @@ input[type=submit]:active,input[type=reset]:active{
 }
 
 .math_keyboard{
-  width:600px;
+  width:auto;
+  margin-right: 10px;
   height: auto;
+}
+
+
+ul.tab {
+    list-style-type: none;
+    margin: 10px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #3385ff;
+    background-color: #3385ff;
+    width:600px;
+}
+
+/* Float the list items side by side */
+ul.tab li {float: left;}
+
+/* Style the links inside the list items */
+ul.tab li a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 9px 10px;
+    text-decoration: none;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of links on hover */
+ul.tab li a:hover {
+    background-color: white;
+    color:#3385ff;
+}
+
+/* Create an active/current tablink class */
+ul.tab li a:focus, .active {
+    background-color: white;
+    color:#3385ff;
+}
+
+/* Style the tab content */
+.tabcontent {
+    margin : 10px;
+    width:600px;
+    display: none;
+    padding: 3px 3px;
+    border: 1px solid #3385ff;
+    border-top: none;
+}
+
+#container{
+  font-size: 13px;
 }

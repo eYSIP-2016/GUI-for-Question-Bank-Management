@@ -17,6 +17,7 @@ class CreateMathsSymbolsTable extends Migration
             $table->increments('id');
             $table->string('code')->unique();
             $table->string('description')->unique();
+            $table->integer('type');
             $table->timestamps();
         });
     }

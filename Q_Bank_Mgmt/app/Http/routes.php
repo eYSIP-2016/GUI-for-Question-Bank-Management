@@ -36,6 +36,22 @@ Route::get('testhome',[
 
 }]);
 
+//Maiintain a file system for images dont keep a database
+Route::get('images/{filename}', function ($filename)
+{
+    $path = storage_path() . '/images/' . $filename;
+
+    if(!File::exists($path)) abort(404);
+
+    $file = File::get($path);
+    $type = File::mimeType($path);
+
+    $response = Response::make($file, 200);
+    $response->header("Content-Type", $type);
+
+    return $response;
+});
+
 Route::get('testhome/{option}','NavController@sendOption');
 
 Route::post('/','NavController@createEquation');
