@@ -56,8 +56,6 @@ Route::get('testhome/{option}','NavController@sendOption');
 
 Route::post('/','NavController@createEquation');
 
-Route::get('testhome/{option}','NavController@sendOption');
-
 Route::resource('users','UserController');
 
 Route::resource('authenticate','UserController@authenticate');

@@ -2,10 +2,57 @@
 <html>
 	<head>
 
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="/css/GUI_QBank/UserHomePg.css">
+	  <meta charset="utf-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1">
+	  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	  <!-- Latest compiled and minified CSS -->
+	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
+
+	  <!-- Latest compiled and minified JavaScript -->
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+
+	  <!-- (Optional) Latest compiled and minified JavaScript translation files -->
+	  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/i18n/defaults-*.min.js"></script>
+
+
+	  <style type="text/css">
+	  	body{
+			font-family: Open Sans;
+			margin-bottom: 100px;
+	  	}
+	  	.math_keyboard{
+		  width:auto;
+		  margin-right: 4px;
+		  height: auto;
+		  margin-top: 10px;
+		}
+
+		.taglist{
+		    list-style-type: none;
+		    padding: 10px;
+		}
+
+		.tagitem, button{
+		    display: inline-block;
+		    border-style: solid;
+		    border-width: 1.5px;
+		    border-color:  #0066ff;
+		    background-color: #f2f2f2;
+		    color:#1a1a1a;
+		    margin-bottom: 4px;
+		    padding: 2px;
+		    border-radius: 4px;
+		    font-size: small;
+		}
+	  </style>
 		<title>This is the Home page of a normal user</title>
+
 		<script type="text/javascript">
+			$(function () {
+		    	$('#myTab a:last').tab('show')
+		  	})
 
 			$(document).ready(function () {
 			      $('#checkBtn').click(function() {
@@ -17,6 +64,79 @@
 			      }
 			    });
 			});
+
+			$('.tag.example .ui.dropdown').dropdown({
+			    allowAdditions: true;
+			    useLabels:true;
+			    maxSelections:false;
+			    glyphWidth:1.0714;
+
+			});
+
+			function wrapText(imageElem, context, text, x, y, maxWidth, lineHeight, format) {
+                var cars = text.split("\n");
+                var ht = cars.length;
+                var h = 43+(ht-1)*lineHeight;
+				context.canvas.setAttribute("height",h);
+
+				if(format === "question"){
+                 	context.fillStyle = "#ffffff";
+	                context.fillRect(0, 0, 600, 500);
+
+	                context.font = "14px 'Arial'";
+	                context.fillStyle = "#000000";
+	             }
+	             else{
+	             	context.fillStyle = "#b3b3b3";
+	                context.fillRect(0, 0, 600, 500);
+
+	                y=20;
+	                context.font = "17px 'Courier'";
+	                context.fillStyle = "#000000";
+	             }
+
+                for (var ii = 0; ii < cars.length; ii++) {
+
+                    var line = "";
+                    var words = cars[ii].split(" ");
+
+                    for (var n = 0; n < words.length; n++) {
+                        var testLine = line + words[n] + " ";
+                        var metrics = context.measureText(testLine);
+                        var testWidth = metrics.width;
+
+                        if (testWidth > maxWidth) {
+                            context.fillText(line, x, y);
+                            line = words[n] + " ";
+                            y += lineHeight;
+                        }
+                        else {
+                            line = testLine;
+                        }
+                    }
+                    context.fillText(line, x, y);
+                    imageElem.src = context.canvas.toDataURL();
+                    y += lineHeight;
+                }
+             }
+
+             function drawText(textAreaId,previewId,textcanvas,format) {
+                 var canvas = document.getElementById(textcanvas);
+                 var context = canvas.getContext("2d");
+                 var imageElem = document.getElementById(previewId);
+
+                 context.clearRect(0, 0, 100, 600);
+
+                 var maxWidth = 600;
+                 var lineHeight = 16;
+                 var x = 10; // (canvas.width - maxWidth) / 2;
+                 var y = 10;
+
+
+                 var text = document.getElementById(textAreaId).value;                
+
+                 wrapText(imageElem, context, text, x, y, maxWidth, lineHeight, format);
+             }
 
 			function openCity(evt, cityName) {
 			    var i, tabcontent, tablinks;
@@ -32,12 +152,14 @@
 			    evt.currentTarget.className += " active";
 			}
 
-			function addTextAtCaret(textAreaId, text) {
+			function addTextAtCaret(textAreaId, text, previewId, textcanvas) {
 			    var textArea = document.getElementById(textAreaId);
 			    var cursorPosition = textArea.selectionStart;
 			    addTextAtCursorPosition(textArea, cursorPosition, text);
 			    updateCursorPosition(cursorPosition, text, textArea);
+			    drawText(textAreaId,previewId,textcanvas);
 			}
+			
 			function addTextAtCursorPosition(textArea, cursorPosition, text) {
 			    var front = (textArea.value).substring(0, cursorPosition);
 			    var back = (textArea.value).substring(cursorPosition, textArea.value.length);
@@ -102,23 +224,29 @@
 		</script>
 	</head>
 <body>
-	<div id="head">
-		<ul>
-			<li>Username</li>
-			<li style="float:right">Signout</li>
-		</ul>
-	</div>
-	<div id="main">
-		<div id="left_bar">
-			<nav class="navigation">
-			<ul class="mainmenu">
-				@yield('nav_bar')
-			</ul>
-			</nav>
-		</div>
+	
+	<nav class="navbar navbar-inverse">
+	  <div class="container-fluid">
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="#">Username</a>
+	    </div>
+	    <ul class="nav navbar-nav navbar-right">
+	      <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> logout</a></li>
+	    </ul>
+	  </div>
+	</nav>
 
-		<div id="right_bar">
-			@yield('view_section')
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3">
+				<ul class="nav nav-pills nav-stacked faded" >
+					@yield('nav_bar')
+				</ul>
+			</div>
+
+			<div class="col-md-9">
+				@yield('view_section')
+			</div>
 		</div>
 	</div>
 </body>
