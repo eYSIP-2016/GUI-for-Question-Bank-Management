@@ -10,9 +10,20 @@ use DB;
 
 use Request;
 
+use App\Q_description;
+use App\Q_table;
+use App\Q_tag_relation;
+use App\code;
+use App\equations;
+use App\options;
+use App\revision_Q_description;
+use App\revision_options;
+use App\revision_Q_table;
+use App\revision_Q_tag_relation;
+use App\revision_code;
+use App\revision_equations;
 use App\tags;
 
-use App\equations;
 class NavController extends Controller
 {
     //
@@ -55,7 +66,7 @@ class NavController extends Controller
 
     	$input = Request::all();
     	
-        $URLpt1 = 'http://api.img4me.com/?text=';
+        /*$URLpt1 = 'http://api.img4me.com/?text=';
         $text = Request::get('Q_exp');
         $URLpt2 = '&font=arial&fcolor=000000&size=10&bcolor=FFFFFF&type=png';
         $pathToImage = file_get_contents($URLpt1.$text.$URLpt2);
@@ -78,10 +89,63 @@ class NavController extends Controller
 
     	$equation->exp_image = $path;
 
-    	$equation->save();
+    	$equation->save();*/
+
+        /*$option_no = Request::get('options_no');
+        $option = new options();
+        $revision_option = new revision_options();
+        for ($i = 1 ; $i <= $option_no ; $i++ ) {
+            # code...
+            $option = new options();
+            $revision_option = new revision_options();
+    
+            $name_option = 'member'.($i-1);
+            $text = Request::get($name_option);
+            $answer = Request::get('answer');
+
+            $option->q_id = 2;//take value from Question table
+            $option->option_no = $i;
+            $option->description = $text;
+            $option->correct_ans = $answer;
+            $q_id = $option->q_id;
+            $option->save();
+
+            $revision_option->op_no = $i;
+            $revision_option->desc = $text;
+            $revision_option->correct_ans = $answer;
+            $revision_option->r_id = 0;
+            $revision_option->q_id = $q_id;
+            $revision_option->save();
+        }*/
+
+        /*if (Request::file('Q_diagram')->isValid()){
+            $file = Request::file('Q_diagram');
+            $time = time();
+            $date = date("Y-m-d",$time);
+            $extension = Request::file('Q_diagram')->getClientOriginalExtension();
+            $name = $date.$time.'.'.$extension;
+            $path = storage_path() . '/diagrams/';
+            Request::file('Q_diagram')->move($path, $name);
+        }*/
+        $time = time();
+        $date = date("Y-m-d",$time);
+        $q_id =0;
+        $q_description = new Q_description();
+        $r_q_description = new revision_Q_description();
+
+        $q_description->q_id = $q_id;
+        $q_description->description = Request::get('Q_desc');
+        //$description_image_URL = Request::get('hidden_desc_url');
+        $description_image_URL = 'https://latex.codecogs.com/gif.latex?hello';
+        $name = 'question'.$date.$time.'.gif';
+        $path = storage_path().'/images/'.$name;
+        file_put_contents($path, file_get_contents($description_image_URL));
+        $q_description->image_path = $path;
+
 
     	return $input;
 
     }
 
 }
+

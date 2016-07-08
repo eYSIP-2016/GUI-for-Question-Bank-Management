@@ -11,11 +11,13 @@
 |
 */
 
-
-
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::post('/','NavController@createEquation');
+
+Route::post('testhome/compose','QuestionController@create');
 
 Route::get('welcomeGUI',function(){
 	return view('GUI_Q_Bank_Views.Welcome_page_GUI_Q_Bank');
@@ -33,10 +35,9 @@ Route::get('testhome',[
 	'as' => 'testhome', function () {
 	$option="";
     return view('GUI_Q_Bank_Views.User_Acc_Home_Page',compact('option'));
-
 }]);
 
-//Maiintain a file system for images dont keep a database
+//a file system is maintained for images 
 Route::get('images/{filename}', function ($filename)
 {
     $path = storage_path() . '/images/' . $filename;
@@ -53,8 +54,6 @@ Route::get('images/{filename}', function ($filename)
 });
 
 Route::get('testhome/{option}','NavController@sendOption');
-
-Route::post('/','NavController@createEquation');
 
 Route::resource('users','UserController');
 

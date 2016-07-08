@@ -13,8 +13,8 @@
 	  <!-- Latest compiled and minified JavaScript -->
 	  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
 
-	  <!-- (Optional) Latest compiled and minified JavaScript translation files -->
-	  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/i18n/defaults-*.min.js"></script>
+	  <link rel="stylesheet" href="/css/sol.css">
+      <script type="text/javascript" src="/javascript/sol.js"></script>
 
 
 	  <style type="text/css">
@@ -50,40 +50,46 @@
 		<title>This is the Home page of a normal user</title>
 
 		<script type="text/javascript">
+
 			$(function () {
 		    	$('#myTab a:last').tab('show')
 		  	})
 
-			$(document).ready(function () {
-			      $('#checkBtn').click(function() {
-			      checked = $("input[type=checkbox]:checked").length;
+		    $(function() {
+		        // initialize sol
+		        $('#my-select').searchableOptionList();
+		    });
 
-			      if(!checked) {
-			        alert("Choose at least one tag");
-			        return false;
-			      }
-			    });
-			});
+		    function refresh(){
+		    	document.getElementById("no_questions").setAttribute("value","");
+		    	var container = document.getElementById("container");
 
-			$('.tag.example .ui.dropdown').dropdown({
-			    allowAdditions: true;
-			    useLabels:true;
-			    maxSelections:false;
-			    glyphWidth:1.0714;
+		        // Clear previous contents of the container
+			    while (container.hasChildNodes()) {
+			        container.removeChild(container.lastChild);
+			    }
+		    }
 
-			});
-
-			function wrapText(imageElem, context, text, x, y, maxWidth, lineHeight, format) {
-                var cars = text.split("\n");
-                var ht = cars.length;
-                var h = 43+(ht-1)*lineHeight;
+			function wrapText(imageElem, context, text, x, y, maxWidth, lineHeight, format, hiddenID) {
+                var lines = text.split("\n");
+                var len = text.length;
+                var h;
+                if(format === "question"){
+                	h = 50+(Math.floor(len/74)+lines.length-1)*lineHeight;
+                }
+                else{
+                	h = 50+(Math.floor(len/57)+lines.length-1)*lineHeight;
+                }
+                
+                // /alert(text.length+' '+h);
 				context.canvas.setAttribute("height",h);
 
 				if(format === "question"){
                  	context.fillStyle = "#ffffff";
 	                context.fillRect(0, 0, 600, 500);
 
-	                context.font = "14px 'Arial'";
+	                y=20;
+	                context.font = "17px 'Arial'";
 	                context.fillStyle = "#000000";
 	             }
 	             else{
@@ -95,10 +101,10 @@
 	                context.fillStyle = "#000000";
 	             }
 
-                for (var ii = 0; ii < cars.length; ii++) {
+                for (var ii = 0; ii < lines.length; ii++) {
 
                     var line = "";
-                    var words = cars[ii].split(" ");
+                    var words = lines[ii].split(" ");
 
                     for (var n = 0; n < words.length; n++) {
                         var testLine = line + words[n] + " ";
@@ -116,11 +122,12 @@
                     }
                     context.fillText(line, x, y);
                     imageElem.src = context.canvas.toDataURL();
+                    document.getElementById(hiddenID).setAttribute("value",imageElem.src);
                     y += lineHeight;
                 }
              }
 
-             function drawText(textAreaId,previewId,textcanvas,format) {
+             function drawText(textAreaId,previewId,textcanvas,format,hiddenID) {
                  var canvas = document.getElementById(textcanvas);
                  var context = canvas.getContext("2d");
                  var imageElem = document.getElementById(previewId);
@@ -134,8 +141,8 @@
 
 
                  var text = document.getElementById(textAreaId).value;                
-
-                 wrapText(imageElem, context, text, x, y, maxWidth, lineHeight, format);
+ 
+                 wrapText(imageElem, context, text, x, y, maxWidth, lineHeight, format, hiddenID);
              }
 
 			function openCity(evt, cityName) {
@@ -152,12 +159,12 @@
 			    evt.currentTarget.className += " active";
 			}
 
-			function addTextAtCaret(textAreaId, text, previewId, textcanvas) {
+			function addTextAtCaret(textAreaId, text, previewId, textcanvas,format, hiddenID) {
 			    var textArea = document.getElementById(textAreaId);
 			    var cursorPosition = textArea.selectionStart;
 			    addTextAtCursorPosition(textArea, cursorPosition, text);
 			    updateCursorPosition(cursorPosition, text, textArea);
-			    drawText(textAreaId,previewId,textcanvas);
+			    drawText(textAreaId,previewId,textcanvas,format,hiddenID);
 			}
 			
 			function addTextAtCursorPosition(textArea, cursorPosition, text) {
@@ -172,10 +179,12 @@
 			    textArea.focus();    
 			}
 
-			function makePreview(textAreaId,previewId){
+			function makePreview(textAreaId,previewId,hiddenID){
 				var latexCode = document.getElementById(textAreaId).value;
 				var link="https://latex.codecogs.com/gif.latex?";
-				var linkToImage=link.concat("",latexCode.replace("\s+","&nbsp;"));
+				var linkToImage=encodeURI(link.concat("",latexCode.replace("\s+","&nbsp;")));
+
+				document.getElementById(hiddenID).setAttribute("value",linkToImage);
 				document.getElementById(previewId).setAttribute("src",linkToImage);
 			} 
 
@@ -192,12 +201,13 @@
 		            
 		            for (i=0;i<number;i++){
 		                // Append a node with a random text
-		                container.appendChild(document.createTextNode(" Member " + (i+1)));
+		                container.appendChild(document.createTextNode(" Member" + (i+1)+"  "));
 		                // Create an <input> element, set its type and name attributes
 		                var input = document.createElement("input");
 		                input.type = "text";
 		                input.name = "member" + i;
 		                input.required = "required";
+		                input.class = "form-control";
 		                container.appendChild(input);
 		                // Append a line break 
 		                container.appendChild(document.createElement("br"));
@@ -214,6 +224,7 @@
 		                input.name = "answer";
 		                input.value = i;
 		                input.required = "required";
+		                input.class = "form-control"
 		                container.appendChild(input);
 		            }
 		        }
@@ -239,7 +250,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-3">
-				<ul class="nav nav-pills nav-stacked faded" >
+				<ul class="nav nav-pills nav-stacked" >
 					@yield('nav_bar')
 				</ul>
 			</div>

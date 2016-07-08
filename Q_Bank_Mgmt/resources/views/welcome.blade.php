@@ -36,8 +36,29 @@
             }*/
 
             // http: //www.html5canvastutorials.com/tutorials/html5-canvas-wrap-text-tutorial/
-            function wrapText(imageElem, context, text, x, y, maxWidth, lineHeight) {
+            
+            function wrapText(imageElem, context, text, x, y, maxWidth, lineHeight, format, hiddenID) {
                 var cars = text.split("\n");
+                var ht = cars.length;
+                var h = 60+(ht-1)*lineHeight;
+                context.canvas.setAttribute("height",h);
+
+                if(format === "question"){
+                    context.fillStyle = "#ffffff";
+                    context.fillRect(0, 0, 600, 500);
+
+                    y=20;
+                    context.font = "17px 'Arial'";
+                    context.fillStyle = "#000000";
+                 }
+                 else{
+                    context.fillStyle = "#b3b3b3";
+                    context.fillRect(0, 0, 600, 500);
+
+                    y=20;
+                    context.font = "17px 'Courier'";
+                    context.fillStyle = "#000000";
+                 }
 
                 for (var ii = 0; ii < cars.length; ii++) {
 
@@ -58,35 +79,29 @@
                             line = testLine;
                         }
                     }
-
                     context.fillText(line, x, y);
                     imageElem.src = context.canvas.toDataURL();
+                    document.getElementById(hiddenID).setAttribute("value",imageElem.src);
                     y += lineHeight;
                 }
              }
 
-             function drawText() {
-                 var canvas = document.getElementById("textcanvas");
+             function drawText(textAreaId,previewId,textcanvas,format,hiddenID) {
+                 var canvas = document.getElementById(textcanvas);
                  var context = canvas.getContext("2d");
-                 var imageElem = document.getElementById('previewId');
+                 var imageElem = document.getElementById(previewId);
 
-                 context.clearRect(0, 0, 500, 600);
+                 context.clearRect(0, 0, 100, 600);
 
-                 var maxWidth = 400;
+                 var maxWidth = 600;
                  var lineHeight = 16;
                  var x = 10; // (canvas.width - maxWidth) / 2;
                  var y = 10;
 
 
-                 var text = document.getElementById("Q_exp").value;                
+                 var text = document.getElementById(textAreaId).value;                
 
-                 context.fillStyle = "#ffffff";
-                 context.fillRect(0, 0, 600, 500);
-
-                 context.font = "14px 'Arial'";
-                 context.fillStyle = "#000000";
-
-                 wrapText(imageElem, context, text, x, y, maxWidth, lineHeight);
+                 wrapText(imageElem, context, text, x, y, maxWidth, lineHeight, format, hiddenID);
              }
 
             function makePreview(textAreaId,previewId,hiddenID){
@@ -97,6 +112,51 @@
                 document.getElementById(hiddenID).setAttribute("value",linkToImage);
             }
 
+          function makeOptions(){
+                var number = document.getElementById("no_questions").value;
+                document.getElementById("options_no").setAttribute("value",number);
+                // Container <div> where dynamic content will be placed
+              if(number>1&&number<7){
+                  var container = document.getElementById("container");
+
+                // Clear previous contents of the container
+                  while (container.hasChildNodes()) {
+                      container.removeChild(container.lastChild);
+                  }
+                
+                for (i=0;i<number;i++){
+                    // Append a node with a random text
+                    container.appendChild(document.createTextNode(" Member" + (i+1)+"  "));
+                    // Create an <input> element, set its type and name attributes
+                    var input = document.createElement("input");
+                    input.type = "text";
+                    input.name = "member"+i;
+                    input.required = "required";
+                    input.class = "form-control";
+                    container.appendChild(input);
+                    // Append a line break 
+                    container.appendChild(document.createElement("br"));
+                }
+
+                container.appendChild(document.createTextNode(" Choose the answer: "));
+                
+                for (i=0;i<number;i++){
+                    // Append a node with a random text
+                    container.appendChild(document.createTextNode((i+1) + "."));
+                    // Create an <input> element, set its type and name attributes
+                    var input = document.createElement("input");
+                    input.type = "radio";
+                    input.name = "answer";
+                    input.value = i;
+                    input.required = "required";
+                    input.class = "form-control"
+                    container.appendChild(input);
+                }
+            }
+            else{
+              alert("Choose a number first :)");
+            }
+      }
 
         </script>
 
@@ -142,40 +202,23 @@
         </style>
     </head>
     <body>
-        {!! Form::open(['url' => '/']) !!}
+        {!! Form::open(['url' => '/','files' => true]) !!}
 
+        <div class="form-group">
+                    
+                    {!! Form::label('Q_desc','Description') !!}
+                    
+                    {!! Form::textarea('Q_desc','',array('rows'=>'10','cols'=>'700','class'=>'form-control','required'=>'required','maxlength'=>'400','onkeyup'=>"drawText('Q_desc','desc_preview','canvas_id','question','hidden_desc_url_id')")) !!}
+                    
+                    {!!  Form::hidden('hidden_desc_url','',array('id'=>'hidden_desc_url_id')) !!}
+
+        </div> 
+                <br>
+
+                <img id="desc_preview"><br>
+                <canvas id="canvas_id" width="800" hidden></canvas>
                 
-
-                {!! Form::label('Q_exp','Mathematical Expressions') !!}<br>
-
-                {!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70','onkeyup'=>'drawText()')) !!}<br>
-                <canvas id="textcanvas" width="600"></canvas><br>
-                <img id="previewId">
-                {!! Form::button('Make Prevew', array( 'onClick'=>"makePreview('Q_exp','previewId','hiddenId')")) !!}
-                
-                {!! Form::submit('Submit') !!}
-
-                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                  <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="#home" role="tab" aria-controls="homeh">Home</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#profile" role="tab" aria-controls="profile">Profile</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#messages" role="tab" aria-controls="messages">Messages</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#settings" role="tab" aria-controls="settings">Settings</a>
-                  </li>
-                </ul>
-
-                <div class="tab-content">
-                  <div class="tab-pane active" id="homeh" role="tabpanel">hello</div>
-                  <div class="tab-pane" id="profile" role="tabpanel">word</div>
-                  <div class="tab-pane" id="messages" role="tabpanel">..kcnak ja.</div>
-                  <div class="tab-pane" id="settings" role="tabpanel">.djbjh..</div>
-                </div>
+        {!! Form::submit('Submit') !!}
 
         {!! Form::close() !!}
     </body>
