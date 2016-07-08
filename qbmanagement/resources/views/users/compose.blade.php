@@ -1,16 +1,18 @@
-@extends('GUI_Q_Bank_Views.User_Acc_Home_Page')
-
+@extends('users.questions')
+  
 	@section('compose')
-
+       
 		<h2><i>Compose</i></h2><br>
-			{!! Form::open(['url'=>'testhome/compose','files' => true]) !!}
-			<div class="form-group">
+
+			{!! Form::open(array('role'=>'form')) !!}
+                
+             
+
+				<div class="form-group">
 					
 					{!! Form::label('Q_desc','Description') !!}
 				    
-				    {!! Form::textarea('Q_desc','',array('rows'=>'10','cols'=>'700','class'=>'form-control','required'=>'required','onkeyup'=>"drawText('Q_desc','desc_preview','canvas_id','question','hidden_desc_url_id')")) !!}
-				    
-				    {!!  Form::hidden('hidden_desc_url','',array('id'=>'hidden_desc_url_id')) !
+				    {!! Form::textarea('Q_desc','',array('rows'=>'10','cols'=>'700','class'=>'form-control','required'=>'required','maxlength'=>'400','onkeyup'=>"drawText('Q_desc','desc_preview','canvas_id','question')")) !!}
 
 				</div> 
 				<br>
@@ -116,62 +118,39 @@
 					</div>
 				</div>
 				<br><br>
-
-
-
+			
 				{!! Form::label('no_questions','Options') !!}<br>
-				{!! Form::number('no_questions','',array( 'min'=>'2','max' => '6','id'=>'no_questions')) !!}&nbsp&nbsp&nbsp
-
-				{!! Form::button('Make Options', array( 'onClick'=>"makeOptions()",'class'=>'btn btn-primary')) !!}&nbsp&nbsp&nbsp
-				<a onclick="refresh()">
-		          <span class="glyphicon glyphicon-refresh"></span>
-		        </a>
-				<br><br>
-
+				{!! Form::number('no_questions','4',array( 'min'=>'2','max' => '6','id'=>'no_questions')) !!}
+				{!! Form::button('Make Options', array( 'onClick'=>"makeOptions()",'class'=>'btn btn-primary')) !!}<br><br>
 				<div id="container">
 				</div><br><br>
 
 
 				<!--LATEX EQUATION EDITOR-->
-
-				{!! Form::label('Q_exp','Mathematical Expressions') !!}
-				<div style="float:right">
-					{!! Form::button('Add an Equation', array( 'data-toggle'=>'collapse','data-target'=>'#math_exp','class'=>'btn btn-primary')) !!}
-				</div>
-				{!!  Form::hidden('hidden_exp_url','',array('id'=>'hidden_exp_url_id')) !!}
+				{!! Form::label('Q_exp','Mathematical Expressions') !!}<div style="float:right">{!! Form::button('Add an Equation', array( 'data-toggle'=>'collapse','data-target'=>'#math_exp','class'=>'btn btn-primary')) !!}</div>
 				<hr style="height:1px;background-color:#666666;"><br>
-				
 				<div id="math_exp" class="collapse">
-					{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70','class'=>'form-control','onkeyup'=>"makePreview('Q_exp','previewId','hidden_exp_url_id')")) !!}<br>
+					{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70','class'=>'form-control')) !!}<br>
+					{!! Form::button('Make Prevew', array( 'onClick'=>"makePreview('Q_exp','previewId')",'class'=>'btn btn-primary')) !!}
 					<img src="" width="auto" height="auto" id="previewId"><br><br>
 				</div>
 				
 				
 				<!--CODE EDITOR-->
-
-				{!! Form::label('Q_code','Add Code') !!}
-				<div style="float:right">
-					{!! Form::button('Add Code', array( 'data-toggle'=>'collapse','data-target'=>'#code','class'=>'btn btn-primary')) !!}
-				</div>
-				{!!  Form::hidden('hidden_code_url','',array('id'=>'hidden_code_url_id')) !!}
+				{!! Form::label('Q_code','Add Code') !!}<div style="float:right">{!! Form::button('Add Code', array( 'data-toggle'=>'collapse','data-target'=>'#code','class'=>'btn btn-primary')) !!}</div>
 				<hr style="height:1px;background-color:#666666;"><br>
-
 				<div id="code" class="collapse">
-					{!! Form::textarea('Q_code','',array('rows'=>'10','cols'=>'700','class'=>'form-control','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id')")) !!}<br>
-
+					{!! Form::textarea('Q_code','',array('rows'=>'10','cols'=>'700','class'=>'form-control','required'=>'required','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code')")) !!}<br>
 				<img id="code_preview"><br>
 				<canvas id="canvas_code_id" width="600" height="43" hidden></canvas>
 				</div>
-
 
 				{!! Form::label('Q_diagram','Diagram') !!}<br>
 				{!! Form::file('Q_diagram','',array('class'=>'form-control')) !!}<br><br>
 
 				
-
-				{!! Form::label('tags[]','Tags') !!}<br>
-				{!! Form::select('tags[]',$tags,null,array('id'=>'my-select','multiple'=>'multiple','required'=>'required')) !!}
-
+				{!! Form::label('tags_id','Tags') !!}<br>
+				{!! Form::select('tags_id',$tags,null,array('id'=>'my-select','multiple'=>'multiple','size'=>'1','required'=>'required')) !!}
 				<br><br><br>
 
 				{!! Form::label('difficulty','Difficulty') !!}<br>
@@ -193,6 +172,6 @@
 						</li>
 					</ul>
 				</center>
-				
-			{!! Form::close() !!}
-	@stop
+		{!! Form::close() !!}
+
+@stop
