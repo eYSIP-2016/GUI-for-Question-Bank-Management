@@ -1,7 +1,14 @@
 <!DOCTYPE html>
 <html>
 	<head>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
 
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
 	  <meta charset="utf-8">
 	  <meta name="viewport" content="width=device-width, initial-scale=1">
 	  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
@@ -46,8 +53,87 @@
 		    border-radius: 4px;
 		    font-size: small;
 		}
+
+		.question_title{
+			font-size: 15px;
+		}
+
+		.image_list{
+			list-style-type: none;
+		}
+
+		.image_list li{
+			display:block;
+			padding: 7px;
+		}
+
+		.image_list li img{
+			max-height: 350px;
+  			max-width: 600px;
+		}
+
+		.creators{
+			font-size: 10px;
+			color:#3377ff;
+			font-style: italic;
+			margin-left: 10px;
+			padding-bottom: 15px;
+		}
+
+		.creators ul{
+			list-style-type: none;
+			float:right;
+		}
+
+		.creators li{
+			display: inline-block;
+			padding-right: 20px;
+		}
+
+		.q_header{
+			font-size: 12px;
+			color: grey;
+			font-style: italic;
+			margin-left: 10px;
+			padding-bottom: 15px;
+		}
+
+		.q_header ul{
+			list-style-type: none;
+			float:right;
+		}
+
+		.q_header li{
+			display: inline-block;
+			padding-right: 20px;
+		}
+
+		.level_and_time{
+			font-style: bold;
+			color:#3377ff;
+		}
+
+		.options{
+			font-size: 15px;
+		}
+
+		.options ol{
+			list-style-type: lower-alpha;
+		}
+
+		.options li{
+			display: block;
+		}
+
+		.results{
+			font-style : italic;
+			color : #8c8c8c;
+			font-size: 16px;
+			padding-bottom: 20px;
+		}
+
 	  </style>
-		<title>This is the Home page of a normal user</title>
+		<title>{{$option}}</title>
 
 		<script type="text/javascript">
 

@@ -10,7 +10,7 @@
 				    
 				    {!! Form::textarea('Q_desc','',array('rows'=>'10','cols'=>'700','class'=>'form-control','required'=>'required','onkeyup'=>"drawText('Q_desc','desc_preview','canvas_id','question','hidden_desc_url_id')")) !!}
 				    
-				    {!!  Form::hidden('hidden_desc_url','',array('id'=>'hidden_desc_url_id')) !
+				    {!!  Form::hidden('hidden_desc_url','',array('id'=>'hidden_desc_url_id')) !!}
 
 				</div> 
 				<br>
@@ -157,7 +157,7 @@
 				<hr style="height:1px;background-color:#666666;"><br>
 
 				<div id="code" class="collapse">
-					{!! Form::textarea('Q_code','',array('rows'=>'10','cols'=>'700','class'=>'form-control','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id')")) !!}<br>
+					{!! Form::textarea('Q_code','',array('rows'=>'10','cols'=>'700','class'=>'form-control','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id')",'style'=>'font-family:Courier')) !!}<br>
 
 				<img id="code_preview"><br>
 				<canvas id="canvas_code_id" width="600" height="43" hidden></canvas>

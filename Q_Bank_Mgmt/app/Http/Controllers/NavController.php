@@ -23,6 +23,7 @@ use App\revision_Q_tag_relation;
 use App\revision_code;
 use App\revision_equations;
 use App\tags;
+use App\users;
 
 class NavController extends Controller
 {
@@ -46,7 +47,29 @@ class NavController extends Controller
         }
 
         elseif ($option==="Browse") {
-            return view('GUI_Q_Bank_Views.user_acc_browse',compact('option'));
+            $tags =  tags::lists('name','id');
+            $questions = DB::table('q_tables')
+                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
+                        ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
+                        ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
+                        ->select('q_tables.diagram_path AS diagram',
+                                 'q_tables.q_id AS q_id',
+                                 'q_tables.options AS option',
+                                 'q_tables.difficulty AS difficulty',
+                                 'q_tables.time AS time',
+                                 'q_descriptions.description AS desc',
+                                 'equations.exp_image AS equation',
+                                 'codes.code_image_path AS code',
+                                 'creator.name AS creator',
+                                 'reviewer.name AS reviewer');
+
+            $results = $questions->count();
+
+            $questions = $questions->paginate(4);
+
+            return view('GUI_Q_Bank_Views.user_acc_browse',compact('option','tags','questions','results'));
         }
 
         elseif ($option==="History") {
@@ -146,6 +169,5 @@ class NavController extends Controller
     	return $input;
 
     }
-
 }
 
