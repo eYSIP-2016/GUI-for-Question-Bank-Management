@@ -15,15 +15,21 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('/','NavController@createEquation');
-
 Route::post('testhome/compose','QuestionController@create');
 
 Route::post('testhome/Browse','QuestionController@getSearchResults');
 
-Route::get('welcomeGUI',function(){
-	return view('GUI_Q_Bank_Views.Welcome_page_GUI_Q_Bank');
-});
+Route::post('testhome/Home','QuestionController@getUsersQuestions');
+
+Route::get('testhome/Home/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
+Route::get('testhome/Browse/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
+Route::post('testhome/Home/Edit/{question_id}','QuestionController@makeChanges');
+
+Route::post('testhome/Home/Pick/{question_id}','QuestionController@create');
+
+Route::post('testhome/Browse/Pick/{question_id}','QuestionController@create');
 
 Route::post('credentials', [
     'as' => 'credentials', 'uses' => 'UserController@doLogin'
@@ -39,11 +45,11 @@ Route::get('testhome',[
     return view('GUI_Q_Bank_Views.User_Acc_Home_Page',compact('option'));
 }]);
 
-//a file system is maintained for images 
-
-
 Route::get('testhome/{option}','NavController@sendOption');
 
+
+
+//a file system is maintained for images 
 Route::get('{folder}/{filename}', function ($folder, $filename)
 {
     if($folder==='images'||$folder==='revisions'){

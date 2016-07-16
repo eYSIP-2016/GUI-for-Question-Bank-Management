@@ -19,14 +19,15 @@
 	{!! Form::close() !!}
 	<hr>
 	<div class="results">
-		{{$results}} results
+		{{$results}} questions
 	</div>
 	@foreach($questions as $question)
 
-		<div class="card" style="border-radius:0px;" >
-			<div class="card-block">
+		<div class="w3-card-4">
+			<div class="w3-container"  style="padding:10px;">
 				<div class="q_header">
 					<ul>
+						<li>Category:<div class=level_and_time>{{ $question->category }}</div></li>
 						<li>Difficulty level:<div class=level_and_time>{{ $question->difficulty }}</div></li>
 						<li>Expected Solving time:<div class=level_and_time>{{ $question->time }}</div></li>
 					</ul>
@@ -77,9 +78,10 @@
 						<li>Updated By: {{ $question->reviewer }} </li>	
 					</ul>
 				</div>
-
-				<div class="card-footer" style="background:white;">
+				<hr>
+				<div class="w3-container">
 					<div class="row">
+					
 						<div class="col-md-10">
 						<?php 
 							$question_id = $question->q_id;
@@ -94,14 +96,13 @@
 						</div>
 						
 						<div class="col-md-2">
-							<button type="button" class="btn btn-default btn-sm" style="float:right;">
-				          		<span class="glyphicon glyphicon-hand-up"></span> Pick
-				        	</button>
+							{{ Html::link('/testhome/Browse/Pick/'.$question->question_id,'Pick', array('class'=>'btn btn-default btn-sm','style' => 'float:right')) }}
 						</div>
 					</div>	
 				</div>
    			</div>
    		</div>
+   		<br>
 	@endforeach		
 	{!! $questions->render() !!}
 @stop

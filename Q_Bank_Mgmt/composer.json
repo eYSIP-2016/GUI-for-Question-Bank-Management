@@ -9,7 +9,8 @@
         "laravel/framework": "5.2.*",
         "laravelcollective/html": "^5.2",
         "mashape/unirest-php": "^3.0",
-        "twbs/bootstrap": "^3.3"
+        "twbs/bootstrap": "^3.3",
+        "venturecraft/revisionable": "1.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
@@ -48,6 +49,6 @@
         ]
     },
     "config": {
-        "preferred-install": "dist"
+        "preferred-install":"dist"
     }
 }

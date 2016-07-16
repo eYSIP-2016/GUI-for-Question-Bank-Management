@@ -2,25 +2,31 @@
 <html>
 	<head>
 	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+	
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/sol.css">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
+
+	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<!-- jQuery library -->
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
 	<!-- Latest compiled JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
-	  <meta charset="utf-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1">
-	  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	  <!-- Latest compiled and minified CSS -->
-	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
 
-	  <!-- Latest compiled and minified JavaScript -->
-	  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
-
-	  <link rel="stylesheet" href="/css/sol.css">
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	  
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
+	  
       <script type="text/javascript" src="/javascript/sol.js"></script>
 
 
@@ -95,7 +101,7 @@
 			color: grey;
 			font-style: italic;
 			margin-left: 10px;
-			padding-bottom: 15px;
+			padding-bottom: 20px;
 		}
 
 		.q_header ul{
@@ -132,6 +138,25 @@
 			padding-bottom: 20px;
 		}
 
+		.actions_buttons {
+			font-size: 10px;
+			padding-bottom: 0px;
+		}
+
+		.actions_buttons ul{
+			list-style-type: none;
+			float:right;
+		}
+
+		.actions_buttons li{
+			display: inline-block;
+		}
+
+		.indent_left{
+			margin-left: 14px;
+			height: 100px;
+		}
+
 	  </style>
 		<title>{{$option}}</title>
 
@@ -145,6 +170,12 @@
 		        // initialize sol
 		        $('#my-select').searchableOptionList();
 		    });
+
+		    window.onload = function() {
+				drawText('Q_desc','desc_preview','canvas_id','question','hidden_desc_url_id');
+				makePreview('Q_exp','previewId','hidden_exp_url_id');
+				drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id');
+			};
 
 		    function refresh(){
 		    	document.getElementById("no_questions").setAttribute("value","");
@@ -285,9 +316,9 @@
 			                container.removeChild(container.lastChild);
 			            }
 		            
-		            for (i=0;i<number;i++){
+		            for (i=1;i<=number;i++){
 		                // Append a node with a random text
-		                container.appendChild(document.createTextNode(" Member" + (i+1)+"  "));
+		                container.appendChild(document.createTextNode(" Member" +i+"  "));
 		                // Create an <input> element, set its type and name attributes
 		                var input = document.createElement("input");
 		                input.type = "text";
@@ -301,9 +332,9 @@
 
 		            container.appendChild(document.createTextNode(" Choose the answer: "));
 		            
-		            for (i=0;i<number;i++){
+		            for (i=1;i<=number;i++){
 		                // Append a node with a random text
-		                container.appendChild(document.createTextNode((i+1) + "."));
+		                container.appendChild(document.createTextNode(i + "."));
 		                // Create an <input> element, set its type and name attributes
 		                var input = document.createElement("input");
 		                input.type = "radio";
