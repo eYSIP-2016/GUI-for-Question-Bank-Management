@@ -23,6 +23,7 @@ use App\revision_q_tag_relation;
 use App\revision_code;
 use App\revision_equations;
 use App\tags;
+use App\diagram;
 use File;
 
 class QuestionController extends Controller
@@ -48,7 +49,7 @@ class QuestionController extends Controller
 
         /*************Storing equations******************/
  		$exp = Request::get('Q_exp');
- 		if (!is_null($exp)&&!empty($exp)) {
+ 		if (!empty($exp)) {
 			$equation = new equations();
 	 		$r_equation = new revision_equations();
 	 		
@@ -86,7 +87,7 @@ class QuestionController extends Controller
  		/*************Storing codes******************/
  		$code_description = Request::get('Q_code');
  		
- 		if (!is_null($code_description)&&!empty($code_description)) {
+ 		if (!empty($code_description)) {
 			$code = new code();
 	 		$r_code = new revision_code();
 
@@ -123,8 +124,9 @@ class QuestionController extends Controller
 
 
  		/************storing diagrams*******************/
- 			# code...
+ 		# code...
 	 	if(!is_null(Request::file('Q_diagram'))){
+	 			$diagram = new diagram();
 	 			if (Request::file('Q_diagram')->isValid()){
 	            $file = Request::file('Q_diagram');
 	            $time = time();
@@ -135,13 +137,10 @@ class QuestionController extends Controller
 	            File::copy($file, $path);
 
 	            $path = URL::to('/');
-	            $question->diagram_path = $path.$name;
+	            $diagram->path = $path.'/images/'.$name;
+	            $diagram->save();
 
-	            $path = storage_path() . '/revisions/';
-	            $file->move($path, $name);
-
-	            $path = URL::to('/');
-	            $r_question->diagram_path = $path.'/revisions/'.$name;
+	            $question->diagram_id = $diagram->getKey();
 	        }
 	    }
 
@@ -186,7 +185,7 @@ class QuestionController extends Controller
         $question->time = Request::get('timeRequired');
         $r_question->time = Request::get('timeRequired');
 
-        if (!is_null(Request::get('no_questions'))) {
+        if (!empty(Request::get('no_questions'))) {
         	# code...
         	$question->options = 1;
         	$r_question->options = 1;
@@ -224,7 +223,7 @@ class QuestionController extends Controller
         /**************Storing Options****************/
 
         $option_no = Request::get('no_questions');
-        if (!is_null($option_no)) {
+        if (!empty($option_no)) {
         	$option = new options();
 	        $revision_option = new revision_options();
 	        for ($i = 1 ; $i <= $option_no ; $i++ ) {
@@ -296,11 +295,12 @@ class QuestionController extends Controller
                         ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
                         ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
                         ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
                         ->leftJoin('category AS category','q_tables.category','=','category.key')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
                                  'q_tables.options AS option',
                                  'difficulty.name AS difficulty',
@@ -320,11 +320,12 @@ class QuestionController extends Controller
                         ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
                         ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
                         ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
                         ->leftJoin('category AS category','q_tables.category','=','category.key')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
                                  'q_tables.options AS option',
                                  'difficulty.name AS difficulty',
@@ -367,12 +368,13 @@ class QuestionController extends Controller
             $questions = DB::table('q_tables')
                         ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
                         ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
                         ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
                         ->leftJoin('category AS category','q_tables.category','=','category.key')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
                                  'q_tables.options AS option',
                                  'difficulty.name AS difficulty',
@@ -393,11 +395,12 @@ class QuestionController extends Controller
                         ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
                         ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
                         ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
                         ->leftJoin('category AS category','q_tables.category','=','category.key')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
                                  'q_tables.options AS option',
                                  'difficulty.name AS difficulty',
@@ -439,10 +442,11 @@ class QuestionController extends Controller
 	 						->where('q_tables.q_id','=',$question_id)
 	                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
 	                        ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
+                        	->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
 	                        ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
 	                        ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
 	                        ->leftJoin('category AS category','q_tables.category','=','category.key')
-	                        ->select('q_tables.diagram_path AS diagram',
+	                        ->select('diagrams.path AS diagram',
 	                                 'q_tables.options AS option',
 	                                 'q_tables.time AS time',
 	                                 'difficulty.name AS difficulty',
@@ -480,7 +484,8 @@ class QuestionController extends Controller
                         ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.options AS option',
                                  'q_tables.difficulty AS difficulty',
                                  'q_tables.category AS category',
@@ -521,16 +526,14 @@ class QuestionController extends Controller
 
 
         /*********************Updating options**************************/
-		$answer_initial = options::where('q_id','=',$question->question_id)
-       	                  ->first()->select('correct_ans');
+
 
        	$answer = Request::get('answer');
 
        	$option_no = Request::get('no_questions');
 
 		$count_initial = options::where('q_id','=',$question->question_id)
-        				->count();
-		
+        				->count();		
 
 		$descs = DB::table('options')
 						->where('q_id',$question_id)
@@ -554,6 +557,9 @@ class QuestionController extends Controller
 		        $option->description = $text;
 		        $option->correct_ans = $answer;
 		        $option->save();
+		        DB::table('q_tables')
+        			->where('q_id',$question_id)
+        			->update(['options'=>1]);
 		        if($option_no === $count_initial){
 			        if (strcmp($descs[$i-1],$text)!==0) {
 			        	$changed_flag = 1;
@@ -577,20 +583,23 @@ class QuestionController extends Controller
         $new_equation = Request::get('Q_exp');
 
         if(strcmp($new_equation, $question->equation)!==0){
-        	DB::table('equations')
-        		->where('exp_id',$question->exp_id)
-        		->update(['exp_latex'=>$new_equation]);
-
-	        $equation_URL = Request::get('hidden_exp_url');
+        	$equation = new equations();
+	 		
+	 		$equation->exp_latex = $new_equation;
+	 		
+	 		$equation_URL = Request::get('hidden_exp_url');
 	        $name = 'equation'.$date.$time.'.gif';
 	 		$path = storage_path().'/images/'.$name;
 	        file_put_contents($path, file_get_contents($equation_URL));
 
 	        $path = URL::to('/').'/images/'.$name;
+	        $equation->exp_image = $path;
+	        $equation->save();
 
-	        DB::table('equations')
-        		->where('exp_id',$question->exp_id)
-        		->update(['exp_image'=>$path]);
+	        $eq_id = $equation->getKey();
+        	DB::table('q_tables')
+        		->where('q_id',$question_id)
+        		->update(['exp_id'=>$eq_id]);
 
         	$changed_flag = 1;
         }
@@ -599,22 +608,27 @@ class QuestionController extends Controller
         /*********************Updating Codes************************/
         $code_description = Request::get('Q_code');
  		
- 		if (strcmp($code_description, $question->code)) {
-			
-			DB::table('codes')
-        		->where('code_id',$question->code_id)
-        		->update(['code_description'=>$code_description]);
+ 		if (strcmp($code_description, $question->code)!==0) {
+			$code = new code();
 
+	 		$code->code_description = $code_description;
+	 		
 	 		$code_URL = Request::get('hidden_code_url');
 	        $name = 'code'.$date.$time.'.png';
 	 		$path = storage_path().'/images/'.$name;
 	        file_put_contents($path, file_get_contents($code_URL));
 
 	        $path = URL::to('/').'/images/'.$name;
-	        
-	        DB::table('codes')
-        		->where('code_id',$question->code_id)
-        		->update(['code_image_path' => $path]);
+	        $code->code_image_path = $path;
+
+
+	        $code->save();
+
+	        $code_id = $code->getKey();
+
+			DB::table('q_tables')
+        		->where('q_id',$question_id)
+        		->update(['exp_id'=>$eq_id]);
 
         	$changed_flag = 1;
         }
@@ -629,6 +643,7 @@ class QuestionController extends Controller
 
         	else if(!is_null(Request::file('Q_diagram'))){
 		 			if (Request::file('Q_diagram')->isValid()){
+		 			$diagram = new diagram();
 		            $file = Request::file('Q_diagram');
 		            $extension = Request::file('Q_diagram')->getClientOriginalExtension();
 		            $name = 'diagram'.$date.$time.'.'.$extension;
@@ -636,17 +651,19 @@ class QuestionController extends Controller
 		            File::copy($file, $path);
 
 		            $path = URL::to('/');
+		            $diagram->path = $path.'/images/'.$name;
+		            $diagram->save();
 		            DB::table('q_tables')
         				->where('q_id',$question->question_id)
-        				->update(['diagram'=>$path.$name]);    
+        				->update(['diagram'=>$diagram->getKey()]);    
         			$changed_flag = 1;
 		        }
 	    	}
 
-        	else if(!is_null($question->diagram)||!empty($question->diagram)){
+        	else if(!empty($question->diagram)){
         		DB::table('q_tables')
         			->where('q_id',$question->question_id)
-        			->update(['diagram'=>null]);
+        			->update(['diagram_id'=>null]);
         		$changed_flag = 1;
         	}
 
@@ -691,10 +708,9 @@ class QuestionController extends Controller
 
         if ($new_difficulty !== $question->difficulty) {
         	# code...
-        	$key = DB::table('difficulty')->select('key')->where('name',$new_difficulty);
         	DB::table('q_tables')
         			->where('q_id',$question->question_id)
-        			->update(['difficulty'=>$key]);
+        			->update(['difficulty'=>$new_difficulty]);
 
         	$changed_flag = 1;
         }
@@ -704,10 +720,9 @@ class QuestionController extends Controller
 
         if ($new_category !== $question->category) {
         	# code...
-        	$key = DB::table('category')->select('key')->where('name',$new_difficulty);
         	DB::table('q_tables')
         			->where('q_id',$question->question_id)
-        			->update(['category'=>$key]);
+        			->update(['category'=>$new_category]);
 
         	$changed_flag = 1;
         }

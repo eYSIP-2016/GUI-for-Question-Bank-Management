@@ -23,6 +23,7 @@ use App\revision_Q_tag_relation;
 use App\revision_code;
 use App\revision_equations;
 use App\tags;
+use App\diagram;
 use App\users;
 
 class NavController extends Controller
@@ -51,11 +52,12 @@ class NavController extends Controller
                         ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
                         ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
                         ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
                         ->leftJoin('category AS category','q_tables.category','=','category.key')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
                                  'q_tables.options AS option',
                                  'difficulty.name AS difficulty',
@@ -95,11 +97,12 @@ class NavController extends Controller
                         ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
                         ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
                         ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
                         ->leftJoin('category AS category','q_tables.category','=','category.key')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
                                  'q_tables.options AS option',
                                  'difficulty.name AS difficulty',

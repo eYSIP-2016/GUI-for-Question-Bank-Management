@@ -3,13 +3,13 @@
 	<head>
 <!-- Latest compiled and minified CSS -->
 	
+	<!-- Latest compiled and minified CSS -->
+	
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 
 	<link rel="stylesheet" href="/css/sol.css">
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
-
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
 
 	<meta charset="utf-8">
 	
@@ -18,26 +18,12 @@
 	<!-- jQuery library -->
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
 	<!-- Latest compiled JavaScript -->
 
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	  
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
-
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
-	  
-	  
-	  
-	  <!-- Latest compiled and minified CSS -->
-	  
-
-	  <!-- Latest compiled and minified JavaScript -->
-	  
-	  
-      <script type="text/javascript" src="/javascript/sol.js"></script>
+    <script type="text/javascript" src="/javascript/sol.js"></script>
 
 
 	  <style type="text/css">
@@ -70,6 +56,10 @@
 		    font-size: small;
 		}
 
+		.indent_left{
+			margin-left: 14px;
+			height: 100px;
+		}
 	  </style>
 
 		<script type="text/javascript">
@@ -227,17 +217,15 @@
 			function makeOptions(){
 					var number = document.getElementById("no_questions").value;
 		            // Container <div> where dynamic content will be placed
-			            if(number>1&&number<7){
-				        var container = document.getElementById("options_container");
-
-		            // Clear previous contents of the container
-			            while (container.hasChildNodes()) {
+		            var container = document.getElementById("options_container");
+		            while (container.hasChildNodes()) {
 			                container.removeChild(container.lastChild);
 			            }
+			            if(number>1&&number<7){
 		            
 		            for (i=1;i<=number;i++){
 		                // Append a node with a random text
-		                container.appendChild(document.createTextNode(" Member" +i+"  "));
+		                container.appendChild(document.createTextNode(" Option " +i+"  "));
 		                // Create an <input> element, set its type and name attributes
 		                var input = document.createElement("input");
 		                input.type = "text";
@@ -264,9 +252,6 @@
 		                container.appendChild(input);
 		            }
 		        }
-		        else{
-		        	alert("Choose a number first :)");
-		        }
 			}
 		</script>
 	</head>
@@ -279,6 +264,20 @@
 
     <div class="col-sm-10" style="background-color:white;">
     	<h2><i>{{ $action }}</i></h2><br>
+    	<div class="btn-group" style="padding-bottom:20px;">
+					<a data-toggle="collapse" data-target="#math_exp" class= "btn btn-default">
+						Equation <span class="glyphicon glyphicon-superscript"></span>
+					</a>
+					<a data-toggle="collapse" data-target="#code" class= "btn btn-default">
+						Code <b> {_}</b>
+					</a>
+					<a data-toggle="collapse" data-target="#diagram_id" class= "btn btn-default">
+						Diagram <span class="glyphicon glyphicon-picture"></span>
+					</a>
+					<a data-toggle="collapse" data-target="#keyboard" class= "btn btn-default">
+						Symbols <span class="glyphicon glyphicon-gbp"></span>
+					</a>
+		</div>
 			{!! Form::open(['url'=>'/testhome/Home/'.$action.'/'.$question->question_id,'files' => true]) !!}
 			<div class="form-group">
 					
@@ -288,15 +287,8 @@
 				    
 				    {!!  Form::hidden('hidden_desc_url','',array('id'=>'hidden_desc_url_id')) !!}
 
-				<br>
-
-				<img id="desc_preview"><br>
+				<img id="desc_preview">
 				<canvas id="canvas_id" width="800" hidden></canvas>
-
-				<div style="float:right">
-					{!! Form::button('Use symbols', array( 'data-toggle'=>'collapse','data-target'=>'#keyboard','class'=>'btn btn-primary')) !!}
-				</div>
-				<br><hr style="height:1px;background-color:#666666;"><br>
 
 				<div id="keyboard" class="collapse">
 					<ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -402,16 +394,21 @@
 					$count_option = $options->count();
 				?>
 				{!! Form::label('no_questions','Options') !!}<br>
-				{!! Form::number('no_questions',$count_option,array( 'min'=>'2','max' => '6','id'=>'no_questions')) !!}&nbsp&nbsp&nbsp
+				<div class="row">
+					<div class="col-md-9">
+						{!! Form::number('no_questions','',array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
+					</div>
 
-				{!! Form::button('Make Options', array( 'onClick'=>"makeOptions()",'class'=>'btn btn-primary')) !!}&nbsp&nbsp&nbsp
-				<a onclick="refresh('options_container')">
-		          	<span class="glyphicon glyphicon-refresh"></span>
-		        </a>
+					<div class="col-md-1">
+						<a onclick="refresh('options_container')" style="float:right">
+				        	<span class="glyphicon glyphicon-refresh"></span>
+				        </a>
+				    </div>
+				</div>
+				<br>
 
-				<br><br>
-				@if($question->opt_used)
 				<div id="options_container">
+				@if($question->opt_used)
 					
 						@foreach($options as $key => $value)
 							{!! Form::text('member'.$key, $value); !!}<br>
@@ -441,19 +438,14 @@
 						@else
 						{!! Form::radio('answer','4') !!}4
 						@endif
-				</div><br><br>
 				@endif
+				</div><br>
 
 				<!--LATEX EQUATION EDITOR-->
-
-				{!! Form::label('Q_exp','Mathematical Expressions') !!}
-				<div style="float:right">
-					{!! Form::button('Add an Equation', array( 'data-toggle'=>'collapse','data-target'=>'#math_exp','class'=>'btn btn-primary')) !!}
-				</div>
-				{!!  Form::hidden('hidden_exp_url','',array('id'=>'hidden_exp_url_id')) !!}
-				<hr style="height:1px;background-color:#666666;"><br>
-				
 				<div id="math_exp" class="collapse">
+				{!! Form::label('Q_exp','Mathematical Expressions') !!}
+				{!!  Form::hidden('hidden_exp_url','',array('id'=>'hidden_exp_url_id')) !!}
+				
 					{!! Form::textarea('Q_exp',$question->equation,array('rows'=>'10','cols'=>'70','class'=>'form-control','onkeyup'=>"makePreview('Q_exp','previewId','hidden_exp_url_id')")) !!}<br>
 					<img src="" width="auto" height="auto" id="previewId"><br><br>
 				</div>
@@ -461,42 +453,36 @@
 				
 				<!--CODE EDITOR-->
 
-				{!! Form::label('Q_code','Add Code') !!}
-				<div style="float:right">
-					{!! Form::button('Add Code', array( 'data-toggle'=>'collapse','data-target'=>'#code','class'=>'btn btn-primary')) !!}
-				</div>
-				{!!  Form::hidden('hidden_code_url','',array('id'=>'hidden_code_url_id')) !!}
-				<hr style="height:1px;background-color:#666666;"><br>
-
 				<div id="code" class="collapse">
-					{!! Form::textarea('Q_code',$question->code,array('rows'=>'10','cols'=>'700','class'=>'form-control','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id')",'style'=>'font-family:Courier')) !!}<br>
+					{!! Form::label('Q_code','Add Code') !!}
+					{!!  Form::hidden('hidden_code_url','',array('id'=>'hidden_code_url_id')) !!}
+					
+						{!! Form::textarea('Q_code',$question->code,array('rows'=>'10','cols'=>'700','class'=>'form-control','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id')",'style'=>'font-family:Courier')) !!}<br>
 
-					<img id="code_preview"><br>
-					<canvas id="canvas_code_id" width="600" height="43" hidden></canvas>
+						<img id="code_preview"><br>
+						<canvas id="canvas_code_id" width="600" height="43" hidden></canvas>
 				</div>
 
 
+				<div id="diagram_id" class="collapse">
+					<!----------Upload Images---------->
+					{!! Form::label('Q_diagram','Diagram') !!}
 
-				<!----------Upload Images---------->
-				{!! Form::label('Q_diagram','Diagram') !!}
+			        @if(is_null($question->diagram)||empty($question->diagram))
+			        	{!! Form::file('Q_diagram',array('class'=>'form-control')) !!}
+				        {!! Form::hidden('remove_image','',array('id'=>'remove_image')) !!}
+				    @else
+				    	{!! Form::file('Q_diagram',array('disabled'=>'false','class'=>'form-control')) !!}
+						<a onclick="refresh('image-container')">
+				          	<span class="glyphicon glyphicon-remove-sign">Remove</span>
+				        </a>
+				    	{!!  Form::hidden('remove_image','1',array('id'=>'remove_image')) !!}
+				   	@endif
 
-		        @if(is_null($question->diagram)||empty($question->diagram))
-		        	{!! Form::file('Q_diagram',array('class'=>'form-control')) !!}
-			        {!! Form::hidden('remove_image','',array('id'=>'remove_image')) !!}
-			    @else
-			    	{!! Form::file('Q_diagram',array('disabled'=>'false','class'=>'form-control')) !!}
-					<a onclick="refresh('image-container')">
-			          	<span class="glyphicon glyphicon-remove-sign">Remove</span>
-			        </a>
-			    	{!!  Form::hidden('remove_image','1',array('id'=>'remove_image')) !!}
-			   	@endif
-
-		        <br><br>
-
-				<div id = "image-container">
-					<img src="<?php echo $question->diagram; ?>">
+					<div id = "image-container">
+						<img src="<?php echo $question->diagram; ?>">
+					</div>
 				</div>
-				
 
 
 				<!----choosing tags---->
@@ -509,52 +495,69 @@
 				{!! Form::label('tags[]','Tags') !!}<br>
 				{!! Form::select('tags[]',$tags,$q_tags,array('id'=>'my-select','multiple'=>'multiple','required'=>'required')) !!}
 
-				<br><br><br>
+				<br>
 				<!---difficulty level---------->
-				{!! Form::label('difficulty','Difficulty') !!}<br>
-				@if($question->difficulty==="Easy")
-				{!! Form::radio('difficulty','Easy',array('required'=>'required','checked'=>true)) !!}Easy
-				@else
-				{!! Form::radio('difficulty','Easy',array('required'=>'required')) !!}Easy
-				@endif
+				<div class="row" style="padding-bottom:50px">
 
-				@if($question->difficulty==="Medium")
-				{!! Form::radio('difficulty','Medium',array('required'=>'required','checked'=>true)) !!}Medium
-				@else
-				{!! Form::radio('difficulty','Medium') !!}medium
-				@endif
-				
-				@if($question->difficulty==="Hard")
-				{!! Form::radio('difficulty','Hard',array('required'=>'required','checked'=>true)) !!}Hard
-				@else
-				{!! Form::radio('difficulty','Hard') !!}Hard
-				@endif
-				<br><br><br>
+					<div class="col-md-3" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
+						{!! Form::label('difficulty','Difficulty') !!}
+						<div class="indent_left">
+						@if($question->difficulty==="1")
+						{!! Form::radio('difficulty','1',array('required'=>'required','checked'=>true)) !!}Easy
+						@else
+						{!! Form::radio('difficulty','1',array('required'=>'required')) !!}Easy
+						@endif
+						<br>
+						@if($question->difficulty==="2")
+						{!! Form::radio('difficulty','2',array('required'=>'required','checked'=>true)) !!}Medium
+						@else
+						{!! Form::radio('difficulty','2') !!}Medium
+						@endif
+						<br>
+						@if($question->difficulty==="3")
+						{!! Form::radio('difficulty','3',array('required'=>'required','checked'=>true)) !!}Hard
+						@else
+						{!! Form::radio('difficulty','3') !!}Hard
+						@endif
+						<br>
+						</div>
+					</div>
 
-				<!-----------------Category tags------------------>
-				{!! Form::label('category','Category') !!}<br>
-				@if($question->category==="Quantitative")
-				{!! Form::radio('category','Quantitative',array('required'=>'required','checked'=>true)) !!}Quantitative
-				@else
-				{!! Form::radio('category','Quantitative',array('required'=>'required')) !!}Quantitative
-				@endif
+					<div class="col-md-6" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
+						<!-----------------Category tags------------------>						
+						{!! Form::label('timeRequired','Time Required') !!}
+						<div class="indent_left">
+						{!! Form::number('timeRequired',$question->time,array('required'=>'required','min'=>'30','placeholder'=>'in seconds')) !!}
+						</div>
+					</div>
 
-				@if($question->category==="Electronics")
-				{!! Form::radio('category','Electronics',array('required'=>'required','checked'=>true)) !!}Electronics
-				@else
-				{!! Form::radio('category','Electronics') !!}Electronics
-				@endif
-				
-				@if($question->category==="Programming")
-				{!! Form::radio('category','Programming',array('required'=>'required','checked'=>true)) !!}Programming
-				@else
-				{!! Form::radio('category','Programming') !!}Programming
-				@endif
-				<br><br><br>
+					<div class="col-md-3">
+						{!! Form::label('category','Category') !!}<br>
+						<div class="indent_left">							
+						@if($question->category==="1")
+						{!! Form::radio('category','1',array('required'=>'required','checked'=>true)) !!}Quantitative
+						@else
+						{!! Form::radio('category','1',array('required'=>'required')) !!}Quantitative
+						@endif
+						<br>
 
+						@if($question->category==="2")
+						{!! Form::radio('category','2',array('required'=>'required','checked'=>true)) !!}Electronics
+						@else
+						{!! Form::radio('category','2') !!}Electronics
+						@endif
+						<br>
+						
+						@if($question->category==="3")
+						{!! Form::radio('category','3',array('required'=>'required','checked'=>true)) !!}Programming
+						@else
+						{!! Form::radio('category','3') !!}Programming
+						@endif
+						<br>
+						</div>
+					</div>
+				</div>
 
-				{!! Form::label('timeRequired','Time Required') !!}<br>
-				{!! Form::number('timeRequired',$question->time,array('required'=>'required','min'=>'30')) !!}in seconds<br><br><br>
 
 				<center>
 						<ul style="list-style-type:none;">

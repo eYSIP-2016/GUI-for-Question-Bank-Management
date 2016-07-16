@@ -7,8 +7,6 @@
 
 	<link rel="stylesheet" href="/css/sol.css">
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
-
 	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
 
 	<meta charset="utf-8">
@@ -18,16 +16,12 @@
 	<!-- jQuery library -->
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
 	<!-- Latest compiled JavaScript -->
 
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	  
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
-	  
-      <script type="text/javascript" src="/javascript/sol.js"></script>
+    <script type="text/javascript" src="/javascript/sol.js"></script>
 
 
 	  <style type="text/css">
@@ -179,7 +173,7 @@
 
 		    function refresh(){
 		    	document.getElementById("no_questions").setAttribute("value","");
-		    	var container = document.getElementById("container");
+		    	var container = document.getElementById("options_container");
 
 		        // Clear previous contents of the container
 			    while (container.hasChildNodes()) {
@@ -308,17 +302,15 @@
 			function makeOptions(){
 					var number = document.getElementById("no_questions").value;
 		            // Container <div> where dynamic content will be placed
-			            if(number>1&&number<7){
-				        var container = document.getElementById("container");
-
-		            // Clear previous contents of the container
-			            while (container.hasChildNodes()) {
+		            var container = document.getElementById("options_container");
+		            while (container.hasChildNodes()) {
 			                container.removeChild(container.lastChild);
 			            }
+			            if(number>1&&number<7){
 		            
 		            for (i=1;i<=number;i++){
 		                // Append a node with a random text
-		                container.appendChild(document.createTextNode(" Member" +i+"  "));
+		                container.appendChild(document.createTextNode(" Option " +i+"  "));
 		                // Create an <input> element, set its type and name attributes
 		                var input = document.createElement("input");
 		                input.type = "text";
@@ -344,9 +336,6 @@
 		                input.class = "form-control"
 		                container.appendChild(input);
 		            }
-		        }
-		        else{
-		        	alert("Choose a number first :)");
 		        }
 			}
 		</script>

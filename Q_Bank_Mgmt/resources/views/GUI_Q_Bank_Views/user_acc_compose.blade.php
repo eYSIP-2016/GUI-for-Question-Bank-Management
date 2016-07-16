@@ -3,6 +3,20 @@
 	@section('compose')
 
 		<h2><i>Compose</i></h2><br>
+		<div class="btn-group" style="padding-bottom:20px;">
+					<a data-toggle="collapse" data-target="#math_exp" class= "btn btn-default">
+						Equation <span class="glyphicon glyphicon-superscript"></span>
+					</a>
+					<a data-toggle="collapse" data-target="#code" class= "btn btn-default">
+						Code <b> {_}</b>
+					</a>
+					<a data-toggle="collapse" data-target="#diagram_id" class= "btn btn-default">
+						Diagram <span class="glyphicon glyphicon-picture"></span>
+					</a>
+					<a data-toggle="collapse" data-target="#keyboard" class= "btn btn-default">
+						Symbols <span class="glyphicon glyphicon-gbp"></span>
+					</a>
+		</div>
 			{!! Form::open(['url'=>'testhome/compose','files' => true]) !!}
 			<div class="form-group">
 			
@@ -12,16 +26,11 @@
 				    
 				    {!!  Form::hidden('hidden_desc_url','',array('id'=>'hidden_desc_url_id')) !!}
 
-				</div> 
-				<br>
+				</div>
 
-				<img id="desc_preview"><br>
+				<img id="desc_preview">
 				<canvas id="canvas_id" width="800" hidden></canvas>
 
-				<div style="float:right">
-					{!! Form::button('Use symbols', array( 'data-toggle'=>'collapse','data-target'=>'#keyboard','class'=>'btn btn-primary')) !!}
-				</div>
-				<br><hr style="height:1px;background-color:#bbbbbb;"><br>
 
 				<div id="keyboard" class="collapse">
 					<ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -115,18 +124,13 @@
 						@endforeach
 					</div>
 				</div>
-				<br><br>
 
 
 
 				{!! Form::label('no_questions','Options') !!}<br>
 				<div class="row">
 					<div class="col-md-9">
-						{!! Form::number('no_questions','',array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control')) !!}
-					</div>
-
-					<div class="col-md-2">
-						{!! Form::button('Make Options', array( 'onClick'=>"makeOptions()",'class'=>'btn btn-primary')) !!}
+						{!! Form::number('no_questions','',array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
 					</div>
 
 					<div class="col-md-1">
@@ -135,56 +139,18 @@
 				        </a>
 				    </div>
 				</div>
-				
-				<br><br>
+				<br>
 
-				<div id="container">
-				</div><br><br>
+				<div id="options_container">
+				</div><br>
 
-
-				<!--LATEX EQUATION EDITOR-->
-
-				{!! Form::label('Q_exp','Mathematical Expressions') !!}
-				<div style="float:right">
-					{!! Form::button('Add an Equation', array( 'data-toggle'=>'collapse','data-target'=>'#math_exp','class'=>'btn btn-primary')) !!}
-				</div>
-				{!!  Form::hidden('hidden_exp_url','',array('id'=>'hidden_exp_url_id')) !!}
-				<hr style="height:1px;background-color:#bbbbbb;"><br>
-				
-				<div id="math_exp" class="collapse">
-					{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70','class'=>'form-control','onkeyup'=>"makePreview('Q_exp','previewId','hidden_exp_url_id')")) !!}<br>
-					<img src="" width="auto" height="auto" id="previewId"><br><br>
-				</div>
-				
-				
-				<!--CODE EDITOR-->
-
-				{!! Form::label('Q_code','Add Code') !!}
-				<div style="float:right">
-					{!! Form::button('Add Code', array( 'data-toggle'=>'collapse','data-target'=>'#code','class'=>'btn btn-primary')) !!}
-				</div>
-				{!!  Form::hidden('hidden_code_url','',array('id'=>'hidden_code_url_id')) !!}
-				<hr style="height:1px;background-color:#bbbbbb;"><br>
-
-				<div id="code" class="collapse">
-					{!! Form::textarea('Q_code','',array('rows'=>'10','cols'=>'700','class'=>'form-control','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id')",'style'=>'font-family:Courier')) !!}<br>
-
-				<img id="code_preview"><br>
-				<canvas id="canvas_code_id" width="600" height="43" hidden></canvas>
-				</div>
-
-
-				{!! Form::label('Q_diagram','Diagram') !!}<br>
-				{!! Form::file('Q_diagram','',array('class'=>'form-control')) !!}<br><br>
-
-				
 
 				{!! Form::label('tags[]','Tags') !!}<br>
 				{!! Form::select('tags[]',$tags,null,array('id'=>'my-select','multiple'=>'multiple','required'=>'required')) !!}
 
 				<br><br><br>
 
-				<div class="row" style="padding-bottom:100px">
+				<div class="row" style="padding-bottom:50px">
 
 					<div class="col-md-3" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
 						{!! Form::label('difficulty','Difficulty') !!}<br>
@@ -212,8 +178,40 @@
 					</div>
 
 				</div>
+				
+				<!--LATEX EQUATION EDITOR-->
 
-				<center>
+				<div id="math_exp" class="collapse">
+					{!! Form::label('Q_exp','Mathematical Expressions') !!}
+
+					{!!  Form::hidden('hidden_exp_url','',array('id'=>'hidden_exp_url_id')) !!}<br>
+					
+					{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70','class'=>'form-control','onkeyup'=>"makePreview('Q_exp','previewId','hidden_exp_url_id')")) !!}<br>
+					
+					<img src="" width="auto" height="auto" id="previewId"><br><br>
+				</div>
+				
+				
+				<!--CODE EDITOR-->
+				<div id="code" class="collapse">
+					{!! Form::label('Q_code','Add Code') !!}
+					
+					{!! Form::hidden('hidden_code_url','',array('id'=>'hidden_code_url_id')) !!}
+				
+					{!! Form::textarea('Q_code','',array('rows'=>'10','cols'=>'700','class'=>'form-control','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id')",'style'=>'font-family:Courier')) !!}<br>
+
+					<img id="code_preview"><br>
+
+					<canvas id="canvas_code_id" width="600" height="43" hidden></canvas>
+				</div>
+
+				<div id="diagram_id" class="collapse">
+					{!! Form::label('Q_diagram','Diagram') !!}<br>
+					{!! Form::file('Q_diagram',array('class'=>'form-control')) !!}<br><br>
+				</div>
+
+
+				<center style="padding-top:50px;">
 					<ul style="list-style-type:none;">
 						<li style="display:inline;padding:20px;">
 							{!! Form::submit('Submit',array('id'=>'checkBtn','class'=>'btn btn-primary')) !!}
