@@ -49,7 +49,7 @@ class NavController extends Controller
         elseif ($option==="Browse") {
             $tags =  tags::lists('name','id');
             $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
                         ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
@@ -94,7 +94,7 @@ class NavController extends Controller
             $symbols_6 = DB::table('maths_symbols')->where('type','6')->get();
             $tags = tags::lists('name','id');
             $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
                         ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')

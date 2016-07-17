@@ -145,6 +145,38 @@
 				</div><br>
 
 
+				<!--LATEX EQUATION EDITOR-->
+				<div id="math_exp" class="collapse">
+				{!! Form::label('Q_exp','Mathematical Expressions') !!}
+				{!!  Form::hidden('hidden_exp_url','',array('id'=>'hidden_exp_url_id')) !!}
+				
+					{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70','class'=>'form-control','onkeyup'=>"makePreview('Q_exp','previewId','hidden_exp_url_id')")) !!}<br>
+					<img src="" width="auto" height="auto" id="previewId"><br><br>
+				</div>
+				
+				
+				<!--CODE EDITOR-->
+
+				<div id="code" class="collapse">
+					{!! Form::label('Q_code','Add Code') !!}
+					{!!  Form::hidden('hidden_code_url','',array('id'=>'hidden_code_url_id')) !!}
+					
+						{!! Form::textarea('Q_code','',array('rows'=>'10','cols'=>'700','class'=>'form-control','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id')",'style'=>'font-family:Courier')) !!}<br>
+
+						<img id="code_preview"><br>
+						<canvas id="canvas_code_id" width="600" height="43" hidden></canvas>
+				</div>
+
+
+				<div id="diagram_id" class="collapse">
+					<!----------Upload Images---------->
+					{!! Form::label('Q_diagram','Diagram') !!}
+
+			        	{!! Form::file('Q_diagram',array('class'=>'form-control')) !!}
+				        {!! Form::hidden('remove_image','',array('id'=>'remove_image')) !!}
+				</div>
+
+
 				{!! Form::label('tags[]','Tags') !!}<br>
 				{!! Form::select('tags[]',$tags,null,array('id'=>'my-select','multiple'=>'multiple','required'=>'required')) !!}
 
@@ -154,27 +186,11 @@
 
 					<div class="col-md-3" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
 						{!! Form::label('difficulty','Difficulty') !!}<br>	
-						<div class="radio-container">					
-							<ul>
-								<li>
-								{!! Form::radio('difficulty','1',array('required'=>'required','id'=>'easy')) !!}
-								{!! Form::label('easy','Easy') !!}
-								<div class="check"><div class="inside"></div></div>
-								</li>
+								{!! Form::radio('difficulty','1',array('required'=>'required','id'=>'easy')) !!}Easy<br>
 
-								<li>
-								{!! Form::radio('difficulty','2',array('id'=>'medium')) !!}
-								{!! Form::label('meddium','Medium') !!}
-								<div class="check"><div class="inside"></div></div>
-								</li>
+								{!! Form::radio('difficulty','2',array('id'=>'medium')) !!}Medium<br>
 
-								<li>
-								{!! Form::radio('difficulty','3',array('id'=>'hard')) !!}
-								{!! Form::label('hard','Hard') !!}
-								<div class="check"><div class="inside"></div></div>
-								</li>
-							</ul>
-						</div>
+								{!! Form::radio('difficulty','3',array('id'=>'hard')) !!}Hard<br>
 					</div>
 
 					<div class="col-md-6" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
