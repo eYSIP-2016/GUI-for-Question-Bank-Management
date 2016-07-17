@@ -39,19 +39,11 @@ class QuestionController extends Controller
  		$question->created_by = $user;
  		$question->last_edited_by = $user;
 
- 		$r_question = new revision_q_table(); 
- 		$r_question->edited_by = $user;
-
- 		$q_description = new q_description();
- 		$r_q_description = new revision_q_description();
-
-
 
         /*************Storing equations******************/
  		$exp = Request::get('Q_exp');
  		if (!empty($exp)) {
 			$equation = new equations();
-	 		$r_equation = new revision_equations();
 	 		
 	 		$equation->exp_latex = $exp;
 	 		
@@ -66,20 +58,6 @@ class QuestionController extends Controller
 
 	        $eq_id = $equation->getKey();
 	        $question->exp_id = $eq_id;
-	        $r_question->exp_id = $eq_id;
-
-	 		$r_equation->exp_id = $eq_id;
-	 		$r_equation->r_id = 0;
-
-	 		$r_equation->exp_latex = $exp; 
-
-	 		$path = storage_path() . '/revisions/' . $name;
-	        file_put_contents($path, file_get_contents($equation_URL));
-
-	        $path = URL::to('/').'/revisions/'.$name;
-	        $r_equation->exp_image = $path;
-
-	       	$r_equation->save();
 
  		}
 
@@ -106,20 +84,6 @@ class QuestionController extends Controller
 
 	        $code_id = $code->getKey(); 
 	        $question->code_id = $code_id;
-	        $r_question->code_id = $code_id;
-
-	 		$r_code->code_id = $code_id;
-	 		$r_code->r_id = 0;
-
-	 		$r_code->code_description = $code_description; 
-
-	 		$path = storage_path().'/revisions/'.$name;
-	        file_put_contents($path, file_get_contents($code_URL));
-
-	        $path = URL::to('/').'/revisions/'.$name;
-	        $r_code->code_image_path = $path;
-
-	        $r_code->save();
  		}
 
 
@@ -145,69 +109,44 @@ class QuestionController extends Controller
 	    }
 
 
-        /************Difficulty level**************/
-        if(Request::get('difficulty') === "easy"){
-        	$question->difficulty = '1';
-        }
-        elseif (Request::get('difficulty') === "medium") {
-         	$question->difficulty = '2';
-        }
-        elseif (Request::get('difficulty') === "hard") {
-        	$question->difficulty = '3';
-        }
-        else{
-        	//do nothing
-        }
-
-        $r_question->difficulty = Request::get('difficulty');
-
-
-
  		/************Category**************/
         $question->category = Request::get('category');
 
 
         /************Difficulty**************/
-        $r_question->difficulty = Request::get('difficulty');
+        $question->difficulty = Request::get('difficulty');
 
 
 
         /***********Time***************************/
         $question->time = Request::get('timeRequired');
-        $r_question->time = Request::get('timeRequired');
 
         if (!empty(Request::get('no_questions'))) {
         	# code...
         	$question->options = 1;
-        	$r_question->options = 1;
         }
-        $question->save();
-
- 		$q_id = $question->getKey();
- 		$r_question->q_id = $q_id;
-        $r_question->save();
 
 
+        /********Storing question description***********/
+        $q_description = new q_description();
 
- 		/********Storing question description***********/
- 		$q_description->q_id = $q_id;
- 		$q_description->description = Request::get('Q_desc');
- 		$description_image_URL = Request::get('hidden_desc_url');
+        $q_description->description = Request::get('Q_desc');
+        $description_image_URL = Request::get('hidden_desc_url');
         $name = 'question'.$date.$time.'.png';
- 		$path = storage_path().'/images/Question/'.$name;
+        $path = storage_path().'/images/Question/'.$name;
         file_put_contents($path, file_get_contents($description_image_URL));
 
         $path = URL::to('/').'/images/'.$name;
         $q_description->image_path = $path;
 
-        $r_q_description->q_id = $q_id;
-        $r_q_description->description = Request::get('Q_desc');
-        $name = 'question'.$date.$time.'.png';
- 		$path = storage_path().'/revisions/'.$name;
-        file_put_contents($path, file_get_contents($description_image_URL));
+        $q_description->save();
+        $description_id = $q_description->getKey();
 
-        $path = URL::to('/').'/revisions/'.$name;
-        $r_q_description->image_path = $path;
+        $question->description_id = $description_id;
+
+        $question->save();
+
+ 		$q_id = $question->getKey();
 
 
 
@@ -216,11 +155,9 @@ class QuestionController extends Controller
         $option_no = Request::get('no_questions');
         if (!empty($option_no)) {
         	$option = new options();
-	        $revision_option = new revision_options();
 	        for ($i = 1 ; $i <= $option_no ; $i++ ) {
 	            # code...
 	            $option = new options();
-	            $revision_option = new revision_options();
 	    
 	            $name_option = 'member'.($i);
 	            $text = Request::get($name_option);
@@ -231,13 +168,6 @@ class QuestionController extends Controller
 	            $option->description = $text;
 	            $option->correct_ans = $answer;
 	            $option->save();
-
-	            $revision_option->op_no = $i;
-	            $revision_option->desc = $text;
-	            $revision_option->correct_ans = $answer;
-	            $revision_option->r_id = 0;
-	            $revision_option->q_id = $q_id;
-	            $revision_option->save();
 	        }
 	         
         }
@@ -245,21 +175,12 @@ class QuestionController extends Controller
         /*****************Adding tags********************/
         foreach(Request::get('tags') as $selected_tag){
 	        $tag_R = new q_tag_relation();
-	        $r_tag_R = new revision_q_tag_relation();
 
 	        $tag_R->q_id = $q_id;
 	        $tag_R->tag_id = $selected_tag;
 
-			$r_tag_R->q_id = $q_id;
-	        $r_tag_R->tag_id = $selected_tag;	        
-	        $r_tag_R->r_id = 0;
-
 	    	$tag_R -> save();
-	    	$r_tag_R -> save();
         }
-
-        $q_description->save();
-        $r_q_description->save();
 
     	return redirect('testhome/compose');
  	}
@@ -274,7 +195,7 @@ class QuestionController extends Controller
 
  		$question_from_tags = q_tag_relation::whereIn('tag_id',$search_tags)->lists('q_id');
 
- 		$question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('q_id');
+ 		$question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('description_id');
 
  		$option = 'Browse';
 
@@ -283,7 +204,7 @@ class QuestionController extends Controller
  		if(empty($search_string)){
  		    
             $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
                         ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
@@ -308,7 +229,7 @@ class QuestionController extends Controller
         else{
         	
             $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
                         ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
@@ -329,10 +250,10 @@ class QuestionController extends Controller
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer')
             			->whereIn('q_tables.q_id',$question_from_tags)
-            			->orWhere('q_tables.q_id',$question_from_description)
+            			->whereIn('q_tables.description_id',$question_from_description)
             			->orderBy('q_tables.updated_at','desc');
         }
-
+        
         	$results = $questions->count();
 
         	$questions = $questions->paginate(4);
@@ -351,13 +272,13 @@ class QuestionController extends Controller
 
  		$question_from_tags = q_tag_relation::whereIn('tag_id',$search_tags)->lists('q_id');
 
- 		$question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('q_id');
+ 		$question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('description_id');
 
  		$option = 'Home';
  		if(empty($search_string)){
  			
             $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
@@ -383,7 +304,7 @@ class QuestionController extends Controller
         else{
         	
             $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
                         ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
@@ -405,7 +326,7 @@ class QuestionController extends Controller
                                  'q_tables.q_id AS question_id'
                                  )
             			->whereIn('q_tables.q_id',$question_from_tags)
-            			->orWhere('q_tables.q_id',$question_from_description)
+            			->orWhere('q_tables.description_id',$question_from_description)
             			->where('q_tables.created_by','=',$user)
             			->orderBy('q_tables.updated_at','desc');
         }
@@ -431,7 +352,7 @@ class QuestionController extends Controller
 
 	 		$question = DB::table('q_tables')
 	 						->where('q_tables.q_id','=',$question_id)
-	                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+	                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
 	                        ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         	->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
 	                        ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
@@ -472,7 +393,7 @@ class QuestionController extends Controller
         $user = '2';
 		$question = DB::table('q_tables')
  						->where('q_tables.q_id','=',$question_id)
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
                         ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
@@ -490,29 +411,31 @@ class QuestionController extends Controller
 
 
         /****************Update description*****************************/
+
         $description = Request::get('Q_desc');
 
         $changed_flag = 0;
 
         if(strcmp($description, $question->description)!==0){
-        	
-        	DB::table('q_descriptions')
+        	$q_description = new q_description();
+
+            $q_description->description = Request::get('Q_desc');
+            $description_image_URL = Request::get('hidden_desc_url');
+            $name = 'question'.$date.$time.'.png';
+            $path = storage_path().'/images/Question/'.$name;
+            file_put_contents($path, file_get_contents($description_image_URL));
+
+            $path = URL::to('/').'/images/'.$name;
+            $q_description->image_path = $path;
+
+            $q_description->save();
+            $description_id = $q_description->getKey();
+
+        	DB::table('q_tables')
         		->where('q_id',$question->question_id)
-        		->update(['description'=>$description]);
-
-	        $description_image_URL = Request::get('hidden_desc_url');
-	        $name = 'question'.$date.$time.'.png';
-	 		$path = storage_path().'/images/'.$name;
-	        file_put_contents($path, file_get_contents($description_image_URL));
-
-	        $path = URL::to('/').'/images/'.$name;
-
-	        DB::table('q_descriptions')
-        		->where('q_id',$question->question_id)
-        		->update(['image_path'=>$path]);
+        		->update(['description_id'=>$description_id]);
 
         	$changed_flag = 1;
-
         }
 
 
