@@ -164,19 +164,10 @@ class QuestionController extends Controller
 
 
  		/************Category**************/
-        if(Request::get('category') === "Quantitative"){
-        	$question->category = '1';
-        }
-        elseif (Request::get('category') === "Electronics") {
-         	$question->category = '2';
-        }
-        elseif (Request::get('category') === "Programming") {
-        	$question->category = '3';
-        }
-        else{
-        	//do nothing
-        }
+        $question->category = Request::get('category');
 
+
+        /************Difficulty**************/
         $r_question->difficulty = Request::get('difficulty');
 
 

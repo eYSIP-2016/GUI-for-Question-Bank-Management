@@ -153,11 +153,27 @@
 				<div class="row" style="padding-bottom:50px">
 
 					<div class="col-md-3" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
-						{!! Form::label('difficulty','Difficulty') !!}<br>
-						<div class="indent_left">
-							{!! Form::radio('difficulty','easy',array('required'=>'required')) !!}Easy<br>
-							{!! Form::radio('difficulty','medium') !!}Medium<br>
-							{!! Form::radio('difficulty','hard') !!}Hard<br>
+						{!! Form::label('difficulty','Difficulty') !!}<br>	
+						<div class="radio-container">					
+							<ul>
+								<li>
+								{!! Form::radio('difficulty','1',array('required'=>'required','id'=>'easy')) !!}
+								{!! Form::label('easy','Easy') !!}
+								<div class="check"><div class="inside"></div></div>
+								</li>
+
+								<li>
+								{!! Form::radio('difficulty','2',array('id'=>'medium')) !!}
+								{!! Form::label('meddium','Medium') !!}
+								<div class="check"><div class="inside"></div></div>
+								</li>
+
+								<li>
+								{!! Form::radio('difficulty','3',array('id'=>'hard')) !!}
+								{!! Form::label('hard','Hard') !!}
+								<div class="check"><div class="inside"></div></div>
+								</li>
+							</ul>
 						</div>
 					</div>
 
@@ -171,44 +187,15 @@
 					<div class="col-md-3">
 						{!! Form::label('category','Pick a Category') !!}<br>
 						<div class="indent_left">
-							{!! Form::radio('category','Quantitative',array('required'=>'required')) !!}Quantitative<br>
-							{!! Form::radio('category','Electronics') !!}Electronics<br>
-							{!! Form::radio('category','Programming') !!}Programming<br>
+							{!! Form::radio('category','1',array('required'=>'required')) !!}Quantitative<br>
+							{!! Form::radio('category','2') !!}Electronics<br>
+							{!! Form::radio('category','3') !!}Programming<br>
 						</div>
 					</div>
 
 				</div>
 				
-				<!--LATEX EQUATION EDITOR-->
-
-				<div id="math_exp" class="collapse">
-					{!! Form::label('Q_exp','Mathematical Expressions') !!}
-
-					{!!  Form::hidden('hidden_exp_url','',array('id'=>'hidden_exp_url_id')) !!}<br>
-					
-					{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70','class'=>'form-control','onkeyup'=>"makePreview('Q_exp','previewId','hidden_exp_url_id')")) !!}<br>
-					
-					<img src="" width="auto" height="auto" id="previewId"><br><br>
-				</div>
 				
-				
-				<!--CODE EDITOR-->
-				<div id="code" class="collapse">
-					{!! Form::label('Q_code','Add Code') !!}
-					
-					{!! Form::hidden('hidden_code_url','',array('id'=>'hidden_code_url_id')) !!}
-				
-					{!! Form::textarea('Q_code','',array('rows'=>'10','cols'=>'700','class'=>'form-control','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id')",'style'=>'font-family:Courier')) !!}<br>
-
-					<img id="code_preview"><br>
-
-					<canvas id="canvas_code_id" width="600" height="43" hidden></canvas>
-				</div>
-
-				<div id="diagram_id" class="collapse">
-					{!! Form::label('Q_diagram','Diagram') !!}<br>
-					{!! Form::file('Q_diagram',array('class'=>'form-control')) !!}<br><br>
-				</div>
 
 
 				<center style="padding-top:50px;">

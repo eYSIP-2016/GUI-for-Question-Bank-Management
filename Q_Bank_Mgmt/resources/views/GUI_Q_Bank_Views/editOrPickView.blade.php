@@ -396,7 +396,7 @@
 				{!! Form::label('no_questions','Options') !!}<br>
 				<div class="row">
 					<div class="col-md-9">
-						{!! Form::number('no_questions','',array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
+						{!! Form::number('no_questions',$options->count(),array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
 					</div>
 
 					<div class="col-md-1">
@@ -411,33 +411,18 @@
 				@if($question->opt_used)
 					
 						@foreach($options as $key => $value)
-							{!! Form::text('member'.$key, $value); !!}<br>
+							{!! Form::text('member'.$key, $value,array('required'=>true)); !!}<br>
 						@endforeach
+
 						Answer :
-
-						@if($correct_ans==="1")
-						{!! Form::radio('answer','1',array('required'=>'required','checked'=>true)) !!}1
-						@else
-						{!! Form::radio('answer','1',array('required'=>'required')) !!}1
-						@endif
-
-						@if($correct_ans==="2")
-						{!! Form::radio('answer','2',array('required'=>'required','checked'=>true)) !!}2
-						@else
-						{!! Form::radio('answer','2') !!}2
-						@endif
+						@foreach($options as $key => $value)
+							@if($correct_ans===strval($key))
+							{!! Form::radio('answer',$key,array('required'=>'required','checked'=>true)) !!}{{$key}}
+							@else
+							{!! Form::radio('answer',$key) !!}{{$key}}
+							@endif
+						@endforeach
 						
-						@if($correct_ans==="3")
-						{!! Form::radio('answer','3',array('required'=>'required','checked'=>true)) !!}3
-						@else
-						{!! Form::radio('answer','3') !!}3
-						@endif
-
-						@if($correct_ans==="4")
-						{!! Form::radio('answer','4',array('required'=>'required','checked'=>true)) !!}4
-						@else
-						{!! Form::radio('answer','4') !!}4
-						@endif
 				@endif
 				</div><br>
 

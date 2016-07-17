@@ -151,6 +151,103 @@
 			height: 100px;
 		}
 
+		.radio-container{
+		  display: block;
+		  position: absolute;
+		  margin: auto;
+		  height: auto;
+		  background:#222222;
+		  width: auto;
+		  padding: 0;
+		}
+
+		.radio-container ul{
+		  list-style: none;
+		  height: 100%;
+		  width: 100%;
+		  margin: 0;
+		  padding: 0;
+		}
+
+
+		.radio-container ul li{
+		  color: #AAAAAA;
+		  display: block;
+		  position: relative;
+		  float: left;
+		  width: 100%;
+		  height: 30px;
+		  border-bottom: 1px solid #111111;
+		}
+
+		.radio-container ul li input[type=radio]{
+		  position: absolute;
+		  visibility: hidden;
+		}
+
+		.radio-container ul li label{
+		  display: block;
+		  position: relative;
+		  font-weight: 300;
+		  font-size: 15px;
+		  padding: 5px 5px 5px 60px;
+		  margin: 0px auto;
+		  height: 7px;
+		  z-index: 9;
+		  cursor: pointer;
+		  -webkit-transition: all 0.25s linear;
+		}
+
+		.radio-container ul li:hover label{
+			color: #FFFFFF;
+		}
+
+		.radio-container ul li .check{
+		  display: block;
+		  position: absolute;
+		  border: 1px solid #AAAAAA;
+		  border-radius: 100%;
+		  height: 25px;
+		  width: 25px;
+		  top: 3px;
+		  left: 2px;
+			z-index: 5;
+			transition: border .25s linear;
+			-webkit-transition: border .25s linear;
+		}
+
+		.radio-container ul li:hover .check {
+		  border: 5px solid #FFFFFF;
+		}
+
+		.radio-container ul li .check::before {
+		  display: block;
+		  position: absolute;
+		  content: '';
+		  border-radius: 100%;
+		  height: 15px;
+		  width: 15px;
+		  top: 5px;
+		  left: 5px;
+		  margin: auto;
+		  transition: background 0.25s linear;
+		  -webkit-transition: background 0.25s linear;
+		}
+
+		.radio-container input[type=radio]:checked ~ .check {
+		  border: 5px solid #0DFF92;
+		}
+
+		.radio-container input[type=radio]:checked ~ .check::before{
+		  background: #0DFF92;
+		}
+
+		.radio-container input[type=radio]:checked ~ label{
+		  color: #0DFF92;
+		}
+
+		
+
 	  </style>
 		<title>{{$option}}</title>
 
