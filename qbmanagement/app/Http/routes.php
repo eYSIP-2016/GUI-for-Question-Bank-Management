@@ -20,11 +20,12 @@ Route::group(['middleware' => 'web'] , function(){
         if ( Auth::check() ) // use Auth::check to check if there is any authorised user
         {
             if ( Auth::user()->user_type_id == 1)
-                return redirect('home');
+                return redirect('adminhome');
             else 
                 return
-                  redirect('questions');
-        } else{
+                  redirect('usershome');
+        } 
+        else{
               return view('auth.login');
         }
     //return Redirect::to('testhome');
@@ -32,16 +33,28 @@ Route::group(['middleware' => 'web'] , function(){
 
 
 
-    Route::get('questions/', [ 'middleware' => 'auth',
-    'as' => 'questions', function () {
+    Route::get('usershome/', [ 'middleware' => 'auth',
+    'as' => 'usershome', function () {
     $option="";
-    return view('users.questions',compact('option'));
+    return view('users.usershome',compact('option'));
 
     }]);
 
 
+    Route::get('adminhome/', [ 'middleware' => 'adm',
+    'as' => 'adminhome', function () {
+    $option="";
+    return view('admin.adminhome',compact('option'));
 
-    Route::get('questions/{option}',[ 'middleware' => 'auth' ,'as' => 'question', 'uses' =>'NavController@sendOption']);
+    }]);
+
+
+    Route::get('adminhome/submitforreview', ['as' => 'adminhomesubmit','uses' => 'Auth\AuthController@distribute']);
+
+    Route::get('usershome/{option}',[ 'middleware' => 'auth' ,'as' => 'usershome', 'uses' =>'NavController@sendOption']);
+    
+    Route::get('adminhome/{option}',[ 'middleware' => 'adm' ,'as' => 'adminshome', 'uses' =>'Auth\AuthController@sendOption']);
+
 
     Route::post('/','NavController@createEquation');
     
@@ -60,6 +73,19 @@ Route::group(['middleware' => 'web'] , function(){
         return $response;
     });
    
+    Route::post('/Compose','QuestionController@create');
+
+    Route::post('usershome/Browse','QuestionController@getSearchResults');
+
+    Route::get('usershome/Home/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
+    Route::get('usershome/Browse/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
+    Route::post('usershome/Home/Edit/{question_id}','QuestionController@makeChanges');
+
+    Route::post('usershome/Home/Pick/{question_id}','QuestionController@create');
+
+    Route::post('usershome/Browse/Pick/{question_id}','QuestionController@create');
 
      
     //Route::post('register', 'Auth\AuthController@postRegister');
@@ -72,6 +98,34 @@ Route::group(['middleware' => 'web'] , function(){
 
     Route::resource('users','Auth\AuthController');
 
-});
 
+    Route::get('{folder}/{filename}', function ($folder, $filename)
+    {
+        if($folder==='images'||$folder==='revisions'){
+            $path = storage_path() . '/'.$folder.'/' . $filename;
+
+            if(!File::exists($path)) abort(404);
+
+            $file = File::get($path);
+            $type = File::mimeType($path);
+  
+            $response = Response::make($file, 200);
+            $response->header("Content-Type", $type);
+
+            return $response;
+        }
+        else{
+            abort(404);
+        }
+    });
+
+
+    
+
+    //Route::group(['middleware' => 'adm'], function()
+    //{
+       Route::resource('tags','tagsController');
+     //});
+
+});
 

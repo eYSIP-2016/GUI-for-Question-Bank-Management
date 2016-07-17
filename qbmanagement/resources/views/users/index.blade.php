@@ -10,10 +10,9 @@
                 <th>E-Mail</th>
                 <th>Created at</th>
                 <th>Updated at</th>
-                
             </tr>
         </thead>
-        <tbody
+        <tbody>
             @foreach( $users as $user )          <!--for loop for each user-->
                 @if( $user->user_type_id === 0)
                     <tr>
@@ -38,4 +37,10 @@
 <center>
 	{{ link_to('register', 'Add User',array('class' => 'btn btn-info') ,$secure =null) }}
 </center>
+
+
+</br>
+</br>
+
+</br>
 @stop

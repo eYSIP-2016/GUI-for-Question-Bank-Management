@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Venturecraft\Revisionable\RevisionableTrait;
 use App\User;
+use App\tags;
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
@@ -12,6 +14,17 @@ use View;
 use Input;
 use Redirect;
 use Illuminate\Http\Request;
+use DB;
+use App\q_description;
+use App\q_table;
+use App\q_tag_relation;
+use App\code;
+use App\equations;
+use App\options;
+use File;
+use App\revision;
+
+
 
 
 class AuthController extends Controller
@@ -91,14 +104,18 @@ class AuthController extends Controller
      */
     protected function create(array $data)
     {
-        
-
-        User::create([
+        $user = new User();
+        $user->name = $data['name'];
+        $user->username = $data['username'];
+        $user->email = $data['email'];
+        $user->password = bcrypt($data['password']);
+        $user->save();
+        /**User::create([
             'name' => $data['name'],
             'username' => $data['username'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
-        ]);
+        ]);  **/
 
         //return Auth::user();
     }
@@ -113,27 +130,43 @@ class AuthController extends Controller
             );
         }
         $this->create($request->all());
-        return Redirect::route('users.index');
+        return Redirect::route('adminhome');
     } 
 
 
-
+/**
     protected function authenticated()
-{
+   {
         if(Auth::user()->user_type_id == 1) {
             return redirect('home');
         }
 
         return redirect('questions');
- }
+    }**/
 
 
     protected function index() { 
         //$users = User::all(); 
-        $users = User::where('user_type_id', '=', 0)->paginate(5);
+        $users = User::where('user_type_id', '=', 0)->paginate(10);
+        //$users_id = DB::table('users')->where('user_type_id', 0)->lists('id');  //key,column_id
+        //shuffle($users_id);
+       // $tags = User::find(25)->tags;
+       /** $user1=User::find(19);   //right query for user
+        $user2=User::where('id',19)->value('version');//right qusery to retrieve value
+        $n = $user2 -1;
+        $u_id =User::where('user_type_id', '=', 0)->lists('id');
+        $revisions = revision::where('u_id',19)->where('version',((int)$user2-1));
+        $a = $user1->revisionHistory->where('version',$user2 - 1);    //right query for latest modification
+        $history1 = $user1->revisionHistory->where('old_value','bala@gmail.com');
+        $a2 = count($revisions);
+        $a1 = count($a);
+        //$user1->revisionHistory->where('revisionable_id',19)->first()->delete();
+        $users1 = User::onlyTrashed()->get();  // to retrieve the soft deleted file
         //$users = DB::table('users')->where('user_type_id', '=', 0)->get();
+        
+        **/
         //$users = User::paginate(2);
-        return view('users.index', compact('users'));
+        return view('users.index', compact('users'/**,'tags','users1','a','a1','a2','u_id','revisions','history1','user2')**/));
         //return View::make('user.index', compact('users'));       //this also works just put "use View" on top
     }
 
@@ -148,11 +181,13 @@ class AuthController extends Controller
     }
 
     public function update($id){            //method to update a user in user model
-        $input = Input::all();              // input specifies the values from the web
+        $input = Input::all();  
+
+        // input specifies the values from the web
         // $validation = Validator::make($input, User::$rules); 
         //if ($validation->passes()){ 
             $user = User::find($id);              // it finds the row with $id and stores it in the user variable
-            $user->update($input);                // update the value stored in database with input values from user values
+            $user->update($input );                // update the value stored in database with input values from user values
             return Redirect::route('users.index', $id); 
        // } 
         //return Redirect::route('users.edit', $id) ->withInput() ->withErrors($validation) ->with('message', 'There were validation errors.'); 
@@ -162,6 +197,153 @@ class AuthController extends Controller
         User::find($id)->delete();        //fine user with a value in id and delete it from user model
         return Redirect::route('users.index'); 
     } 
+    
+
+    protected function sendOption($option){
+        if( Auth::check()){
+            if($option==="Users"){
+                $users = User::where('user_type_id', '=', 0)->paginate(2);
+                return view('admin.users',compact('option','users'));
+            }
+            else if ($option==="Tags") {
+                $tags = tags::paginate(10);
+                return view('admin.tags',compact('option','tags'));   
+            }
+
+            else if ($option==="Browse") {
 
 
+                $tags =  tags::lists('name','id');
+                $questions = DB::table('q_tables')
+                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
+                        ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
+                        ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
+                        ->select('q_tables.diagram_path AS diagram',
+                                 'q_tables.q_id AS q_id',
+                                 'q_tables.options AS option',
+                                 'q_tables.difficulty AS difficulty',
+                                 'q_tables.time AS time',
+                                 'q_descriptions.description AS desc',
+                                 'equations.exp_image AS equation',
+                                 'codes.code_image_path AS code',
+                                 'creator.name AS creator',
+                                 'reviewer.name AS reviewer')->orderBy('q_tables.updated_at','desc');
+
+                $results = $questions->count();
+
+                $questions = $questions->paginate(4);
+
+
+                return view('admin.browse',compact('option','tags','questions','results'));
+            }
+
+            else if ($option==="New_questions") {
+//displaying new questions in the view                
+
+                $r_q_id = DB::table('reviews')->where('reviewed',0)->distinct()->lists('q_id');
+                //$reviews = DB::table('review')->where('reviewed',0)->get();
+                $tags =  tags::lists('name','id');
+
+                //fetching new questions created 
+                $questions = DB::table('q_tables')
+                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
+                        ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
+                        ->leftJoin('users AS editor','q_tables.last_edited_by','=','editor.id')
+                        ->select('q_tables.diagram_path AS diagram',
+                                 'q_tables.q_id AS q_id',
+                                 'q_tables.options AS option',
+                                 'q_tables.difficulty AS difficulty',
+                                 'q_tables.time AS time',
+                                 'q_descriptions.description AS desc',
+                                 'equations.exp_image AS equation',
+                                 'codes.code_image_path AS code',
+                                 'creator.name AS creator',
+                                 'editor.name AS editor')
+                        ->whereIn('q_tables.q_id',$r_q_id)                        
+                        ->orderBy('q_tables.updated_at','desc');
+
+                $reviews = DB::table('reviews')
+                            ->leftJoin('users AS reviewer','reviews.u_id','=','reviewer.id')
+                            ->select('reviews.u_id',
+                                     'reviewer.name AS reviewer',
+                                     'reviews.q_id',
+                                     'reviews.alloted',
+                                     'reviews.reviewed')
+                            ->where('reviews.reviewed',0);
+                
+                
+                
+                $results = $questions->count();
+                
+                $reviews = $reviews->get();
+                $questions = $questions->paginate(4);
+
+                return view('admin.new_questions',compact('option','tags','results','questions','reviews'));
+            }
+ 
+            else if ($option==="Home") {
+               return view('admin.home',compact('option'));
+            }
+
+            else{
+                return view('adminhome',compact('option'));     
+            }  
+        }
+    }
+
+
+    public function distribute(){
+
+        $users = DB::table('users')->where('user_type_id' , 0)->lists('id');  //key,column_id
+        $reviews = DB::table('reviews')->where('alloted',0)->distinct()->lists('q_id');
+        //$review = DB::table('review')->lists('q_id');
+        shuffle($users);
+        shuffle($reviews);
+        //$shuffled_questions = $questions->shuffle();
+        //$shuffled_questions->all();
+        $u = count($users);
+        $q = count($reviews);
+    
+        
+        
+        for($i=0,$j=1,$x=0; $i<$j ; $j++,$i++)   //diagonally  incrementing j,i in upper triangular matrix such that "j<i"
+        {
+            if($x >= $q){
+                break;
+            }
+            elseif( $j >= $u)
+            {  
+                if ( $i == 1)   //shuffle order of users to shuffle the pairs after a cycle in upper triangular matrix
+                {
+                    shuffle($users); 
+                }
+                
+                $j=($j-$i)%($u-1);   //diagonally incrementing j and i in upper triangular 
+                $i=-1;
+           }
+           else {
+            
+            DB::table('reviews')            
+            ->where('q_id',$reviews[$x])
+            ->where('u_id',1)   
+            ->update(['u_id' => $users[$i] ,'alloted' => 1]);
+            // xth question should be alloted to ith reviewer
+
+            DB::table('reviews')            
+            ->where('q_id',$reviews[$x])
+            ->where('u_id',2)     
+            ->update(['u_id' => $users[$j] , 'alloted' => 1]); 
+
+              
+            // xth question should be alloted to jth reviewer
+            $x++;
+            }
+        }
+
+        return Redirect::back();
+    }
 }
