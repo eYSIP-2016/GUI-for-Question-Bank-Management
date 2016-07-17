@@ -73,7 +73,8 @@ Route::group(['middleware' => 'web'] , function(){
         return $response;
     });
    
-    Route::post('/Compose','QuestionController@create');
+
+    Route::post('usershome/Compose','QuestionController@create');
 
     Route::post('usershome/Browse','QuestionController@getSearchResults');
 

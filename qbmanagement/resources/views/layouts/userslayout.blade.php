@@ -3,25 +3,25 @@
 	<head>
 	<!-- Latest compiled and minified CSS -->
 	
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/sol.css">
+
+	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<!-- jQuery library -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 	<!-- Latest compiled JavaScript -->
-	
-	  <meta charset="utf-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1">
-	  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	  <!-- Latest compiled and minified CSS -->
-	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
 
-	  <!-- Latest compiled and minified JavaScript -->
-	  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
-
-	  <link rel="stylesheet" href="/css/sol.css">
-      <script type="text/javascript" src="/css/sol.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	  
+    <script type="text/javascript" src="/css/sol.js"></script>
 
 
 	  <style type="text/css">
@@ -95,7 +95,7 @@
 			color: grey;
 			font-style: italic;
 			margin-left: 10px;
-			padding-bottom: 15px;
+			padding-bottom: 20px;
 		}
 
 		.q_header ul{
@@ -132,6 +132,122 @@
 			padding-bottom: 20px;
 		}
 
+		.actions_buttons {
+			font-size: 10px;
+			padding-bottom: 0px;
+		}
+
+		.actions_buttons ul{
+			list-style-type: none;
+			float:right;
+		}
+
+		.actions_buttons li{
+			display: inline-block;
+		}
+
+		.indent_left{
+			margin-left: 14px;
+			height: 100px;
+		}
+
+		.radio-container{
+		  display: block;
+		  position: absolute;
+		  margin: auto;
+		  height: auto;
+		  background:#222222;
+		  width: auto;
+		  padding: 0;
+		}
+
+		.radio-container ul{
+		  list-style: none;
+		  height: 100%;
+		  width: 100%;
+		  margin: 0;
+		  padding: 0;
+		}
+
+
+		.radio-container ul li{
+		  color: #AAAAAA;
+		  display: block;
+		  position: relative;
+		  float: left;
+		  width: 100%;
+		  height: 30px;
+		  border-bottom: 1px solid #111111;
+		}
+
+		.radio-container ul li input[type=radio]{
+		  position: absolute;
+		  visibility: hidden;
+		}
+
+		.radio-container ul li label{
+		  display: block;
+		  position: relative;
+		  font-weight: 300;
+		  font-size: 15px;
+		  padding: 5px 5px 5px 60px;
+		  margin: 0px auto;
+		  height: 7px;
+		  z-index: 9;
+		  cursor: pointer;
+		  -webkit-transition: all 0.25s linear;
+		}
+
+		.radio-container ul li:hover label{
+			color: #FFFFFF;
+		}
+
+		.radio-container ul li .check{
+		  display: block;
+		  position: absolute;
+		  border: 1px solid #AAAAAA;
+		  border-radius: 100%;
+		  height: 25px;
+		  width: 25px;
+		  top: 3px;
+		  left: 2px;
+			z-index: 5;
+			transition: border .25s linear;
+			-webkit-transition: border .25s linear;
+		}
+
+		.radio-container ul li:hover .check {
+		  border: 5px solid #FFFFFF;
+		}
+
+		.radio-container ul li .check::before {
+		  display: block;
+		  position: absolute;
+		  content: '';
+		  border-radius: 100%;
+		  height: 15px;
+		  width: 15px;
+		  top: 5px;
+		  left: 5px;
+		  margin: auto;
+		  transition: background 0.25s linear;
+		  -webkit-transition: background 0.25s linear;
+		}
+
+		.radio-container input[type=radio]:checked ~ .check {
+		  border: 5px solid #0DFF92;
+		}
+
+		.radio-container input[type=radio]:checked ~ .check::before{
+		  background: #0DFF92;
+		}
+
+		.radio-container input[type=radio]:checked ~ label{
+		  color: #0DFF92;
+		}
+
+		
+
 	  </style>
 		<title>{{$option}}</title>
 
@@ -146,9 +262,15 @@
 		        $('#my-select').searchableOptionList();
 		    });
 
+		    window.onload = function() {
+				drawText('Q_desc','desc_preview','canvas_id','question','hidden_desc_url_id');
+				makePreview('Q_exp','previewId','hidden_exp_url_id');
+				drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id');
+			};
+
 		    function refresh(){
 		    	document.getElementById("no_questions").setAttribute("value","");
-		    	var container = document.getElementById("container");
+		    	var container = document.getElementById("options_container");
 
 		        // Clear previous contents of the container
 			    while (container.hasChildNodes()) {
@@ -277,17 +399,15 @@
 			function makeOptions(){
 					var number = document.getElementById("no_questions").value;
 		            // Container <div> where dynamic content will be placed
-			            if(number>1&&number<7){
-				        var container = document.getElementById("container");
-
-		            // Clear previous contents of the container
-			            while (container.hasChildNodes()) {
+		            var container = document.getElementById("options_container");
+		            while (container.hasChildNodes()) {
 			                container.removeChild(container.lastChild);
 			            }
+			            if(number>1&&number<7){
 		            
 		            for (i=1;i<=number;i++){
 		                // Append a node with a random text
-		                container.appendChild(document.createTextNode(" Member" + i+"  "));
+		                container.appendChild(document.createTextNode(" Option " +i+"  "));
 		                // Create an <input> element, set its type and name attributes
 		                var input = document.createElement("input");
 		                input.type = "text";
@@ -314,9 +434,6 @@
 		                container.appendChild(input);
 		            }
 		        }
-		        else{
-		        	alert("Choose a number first :)");
-		        }
 			}
 		</script>
 	</head>
@@ -328,7 +445,7 @@
 	      <a class="navbar-brand" href="#">Username</a>
 	    </div>
 	    <ul class="nav navbar-nav navbar-right">
-	      <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> logout</a></li>
+	      <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> logout</a></li>
 	    </ul>
 	  </div>
 	</nav>

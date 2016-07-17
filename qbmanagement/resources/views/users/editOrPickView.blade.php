@@ -23,7 +23,7 @@
 
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	  
-    <script type="text/javascript" src="/javascript/sol.js"></script>
+    <script type="text/javascript" src="/css/sol.js"></script>
 
 
 	  <style type="text/css">

@@ -58,7 +58,7 @@
                 selectAll: 'Select all',
                 selectNone: 'Select none',
                 quickDelete: '&times;',
-                searchplaceholder: 'Click here to search',
+                searchplaceholder: 'Click here to search tags',
                 loadingData: 'Still loading data...',
                 itemsSelected: '{$a} items selected'
             },

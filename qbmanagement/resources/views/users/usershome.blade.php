@@ -4,7 +4,7 @@
 	<!--This section views the Home page of the user which views his/her questions-->
 	<!--This section views the Home page of the user which views his/her questions-->
 	@if($option==="Home"||$option==="")
-	<li class="active"><a href="{{ URL::to('questions/Home')}}">Home<span class="glyphicon glyphicon-home" style="float:right;"></span></a></li>
+	<li class="active"><a href="{{ URL::to('usershome/Home')}}">Home<span class="glyphicon glyphicon-home" style="float:right;"></span></a></li>
 		@section('view_section')
 			
 			@yield('home')

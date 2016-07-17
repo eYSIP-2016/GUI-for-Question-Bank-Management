@@ -26,6 +26,12 @@
         This Question is Updated By : {{$question->reviewer}}
       </div>
       <div class="card-block">
+
+      all the logic for versions on line 30
+      {{$question}}
+
+      </div>
+      <div class="card-block">
         <div class="q_header">
           <ul>
             <li>Difficulty level:<div class=level_and_time>{{ $question->difficulty }}</div></li>

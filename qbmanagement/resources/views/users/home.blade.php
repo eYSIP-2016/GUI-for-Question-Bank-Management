@@ -3,7 +3,7 @@
 
 	@section('home')
 		<h1><i>My Questions</i></h1><br>
-		{!! Form::open(['url'=>'testhome/Home']) !!}
+		{!! Form::open(['url'=>'usershome/Home']) !!}
 		<div class="form-group">
 			<div class="row">
 				<div class="col-md-10">
@@ -89,8 +89,8 @@
 						<div class="col-md-3">
 							<div class="actions_buttons">
 								<ul>
-									<li>{{ Html::link('/testhome/Home/Edit/'.$question->question_id,'Edit', array('class'=>'btn btn-primary btn-sm')) }}</li>
-									<li>{{ Html::link('/testhome/Home/Pick/'.$question->question_id,'Pick', array('class'=>'btn btn-default btn-sm')) }}</li>
+									<li>{{ Html::link('/usershome/Home/Edit/'.$question->question_id,'Edit', array('class'=>'btn btn-primary btn-sm')) }}</li>
+									<li>{{ Html::link('/usershome/Home/Pick/'.$question->question_id,'Pick', array('class'=>'btn btn-default btn-sm')) }}</li>
 								</ul>
 							</div>
 						</div>
