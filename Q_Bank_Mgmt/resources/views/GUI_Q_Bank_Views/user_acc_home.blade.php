@@ -49,9 +49,9 @@
 					</ul>
 				</div>
 
-				@if($question->option=='1')
+				@if(!is_null($question->option))
 					<?php
-						$options = App\options::where('q_id','=',$question->q_id)->lists('description','option_id');
+						$options = App\options::where('q_id','=',$question->q_id)->where('revision','=',$question->option)->lists('description','option_id');
 					?>
 
 					<ol style="list-style-type:lower-alpha;">
@@ -73,9 +73,9 @@
 					<div class="row">
 						<div class="col-md-9">
 						<?php 
-							$question_id = $question->q_id;
 							$q_tags = App\q_tag_relation::
-										where('q_id','=',$question_id)
+										where('q_id','=',$question->q_id)
+										->where('tag_revision','=',$question->tag_revision)
 										->leftJoin('tags','q_tag_relations.tag_id','=','tags.id')
 										->lists('tags.name','tags.id');
 						?>

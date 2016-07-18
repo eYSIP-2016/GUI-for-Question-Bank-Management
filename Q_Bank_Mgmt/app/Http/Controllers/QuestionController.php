@@ -123,7 +123,7 @@ class QuestionController extends Controller
 
         if (!empty(Request::get('no_questions'))) {
         	# code...
-        	$question->options = 1;
+        	$question->options = 0;
         }
 
 
@@ -167,6 +167,7 @@ class QuestionController extends Controller
 	            $option->option_no = $i;
 	            $option->description = $text;
 	            $option->correct_ans = $answer;
+                $option->revision = 0;
 	            $option->save();
 	        }
 	         
@@ -200,35 +201,8 @@ class QuestionController extends Controller
  		$option = 'Browse';
 
  		$tags =  tags::lists('name','id');
-
- 		if(empty($search_string)){
- 		    
-            $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
-                        ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
-                        ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
-                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
-                        ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
-                        ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
-                        ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
-                        ->leftJoin('category AS category','q_tables.category','=','category.key')
-                        ->select('diagrams.path AS diagram',
-                                 'q_tables.q_id AS q_id',
-                                 'q_tables.options AS option',
-                                 'difficulty.name AS difficulty',
-                                 'category.name AS category',
-                                 'q_tables.time AS time',
-                                 'q_descriptions.description AS desc',
-                                 'equations.exp_image AS equation',
-                                 'codes.code_image_path AS code',
-                                 'creator.name AS creator',
-                                 'q_tables.q_id AS question_id',
-                                 'reviewer.name AS reviewer')
-            			->whereIn('q_tables.q_id',$question_from_tags)->orderBy('q_tables.updated_at','desc');
-        }
-        else{
         	
-            $questions = DB::table('q_tables')
+        $questions = DB::table('q_tables')
                         ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
@@ -248,12 +222,11 @@ class QuestionController extends Controller
                                  'codes.code_image_path AS code',
                                  'q_tables.q_id AS question_id',
                                  'creator.name AS creator',
-                                 'reviewer.name AS reviewer')
+                                 'reviewer.name AS reviewer',
+                                 'q_tables.tag_revision AS tag_revision')
             			->whereIn('q_tables.q_id',$question_from_tags)
-            			->whereIn('q_tables.description_id',$question_from_description)
+            			->orWhereIn('q_tables.description_id',$question_from_description)
             			->orderBy('q_tables.updated_at','desc');
-        }
-        
         	$results = $questions->count();
 
         	$questions = $questions->paginate(4);
@@ -275,13 +248,12 @@ class QuestionController extends Controller
  		$question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('description_id');
 
  		$option = 'Home';
- 		if(empty($search_string)){
- 			
-            $questions = DB::table('q_tables')
+        
+ 		$questions = DB::table('q_tables')
                         ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
-                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
                         ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
                         ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
@@ -295,41 +267,14 @@ class QuestionController extends Controller
                                  'q_descriptions.description AS desc',
                                  'equations.exp_image AS equation',
                                  'codes.code_image_path AS code',
+                                 'q_tables.q_id AS question_id',
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
-                                 'q_tables.q_id AS question_id')
+                                 'q_tables.tag_revision AS tag_revision')
+                        ->whereIn('q_tables.q_id',$question_from_tags)
                         ->where('q_tables.created_by','=',$user)
-            			->whereIn('q_tables.q_id',$question_from_tags)->orderBy('q_tables.updated_at','desc');
-        }
-        else{
-        	
-            $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
-                        ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
-                        ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
-                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
-                        ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
-                        ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
-                        ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
-                        ->leftJoin('category AS category','q_tables.category','=','category.key')
-                        ->select('diagrams.path AS diagram',
-                                 'q_tables.q_id AS q_id',
-                                 'q_tables.options AS option',
-                                 'difficulty.name AS difficulty',
-                                 'category.name AS category',
-                                 'q_tables.time AS time',
-                                 'q_descriptions.description AS desc',
-                                 'equations.exp_image AS equation',
-                                 'codes.code_image_path AS code',
-                                 'creator.name AS creator',
-                                 'reviewer.name AS reviewer',
-                                 'q_tables.q_id AS question_id'
-                                 )
-            			->whereIn('q_tables.q_id',$question_from_tags)
-            			->orWhere('q_tables.description_id',$question_from_description)
-            			->where('q_tables.created_by','=',$user)
-            			->orderBy('q_tables.updated_at','desc');
-        }
+                        ->orWhereIn('q_tables.description_id',$question_from_description)
+                        ->orderBy('q_tables.updated_at','desc');
 
         	$results = $questions->count();
 
@@ -339,7 +284,7 @@ class QuestionController extends Controller
  	}
 
  	public function editOrPickQuestion($action, $question_id){
- 		if($action ==="Edit"|| $action==="Pick"){
+ 		if($action ==="Edit"|| $action==="Pick" || $action==="Review"){
 	 		$symbol_group = DB::table('math_symbols_group')->get();
 	    	$symbols_1 = DB::table('maths_symbols')->where('type','1')->get();
 	        $symbols_2 = DB::table('maths_symbols')->where('type','2')->get();
@@ -367,12 +312,14 @@ class QuestionController extends Controller
 	                                 'equations.exp_latex AS equation',
 	                                 'codes.code_description AS code',
 	                                 'q_tables.q_id AS question_id',
-	                                 'q_tables.options AS opt_used')->first();
+	                                 'q_tables.options AS opt_used',
+                                     'q_tables.tag_revision AS tag_revision')->first();
 
 	        $options_used = $question->opt_used;
-	        if ($options_used===1) {
+	        if (!is_null($options_used)) {
 
-	        	$option_object = options::where('q_id',$question_id)->first();
+	        	$option_object = options::where('q_id',$question_id)->where('revision',$options_used
+                    )->first();
 		        $correct_ans = $option_object->correct_ans;
 
 		        return view('GUI_Q_Bank_Views.editOrPickView',compact('question','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','tags','correct_ans','action'));
@@ -383,7 +330,7 @@ class QuestionController extends Controller
 	        
     	}
     	else{
-    		App::abort(403, 'Unauthorized action.');
+    		App::abort(403, 'No such Page');
     	}
 	}
 
@@ -407,7 +354,8 @@ class QuestionController extends Controller
                                  'codes.code_description AS code',
                                  'q_tables.q_id AS question_id',
                                  'equations.exp_id AS exp_id',
-                        		 'codes.code_id AS code_id')->first();
+                        		 'codes.code_id AS code_id',
+                                 'q_tables.tag_revision AS tag_revision')->first();
 
 
         /****************Update description*****************************/
@@ -441,56 +389,83 @@ class QuestionController extends Controller
 
         /*********************Updating options**************************/
 
-
        	$answer = Request::get('answer');
 
-       	$option_no = Request::get('no_questions');
+        $options_changed = 0;
 
-		$count_initial = options::where('q_id','=',$question->question_id)
-        				->count();		
+        $revisions = options::where('q_id',$question_id)->max('revision');
 
-		$descs = DB::table('options')
-						->where('q_id',$question_id)
-						->lists('description','option_no');
+       	$current_option_count = Request::get('no_questions');
 
-		DB::table('options')
-					->where('q_id',$question_id)
-					->delete();
+        if (!is_null($question->option)) {
+            # code...
+            $count_initial = options::where('q_id','=',$question->question_id)
+                                    ->where('revision',$question->option)
+                                    ->count();  
+
+            $descs = DB::table('options')
+                        ->where('q_id',$question_id)
+                        ->where('revision',$question->option)
+                        ->lists('description','option_no');
+        }
+		else{
+            $count_initial = 0;
+        }
+
+        
+
+        if($count_initial===0){
+            if($current_option_count!==0){
+                $options_changed = 1;
+            }
+            else{
+                //do nothing
+            }
+        }
+
+        else{
+            if($current_option_count === $count_initial){
+
+                for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
+                    $name_option = 'member'.$i;
+                    $text = Request::get($name_option);
+
+                    if (strcmp($descs[$i-1],$text)!==0) {
+                        $options_changed = 1;
+                    }
+                    else{
+                        //do nothing
+                    }
+                }
+            }
+            else{
+                $options_changed = 1;
+            }
+        }
 
 
-        if (!empty($option_no)) {
+        if ($options_changed===1) {
         	
-			for ($i = 1 ; $i <= $option_no ; $i++ ) {
+			for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
 			 	$name_option = 'member'.$i;
 				$text = Request::get($name_option);
 
 				$option = new options();
 
-				$option->q_id = $question_id;//take value from Question table
+				$option->q_id = $question_id; //take value from Question table
 		        $option->option_no = $i;
 		        $option->description = $text;
 		        $option->correct_ans = $answer;
+                $option->revision = $revisions+1;
 		        $option->save();
-		        DB::table('q_tables')
-        			->where('q_id',$question_id)
-        			->update(['options'=>1]);
-		        if($option_no === $count_initial){
-			        if (strcmp($descs[$i-1],$text)!==0) {
-			        	$changed_flag = 1;
-			        }
-		    	}
-		    	else{
-		    		$changed_flag = 1;
-		    	}
 			}
+            DB::table('q_tables')
+                    ->where('q_id',$question_id)
+                    ->update(['options'=>$revisions+1]);
+            $changed_flag = 1;
         }
         else{
-        	if(empty($count_initial)||$count_initial===0){
-        		//do nothing
-        	}
-        	else{
-        		$changed_flag = 1;
-        	}
+        	//do nothing
         }
 
         /********************Updating Equations********************/
@@ -591,7 +566,11 @@ class QuestionController extends Controller
 
         /********************Update tags**********************/
         $tags_new = Request::get('tags');
+
+        $current_tag_revision = q_tag_relation::where('q_id',$question_id)->max('tag_revision');        
+
 		$q_tags = q_tag_relation::where('q_id',$question->question_id)
+                                ->where('tag_revision',$question->tag_revision)
 								->get()
 								->lists('tag_id','key')
 								->all();
@@ -603,18 +582,20 @@ class QuestionController extends Controller
 		}
 
 		else{
-			DB::table('q_tag_relations')
-				->where('q_id',$question->question_id)
-				->delete();
-
 			foreach(Request::get('tags') as $selected_tag){
 		        $tag_R = new q_tag_relation();
 
 		        $tag_R->q_id = $question_id;
 		        $tag_R->tag_id = $selected_tag;
+                $tag_R->tag_revision = $current_tag_revision+1;
 
 		    	$tag_R -> save();
         	}
+
+            DB::table('q_tables')
+                    ->where('q_id',$question_id)
+                    ->update(['tag_revision'=>$current_tag_revision+1]);
+
 		}
 
 		/***********************Update difficuty************************/

@@ -408,7 +408,7 @@
 				<br>
 
 				<div id="options_container">
-				@if($question->opt_used)
+				@if(!is_null($question->opt_used))
 					
 						@foreach($options as $key => $value)
 							{!! Form::text('member'.$key, $value,array('required'=>true)); !!}<br>

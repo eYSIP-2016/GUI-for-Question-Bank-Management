@@ -68,7 +68,8 @@ class NavController extends Controller
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
-                                 'q_tables.q_id AS question_id');
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision');
 
             $results = $questions->count();
 
@@ -113,7 +114,8 @@ class NavController extends Controller
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
-                                 'q_tables.q_id AS question_id')->where('q_tables.created_by','=',$user);
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision')->where('q_tables.created_by','=',$user);
 
             $results = $questions->count();
 

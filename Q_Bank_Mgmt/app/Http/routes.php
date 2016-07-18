@@ -25,6 +25,8 @@ Route::get('testhome/Home/{action}/{question_id}','QuestionController@editOrPick
 
 Route::get('testhome/Browse/{action}/{question_id}','QuestionController@editOrPickQuestion');
 
+Route::get('testhome/Review/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
 Route::post('testhome/Home/Edit/{question_id}','QuestionController@makeChanges');
 
 Route::post('testhome/Home/Pick/{question_id}','QuestionController@create');
