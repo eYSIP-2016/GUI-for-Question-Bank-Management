@@ -4,10 +4,24 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Sofa\Revisionable\Laravel\RevisionableTrait; // trait
+use Sofa\Revisionable\Revisionable; // interface
 
-class q_table extends Model
+class q_table extends Model implements Revisionable
 {
     //
+    use RevisionableTrait;
+
+
+    protected $revisionable=[
+    'category',
+    'description_id',
+    'diagram_id',
+    'exp_id',
+    'code_id',
+    'difficulty',
+    'time'
+    ];
 
 
     /**use \Venturecraft\Revisionable\RevisionableTrait;
@@ -27,7 +41,11 @@ class q_table extends Model
     'created_by',
     'last_edited_by',
     );**/
+    protected $revisionPresenter = 'App\Presenters\q_table';
 
+    protected $fillable = [
+        ''
+    ];
 
     protected $primaryKey = 'q_id';
     

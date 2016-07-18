@@ -20,16 +20,19 @@
     {{$results}} results
   </div>
   @foreach($questions as $question)
-
+    </br></br>
     <div class="card" style="border-radius:0px;" >
       <div class="card-header">
         This Question is Updated By : {{$question->reviewer}}
-      </div>
+      </div></br>
       <div class="card-block">
-
-      all the logic for versions on line 30
-      {{$question}}
-
+      <?php
+          $questions1=App\q_table::find($question->q_id);
+          $count=$questions1->getRevisionsCountAttribute();
+        ?>
+          @for($i=1,$j=$count-2;$j>=0;$j--,$i++)
+            {{ link_to('usershome/History/'.$question->q_id.'/'.$j, 'Version '.$i,array('class' => 'btn btn-info') ,$secure =null) }}
+          @endfor
       </div>
       <div class="card-block">
         <div class="q_header">
@@ -100,11 +103,7 @@
             @endforeach
             </div>
             
-            <div class="col-md-2">
-              <button type="button" class="btn btn-default btn-sm" style="float:right;">
-                      <span class="glyphicon glyphicon-hand-up"></span> Pick
-                  </button>
-            </div>
+            
           </div>  
         </div>
         </div>

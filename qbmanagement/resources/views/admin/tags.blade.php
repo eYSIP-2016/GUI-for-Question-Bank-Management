@@ -68,11 +68,7 @@
 
 
 
-    @foreach ($tags as $tag)
-    @foreach( $tag->revisionHistory as $history )
-        <li>{{ $history->userResponsible()->username }} modified {{ $history->fieldName() }} from {{ $history->oldValue() }} to {{ $history->newValue() }}</li>
-    @endforeach
-    @endforeach
+    
 
     @stop
 

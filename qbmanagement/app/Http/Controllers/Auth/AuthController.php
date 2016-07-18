@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Venturecraft\Revisionable\RevisionableTrait;
+//use Venturecraft\Revisionable\RevisionableTrait;
 use App\User;
 use App\tags;
 use Validator;
@@ -28,7 +28,9 @@ use App\revision;
 
 
 class AuthController extends Controller
-{
+{    
+
+    
     /*
     |--------------------------------------------------------------------------
     | Registration & Login Controller
@@ -187,7 +189,10 @@ class AuthController extends Controller
         // $validation = Validator::make($input, User::$rules); 
         //if ($validation->passes()){ 
             $user = User::find($id);              // it finds the row with $id and stores it in the user variable
-            $user->update($input );                // update the value stored in database with input values from user values
+            $user->name=Input::get('name'); 
+            $user->username=Input::get('username'); 
+            $user->email=Input::get('email') ;  
+            $user->save();           // update the value stored in database with input values from user values
             return Redirect::route('users.index', $id); 
        // } 
         //return Redirect::route('users.edit', $id) ->withInput() ->withErrors($validation) ->with('message', 'There were validation errors.'); 

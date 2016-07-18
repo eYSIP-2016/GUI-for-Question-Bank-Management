@@ -88,6 +88,8 @@ Route::group(['middleware' => 'web'] , function(){
 
     Route::post('usershome/Browse/Pick/{question_id}','QuestionController@create');
 
+    Route::get('usershome/History/{question_id}/{version_no}','QuestionController@version');
+
      
     //Route::post('register', 'Auth\AuthController@postRegister');
 
