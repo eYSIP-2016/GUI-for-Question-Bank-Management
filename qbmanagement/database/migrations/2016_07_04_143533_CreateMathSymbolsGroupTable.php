@@ -12,11 +12,12 @@ class CreateMathSymbolsGroupTable extends Migration
      */
     public function up()
     {
-        Schema::create('math_symbols_group', function (Blueprint $table) {
+       /** Schema::create('math_symbols_group', function (Blueprint $table) {
             $table->increments('id');
             $table->string('group_name');
             $table->timestamps();
-        });
+            $table->string('div_id',45);
+        }); **/
     }
 
     /**
@@ -26,6 +27,6 @@ class CreateMathSymbolsGroupTable extends Migration
      */
     public function down()
     {
-        Schema::drop('math_symbols_group');
+        //Schema::drop('math_symbols_group');
     }
 }

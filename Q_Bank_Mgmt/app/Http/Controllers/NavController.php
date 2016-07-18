@@ -84,8 +84,8 @@ class NavController extends Controller
 
         elseif ($option==="Home"||$option==="") {
 
-            $user = 2;
-            $tags = tags::lists('name','id');
+            $user = Auth::id();
+            $tags = tag::lists('name','id');
             $symbol_group = DB::table('math_symbols_group')->get();
             $symbols_1 = DB::table('maths_symbols')->where('type','1')->get();
             $symbols_2 = DB::table('maths_symbols')->where('type','2')->get();

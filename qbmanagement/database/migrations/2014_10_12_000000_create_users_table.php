@@ -12,7 +12,7 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        /**Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->string('username',32);
@@ -21,7 +21,8 @@ class CreateUsersTable extends Migration
             $table->integer('user_type_id')->default(0);
             $table->rememberToken();
             $table->timestamps();
-        });
+            $table->softDeletes();
+        });**/
     }
 
     /**
@@ -31,6 +32,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::drop('users');
+        //Schema::drop('users');
     }
 }

@@ -19,10 +19,10 @@ class RedirectIfAuthenticated
     {
         if (Auth::guard($guard)->check()) {
               if(Auth::user()->user_type_id == 0)
-                {return redirect('/questions');}
+                {return redirect('/');}
             else
             {
-                return redirect('/home');
+                return redirect('/');
             }
 
         }

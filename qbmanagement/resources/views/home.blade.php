@@ -10,7 +10,7 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-6" >
-                            <h3>{!! link_to_route('questions', 'Questions',null ,array('class' => 'btn btn-info') ) !!}</h3>
+                            <h3></h3>
                         </div>
                         @if ( Auth::user()->user_type_id == 1 )
                             <div class="col-md-6">   

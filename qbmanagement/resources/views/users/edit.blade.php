@@ -22,7 +22,11 @@
     <div class="form-group">
         {{ Form::label('password', 'Password :') }} 
         {{ Form::text('password') }} 
-    </div>  
+    </div>
+    <div class="form-group">
+        {{ Form::label('version', 'version:') }} 
+        {{ Form::number('version') }} 
+    </div>
     {{ Form::submit('Update', array('class' => 'btn btn-info')) }} 
         {{ link_to_route('users.index', 'Cancel', $user-> id, array('class' => 'btn')) }} 
      

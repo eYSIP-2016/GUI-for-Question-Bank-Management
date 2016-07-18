@@ -1,29 +1,36 @@
-@extends('users.questions')
-  
+@extends('users.usershome')
+
 	@section('compose')
-       
+
 		<h2><i>Compose</i></h2><br>
-
-			{!! Form::open(array('role'=>'form')) !!}
-                
-             
-
-				<div class="form-group">
-					
+		<div class="btn-group" style="padding-bottom:20px;">
+					<a data-toggle="collapse" data-target="#math_exp" class= "btn btn-default">
+						Equation <span class="glyphicon glyphicon-superscript"></span>
+					</a>
+					<a data-toggle="collapse" data-target="#code" class= "btn btn-default">
+						Code <b> {_}</b>
+					</a>
+					<a data-toggle="collapse" data-target="#diagram_id" class= "btn btn-default">
+						Diagram <span class="glyphicon glyphicon-picture"></span>
+					</a>
+					<a data-toggle="collapse" data-target="#keyboard" class= "btn btn-default">
+						Symbols <span class="glyphicon glyphicon-gbp"></span>
+					</a>
+		</div>
+			{!! Form::open(['url'=>'usershome/Compose','files' => true]) !!}
+			<div class="form-group">
+			
 					{!! Form::label('Q_desc','Description') !!}
 				    
-				    {!! Form::textarea('Q_desc','',array('rows'=>'10','cols'=>'700','class'=>'form-control','required'=>'required','maxlength'=>'400','onkeyup'=>"drawText('Q_desc','desc_preview','canvas_id','question')")) !!}
+				    {!! Form::textarea('Q_desc','',array('rows'=>'10','cols'=>'700','class'=>'form-control','required'=>'required','onkeyup'=>"drawText('Q_desc','desc_preview','canvas_id','question','hidden_desc_url_id')")) !!}
+				    
+				    {!!  Form::hidden('hidden_desc_url','',array('id'=>'hidden_desc_url_id')) !!}
 
-				</div> 
-				<br>
+				</div>
 
-				<img id="desc_preview"><br>
+				<img id="desc_preview">
 				<canvas id="canvas_id" width="800" hidden></canvas>
 
-				<div style="float:right">
-					{!! Form::button('Use symbols', array( 'data-toggle'=>'collapse','data-target'=>'#keyboard','class'=>'btn btn-primary')) !!}
-				</div>
-				<br><hr style="height:1px;background-color:#666666;"><br>
 
 				<div id="keyboard" class="collapse">
 					<ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -117,53 +124,99 @@
 						@endforeach
 					</div>
 				</div>
-				<br><br>
-			
+
+
+
 				{!! Form::label('no_questions','Options') !!}<br>
-				{!! Form::number('no_questions','4',array( 'min'=>'2','max' => '6','id'=>'no_questions')) !!}
-				{!! Form::button('Make Options', array( 'onClick'=>"makeOptions()",'class'=>'btn btn-primary')) !!}<br><br>
-				<div id="container">
-				</div><br><br>
+				<div class="row">
+					<div class="col-md-9">
+						{!! Form::number('no_questions','',array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
+					</div>
+
+					<div class="col-md-1">
+						<a onclick="refresh()" style="float:right">
+				        	<span class="glyphicon glyphicon-refresh"></span>
+				        </a>
+				    </div>
+				</div>
+				<br>
+
+				<div id="options_container">
+				</div><br>
 
 
 				<!--LATEX EQUATION EDITOR-->
-				{!! Form::label('Q_exp','Mathematical Expressions') !!}<div style="float:right">{!! Form::button('Add an Equation', array( 'data-toggle'=>'collapse','data-target'=>'#math_exp','class'=>'btn btn-primary')) !!}</div>
-				<hr style="height:1px;background-color:#666666;"><br>
 				<div id="math_exp" class="collapse">
-					{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70','class'=>'form-control')) !!}<br>
-					{!! Form::button('Make Prevew', array( 'onClick'=>"makePreview('Q_exp','previewId')",'class'=>'btn btn-primary')) !!}
+				{!! Form::label('Q_exp','Mathematical Expressions') !!}
+				{!!  Form::hidden('hidden_exp_url','',array('id'=>'hidden_exp_url_id')) !!}
+				
+					{!! Form::textarea('Q_exp','',array('rows'=>'10','cols'=>'70','class'=>'form-control','onkeyup'=>"makePreview('Q_exp','previewId','hidden_exp_url_id')")) !!}<br>
 					<img src="" width="auto" height="auto" id="previewId"><br><br>
 				</div>
 				
 				
 				<!--CODE EDITOR-->
-				{!! Form::label('Q_code','Add Code') !!}<div style="float:right">{!! Form::button('Add Code', array( 'data-toggle'=>'collapse','data-target'=>'#code','class'=>'btn btn-primary')) !!}</div>
-				<hr style="height:1px;background-color:#666666;"><br>
+
 				<div id="code" class="collapse">
-					{!! Form::textarea('Q_code','',array('rows'=>'10','cols'=>'700','class'=>'form-control','required'=>'required','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code')")) !!}<br>
-				<img id="code_preview"><br>
-				<canvas id="canvas_code_id" width="600" height="43" hidden></canvas>
+					{!! Form::label('Q_code','Add Code') !!}
+					{!!  Form::hidden('hidden_code_url','',array('id'=>'hidden_code_url_id')) !!}
+					
+						{!! Form::textarea('Q_code','',array('rows'=>'10','cols'=>'700','class'=>'form-control','onkeyup'=>"drawText('Q_code','code_preview','canvas_code_id','code','hidden_code_url_id')",'style'=>'font-family:Courier')) !!}<br>
+
+						<img id="code_preview"><br>
+						<canvas id="canvas_code_id" width="600" height="43" hidden></canvas>
 				</div>
 
-				{!! Form::label('Q_diagram','Diagram') !!}<br>
-				{!! Form::file('Q_diagram','',array('class'=>'form-control')) !!}<br><br>
 
-				
-				{!! Form::label('tags_id','Tags') !!}<br>
-				{!! Form::select('tags_id',$tags,null,array('id'=>'my-select','multiple'=>'multiple','size'=>'1','required'=>'required')) !!}
+				<div id="diagram_id" class="collapse">
+					<!----------Upload Images---------->
+					{!! Form::label('Q_diagram','Diagram') !!}
+
+			        	{!! Form::file('Q_diagram',array('class'=>'form-control')) !!}
+				        {!! Form::hidden('remove_image','',array('id'=>'remove_image')) !!}
+				</div>
+
+
+
+
+				{!! Form::label('tags[]','Tags') !!}<br>
+				{!! Form::select('tags[]',$tags,null,array('id'=>'my-select','multiple'=>'multiple','required'=>'required')) !!}
+
 				<br><br><br>
 
-				{!! Form::label('difficulty','Difficulty') !!}<br>
-				{!! Form::radio('difficulty','easy',array('required'=>'required')) !!}Easy
-				{!! Form::radio('difficulty','medium') !!}Medium
-				{!! Form::radio('difficulty','hard') !!}Hard<br><br><br>
+				<div class="row" style="padding-bottom:50px">
 
-				{!! Form::label('timeRequired','Time Required') !!}<br>
-				{!!Form::number('timeRequired','',array('required'=>'required','min'=>'30'))!!}in seconds<br><br><br>
+					<div class="col-md-3" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
+						{!! Form::label('difficulty','Difficulty') !!}<br>	
+								{!! Form::radio('difficulty','1',array('required'=>'required','id'=>'easy')) !!}Easy<br>
 
-				<center>
-					<div class="math_keyboard">
-							<ul style="list-style-type:none;">
+								{!! Form::radio('difficulty','2',array('id'=>'medium')) !!}Medium<br>
+
+								{!! Form::radio('difficulty','3',array('id'=>'hard')) !!}Hard<br>
+					</div>
+					<div class="col-md-6" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
+						{!! Form::label('timeRequired','Time Required') !!}<br>
+						<div class="indent_left">
+							{!!Form::number('timeRequired','',array('required'=>'required','min'=>'30','class'=>'form-control','placeholder'=>'in seconds'))!!}
+						</div>
+					</div>
+
+					<div class="col-md-3">
+						{!! Form::label('category','Pick a Category') !!}<br>
+						<div class="indent_left">
+							{!! Form::radio('category','1',array('required'=>'required')) !!}Quantitative<br>
+							{!! Form::radio('category','2') !!}Electronics<br>
+							{!! Form::radio('category','3') !!}Programming<br>
+						</div>
+					</div>
+
+				</div>
+				
+				
+
+
+				<center style="padding-top:50px;">
+					<ul style="list-style-type:none;">
 						<li style="display:inline;padding:20px;">
 							{!! Form::submit('Submit',array('id'=>'checkBtn','class'=>'btn btn-primary')) !!}
 						</li>
@@ -172,6 +225,6 @@
 						</li>
 					</ul>
 				</center>
-		{!! Form::close() !!}
-
-@stop
+				
+			{!! Form::close() !!}
+	@stop

@@ -1,4 +1,4 @@
-@extends('users.questions')
+@extends('users.usershome')
 	@section('review')
 		review Here
 		
