@@ -281,7 +281,7 @@ class QuestionController extends Controller
 
 
  	public function editOrPickQuestion($action, $question_id){
- 		if($action ==="Edit"|| $action==="Pick"){
+ 		if($action ==="Edit"|| $action==="Pick" || $action==="Modify"){
 	 		$symbol_group = DB::table('math_symbols_group')->get();
 	    	$symbols_1 = DB::table('maths_symbols')->where('type','1')->get();
 	        $symbols_2 = DB::table('maths_symbols')->where('type','2')->get();

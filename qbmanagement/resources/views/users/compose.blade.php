@@ -2,7 +2,7 @@
 
 	@section('compose')
 
-		<h2><i>Compose</i></h2><br>
+		<h1><i>Compose</i></h1><br>
 		<div class="btn-group" style="padding-bottom:20px;">
 					<a data-toggle="collapse" data-target="#math_exp" class= "btn btn-default">
 						Equation <span class="glyphicon glyphicon-superscript"></span>

@@ -148,7 +148,7 @@
       <div class="col-sm-8">
       <div class="w3-card-4" style="border-radius:0px;" ></br></br>
         <header class="w3-container w3-light-grey">
-          </br></br><center><h3><i><p>Current version of Question</p></i></h3></center></br></br>
+          </br></br><center><h3><i><p>Current Question</p></i></h3></center></br></br>
         </header></br>
         <div class="w3-container">
           <div class="q_header">

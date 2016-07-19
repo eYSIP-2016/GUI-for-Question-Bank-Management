@@ -1,7 +1,7 @@
 @extends('users.usershome')
 	@section('history')
 
-
+    <h1><i>History</i></h1><br>
 		{!! Form::open(['url'=>'usershome/Browse']) !!}
     <div class="form-group">
       <div class="row">
