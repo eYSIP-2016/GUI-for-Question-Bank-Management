@@ -473,56 +473,63 @@ class QuestionController extends Controller
 
         /********************Updating Equations********************/
         $new_equation = Request::get('Q_exp');
-
-        if(strcmp($new_equation, $questions->equation)!==0){
-        	$equation = new equations();
+        if($new_equation != ""){
+            if(strcmp($new_equation, $questions->equation)!==0){
+            	$equation = new equations();
 	 		
-	 		$equation->exp_latex = $new_equation;
+	 		    $equation->exp_latex = $new_equation;
 	 		
-	 		$equation_URL = Request::get('hidden_exp_url');
-	        $name = 'equation'.$date.$time.'.gif';
-	 		$path = storage_path().'/images/'.$name;
-	        file_put_contents($path, file_get_contents($equation_URL));
+	 		    $equation_URL = Request::get('hidden_exp_url');
+	            $name = 'equation'.$date.$time.'.gif';
+	 		    $path = storage_path().'/images/'.$name;
+	           file_put_contents($path, file_get_contents($equation_URL));
 
-	        $path = URL::to('/').'/images/'.$name;
-	        $equation->exp_image = $path;
-	        $equation->save();
+	           $path = URL::to('/').'/images/'.$name;
+	           $equation->exp_image = $path;
+	           $equation->save();
 
-	        $eq_id = $equation->getKey();
-            $question->exp_id = $eq_id;
+	           $eq_id = $equation->getKey();
+                $question->exp_id = $eq_id;
         	/**DB::table('q_tables')
         		->where('q_id',$question_id)
         		->update(['exp_id'=>$eq_id]);
             **/
-        	$changed_flag = 1;
+        	   $changed_flag = 1;
+                }
         }
-
+        else{
+             $question->exp_id = null;
+            }  
 
         /*********************Updating Codes************************/
         $code_description = Request::get('Q_code');
- 		
- 		if (strcmp($code_description, $questions->code)!==0) {
-			$code = new code();
+ 		if($new_equation != ""){
+ 		    if (strcmp($code_description, $questions->code)!==0) {
+			     $code = new code();
 
-	 		$code->code_description = $code_description;
+    	 		$code->code_description = $code_description;
 	 		
-	 		$code_URL = Request::get('hidden_code_url');
-	        $name = 'code'.$date.$time.'.png';
-	 		$path = storage_path().'/images/'.$name;
-	        file_put_contents($path, file_get_contents($code_URL));
+    	 		$code_URL = Request::get('hidden_code_url');
+    	        $name = 'code'.$date.$time.'.png';
+	    		$path = storage_path().'/images/'.$name;
+	            file_put_contents($path, file_get_contents($code_URL));
 
-	        $path = URL::to('/').'/images/'.$name;
-	        $code->code_image_path = $path;
+	            $path = URL::to('/').'/images/'.$name;
+    	        $code->code_image_path = $path;
 
 
-	        $code->save();
-	        $code_id = $code->getKey();
-            $question->code_id = $code_id;
+	            $code->save();
+	            $code_id = $code->getKey();
+                $question->code_id = $code_id;
 			/**DB::table('q_tables')
         		->where('q_id',$question_id)
         		->update(['exp_id'=>$eq_id]);
             **/
-        	$changed_flag = 1;
+        	    $changed_flag = 1;
+            }
+        }
+        else{
+                $question->code_id = null;
         }
 
         /*********************updating diagrams*********************/
@@ -678,7 +685,7 @@ class QuestionController extends Controller
         $updated_by = $version->old('last_edited_by');
         $option =$version->old('options');
         $q_tag_relation =$version->old('q_tag_relation');
-
+        
         $question = DB::table('q_tables')
                         ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
@@ -722,9 +729,9 @@ class QuestionController extends Controller
         $question_old->description_id = $version->old('description_id');
         $question_old->diagram_id =$version->old('diagram_id');
         $question_old->exp_id =$version->old('exp_id');
-        $question_old->code_id=$version->old('code_id');
+        $question_old->code_id=$version->old('code_id');    
         $question_old->options=$version->old('options');
-        $question_old->q_tag_relation=$version->old('');
+        $question_old->q_tag_relation=$version->old('q_tag_relation');
         $question_old->difficulty=$version->old('difficulty');
         $question_old->time=$version->old('time');
         $question_old->version=$version->old('q_tag_relation');
