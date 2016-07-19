@@ -116,7 +116,8 @@ class NavController extends Controller
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
-                                 'q_tables.q_id AS question_id')
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.version AS version')
                         ->where('q_tables.created_by','=',$user)
                         ->whereIn('q_id',$revision);
                         //->whereIn('q_tables.q_id',$r_q_id) 

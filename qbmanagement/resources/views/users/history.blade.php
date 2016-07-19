@@ -20,9 +20,9 @@
   <hr>
   <div class="results">
     {{$results}} results
-  </div>
+  </div></br>
   @foreach($questions as $question)
-    </br></br>
+    </br>
     <div class="w3-card-4" style="border-radius:0px;" >
       <div class="w3-container" style="padding:10px">
         <div class="creators">
@@ -37,7 +37,11 @@
         ?>
           Version:
           @for($i=1;$i<=$count;$i++)
-             {{ link_to('usershome/History/'.$question->q_id.'/'.$i,$i,array('class' => 'label label-primary ') ,$secure =null) }} 
+            @if($i != $question->version)
+              {{ link_to('usershome/History/'.$question->q_id.'/'.$i,$i,array('class' => 'label label-primary ') ,$secure =null) }} 
+            @else
+               <span class="label label-default">{{$i}}</span>
+            @endif
           @endfor
           
       </div><hr>

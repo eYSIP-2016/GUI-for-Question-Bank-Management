@@ -23,6 +23,7 @@ use File;
 use Auth;
 use Sofa\Revisionable\Laravel\RevisionableTrait; // trait
 use Sofa\Revisionable\Revisionable;
+use Redirect;
 
 class QuestionController extends Controller 
 {
@@ -349,7 +350,8 @@ class QuestionController extends Controller
                                  'codes.code_description AS code',
                                  'q_tables.q_id AS question_id',
                                  'equations.exp_id AS exp_id',
-                        		 'codes.code_id AS code_id')->first();
+                        		 'codes.code_id AS code_id',
+                                 'q_tables.version AS version')->first();
 
 
         /****************Update description*****************************/
@@ -604,6 +606,7 @@ class QuestionController extends Controller
 
         if($changed_flag ===1){
             $question->last_edited_by=$user;
+            $question->version = $question->getRevisionsCountAttribute() + 1;
             $question->save();
         	/**DB::table('q_tables')
         			->where('q_id',$question->question_id)
@@ -622,7 +625,7 @@ class QuestionController extends Controller
         $r_question_id = $question_id;
         $r_version_no =$version_no;
         $question_old = q_table::find($question_id);
-        $version = $question_old->revisionStep($version_no);
+        $version = $question_old->revisionVersion($version_no);
         
 
         $user = Auth::id();            
@@ -637,7 +640,6 @@ class QuestionController extends Controller
         $time = $version->old('time');
         $updated_by = $version->old('last_edited_by');
 
-        $revision = DB::table('revisions')->where('action','updated')->lists('row_id');
         $question = DB::table('q_tables')
                         ->where('q_tables.q_id',$question_id)
                         ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
@@ -670,10 +672,10 @@ class QuestionController extends Controller
 
 
 
-    public function restore($question_id,$version_no){
+    public function revise($question_id,$version_no){
 
         $question_old = q_table::find($question_id);         //fetching question
-        $version = $question_old->revisionStep($version_no);  //fetching version 
+        $version = $question_old->revisionVersion($version_no);  //fetching version 
 
         //storing the values in the question field
         $question_old->category = $version->old('category');  
@@ -683,13 +685,20 @@ class QuestionController extends Controller
         $question_old->code_id=$version->old('code_id');
         $question_old->difficulty=$version->old('difficulty');
         $question_old->time=$version->old('time');
-
+        $question_old->version=$version_no;
         //updating it in the databaase\
         $question_old->disableRevisioning(); //to disable the revision on restore
         $question_old->save();
 
         return redirect('usershome/History');
-    }  
+    } 
+
+
+    public function delete($question_id){
+        $question = q_table::find($question_id);
+        $question->delete();
+        return Redirect::back();
+    }
 
 
 }

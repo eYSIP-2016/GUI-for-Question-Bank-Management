@@ -101,7 +101,8 @@
           </div>  
         </div>
         </div>
-      </div>
-  @endforeach   
+      </div></br>
+  @endforeach
+
   {!! $questions->render() !!}
 @stop
