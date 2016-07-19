@@ -83,13 +83,16 @@ Route::group(['middleware' => 'web'] , function(){
     Route::get('usershome/Browse/{action}/{question_id}','QuestionController@editOrPickQuestion');
 
     Route::post('usershome/Home/Edit/{question_id}','QuestionController@makeChanges');
-
+    
+    Route::delete('usershome/Home/Delete/{question_id}',['as' => 'question.destroy','uses' => 'QuestionController@delete']);
+    
     Route::post('usershome/Home/Pick/{question_id}','QuestionController@create');
 
     Route::post('usershome/Browse/Pick/{question_id}','QuestionController@create');
 
     Route::get('usershome/History/{question_id}/{version_no}','QuestionController@version');
 
+    Route::get('usershome/Restore/{question_id}/{version_no}', ['as'=>'restore', 'uses'=>'QuestionController@revise']);
      
     //Route::post('register', 'Auth\AuthController@postRegister');
 

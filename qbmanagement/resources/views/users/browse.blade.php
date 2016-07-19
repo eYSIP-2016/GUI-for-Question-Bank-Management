@@ -23,8 +23,8 @@
   </div>
   @foreach($questions as $question)
 
-    <div class="card" style="border-radius:0px;" >
-      <div class="card-block">
+    <div class="w3-card-4" style="border-radius:0px;" >
+      <div class="w3-container"  style="padding:20px">
         <div class="q_header">
           <ul>
             <li>Difficulty level:<div class=level_and_time>{{ $question->difficulty }}</div></li>
@@ -77,8 +77,8 @@
             <li>Updated By: {{ $question->reviewer }} </li> 
           </ul>
         </div>
-
-        <div class="card-footer" style="background:white;">
+        <hr>
+        <div class="w3-container" style="background:white padding:10px";>
           <div class="row">
             <div class="col-md-10">
             <?php 
@@ -101,7 +101,8 @@
           </div>  
         </div>
         </div>
-      </div>
-  @endforeach   
+      </div></br>
+  @endforeach
+
   {!! $questions->render() !!}
 @stop
