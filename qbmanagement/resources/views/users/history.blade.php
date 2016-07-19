@@ -1,5 +1,7 @@
 @extends('users.usershome')
 	@section('history')
+
+
 		{!! Form::open(['url'=>'usershome/Browse']) !!}
     <div class="form-group">
       <div class="row">
@@ -21,20 +23,25 @@
   </div>
   @foreach($questions as $question)
     </br></br>
-    <div class="card" style="border-radius:0px;" >
-      <div class="card-header">
-        This Question is Updated By : {{$question->reviewer}}
-      </div></br>
-      <div class="card-block">
+    <div class="w3-card-4" style="border-radius:0px;" >
+      <div class="w3-container" style="padding:10px">
+        <div class="creators">
+          <ul>
+            <li>Updated By: {{ $question->reviewer }} </li> 
+          </ul>
+        </div>
+      </br>
       <?php
-          $questions1=App\q_table::find($question->q_id);
-          $count=$questions1->getRevisionsCountAttribute();
+          $revisionquestions=App\q_table::find($question->q_id);
+          $count=$revisionquestions->getRevisionsCountAttribute();
         ?>
-          @for($i=1,$j=$count-2;$j>=0;$j--,$i++)
-            {{ link_to('usershome/History/'.$question->q_id.'/'.$j, 'Version '.$i,array('class' => 'btn btn-info') ,$secure =null) }}
+          Version:
+          @for($i=1;$i<=$count;$i++)
+             {{ link_to('usershome/History/'.$question->q_id.'/'.$i,$i,array('class' => 'label label-primary ') ,$secure =null) }} 
           @endfor
-      </div>
-      <div class="card-block">
+          
+      </div><hr>
+      <div class="w3-container" style="padding:10px">
         <div class="q_header">
           <ul>
             <li>Difficulty level:<div class=level_and_time>{{ $question->difficulty }}</div></li>
@@ -81,14 +88,9 @@
 
         @endif
 
-        <div class="creators">
-          <ul>
-            <li>Created By: {{ $question->creator }} </li>
-            <li>Updated By: {{ $question->reviewer }} </li> 
-          </ul>
-        </div>
-
-        <div class="card-footer" style="background:white;">
+        
+        <hr>
+        <div class="w3-container" style="background:white padding:10px";">
           <div class="row">
             <div class="col-md-10">
             <?php 

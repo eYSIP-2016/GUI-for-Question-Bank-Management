@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-	  <head>
+	<head>
 	<!-- Latest compiled and minified CSS -->
 	
 	  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
@@ -136,16 +136,19 @@
         height: 100px;
         }
 	    </style>
-	</head>
-    <body class="" ="w3-container"></br></br>
 
+
+	</head>
+  <body class="" ="w3-container"></br></br>
 
     <!-- ********* Showing current version  *************    -->
 
-
-      <div class="w3-card-2" style="border-radius:0px;" ></br></br>
+    <div class="row">
+      <div class="col-sm-2"></div>
+      <div class="col-sm-8">
+      <div class="w3-card-4" style="border-radius:0px;" ></br></br>
         <header class="w3-container w3-light-grey">
-          </br></br><center><h3><i><p>Newer version of Question</p></i></h3></center></br></br>
+          </br></br><center><h3><i><p>Current version of Question</p></i></h3></center></br></br>
         </header></br>
         <div class="w3-container">
           <div class="q_header">
@@ -180,11 +183,10 @@
           @endif
           <div class="creators">
             <ul>
-              <li>Created By: {{ $question->creator }} </li>
               <li>Updated By: {{ $question->reviewer }} </li> 
             </ul>
-          </div>
-          <div class="card-footer" style="background:white;">
+          </div><hr>
+          <div class="w3-container" style="background:white;">
             <div class="row">
               <div class="col-md-10">
                 <?php 
@@ -204,13 +206,23 @@
    
 
 
+
+      <center>
+        <div class="col-md-6">
+          <a href="{{ URL::to('/usershome/History') }}" class="btn btn-info">Back</a>
+        </div>
+        <div class="col-md-6">
+         {{ link_to('usershome/Restore/'.$question->q_id.'/'.$version_no,'Restore',array('class' => 'btn btn-warning') ,$secure =null) }}
+        </div>      
+      </center></br></br></br>
+
     <!-- **************  Showing old version ************** -->
         
 
     
       <div class="w3-card-2" style="border-radius:0px;" ></br></br>
         <header class="w3-container w3-light-grey">
-          </br></br><center><h3><i>Older version of Question</i></h3></center></br></br>
+          </br></br><center><h3><i>Version {{$version_no}} of Question</i></h3></center></br></br>
         </header></br>
         <div class="w3-container">
           <div class="q_header">
@@ -246,11 +258,10 @@
           @endif
           <div class="creators">
             <ul>
-              <li>Created By: {{ $question->creator }} </li>
-              <li>Updated By: {{ $question->reviewer }} </li> 
+              <li>Updated By: {{ $updated_by }} </li> 
             </ul>
-          </div>
-          <div class="card-footer" style="background:white;">
+          </div><hr>
+          <div class="w3-container" style="background:white;">
             <div class="row">
               <div class="col-md-10">
                 <?php 
@@ -267,6 +278,8 @@
           </div></br></br>
         </div>
       </div></br></br>
-
-</body>
+      </div>
+      <div class="col-sm-2"></div>
+    </div>
+  </body>
 </html>

@@ -619,7 +619,8 @@ class QuestionController extends Controller
     /*******to show version*******/
     public function version($question_id,$version_no){
         //check the question id and fetch all the revisions and if version no matches the version stored in the database retreive all the old values and do the join and display and new values and display the question ..provide the button at the bottom to restore or return back
-
+        $r_question_id = $question_id;
+        $r_version_no =$version_no;
         $question_old = q_table::find($question_id);
         $version = $question_old->revisionStep($version_no);
         
@@ -634,8 +635,9 @@ class QuestionController extends Controller
         $code = DB::table('codes')->where('code_id',$version->old('code_id'))->value('code_image_path');
         $difficulty = DB::table('difficulty')->where('key',$version->old('difficulty'))->value('name');
         $time = $version->old('time');
+        $updated_by = $version->old('last_edited_by');
 
-
+        $revision = DB::table('revisions')->where('action','updated')->lists('row_id');
         $question = DB::table('q_tables')
                         ->where('q_tables.q_id',$question_id)
                         ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
@@ -662,9 +664,32 @@ class QuestionController extends Controller
 
 
 
-        return view('users.version',compact('question','category','description','diagram','equation','code','difficulty','time'));
+        return view('users.version',compact('question','category','description','diagram','equation','code','difficulty','time','version_no','updated_by'));
                 
     }
+
+
+
+    public function restore($question_id,$version_no){
+
+        $question_old = q_table::find($question_id);         //fetching question
+        $version = $question_old->revisionStep($version_no);  //fetching version 
+
+        //storing the values in the question field
+        $question_old->category = $version->old('category');  
+        $question_old->description_id = $version->old('description_id');
+        $question_old->diagram_id =$version->old('diagram_id');
+        $question_old->exp_id =$version->old('exp_id');
+        $question_old->code_id=$version->old('code_id');
+        $question_old->difficulty=$version->old('difficulty');
+        $question_old->time=$version->old('time');
+
+        //updating it in the databaase\
+        $question_old->disableRevisioning(); //to disable the revision on restore
+        $question_old->save();
+
+        return redirect('usershome/History');
+    }  
 
 
 }

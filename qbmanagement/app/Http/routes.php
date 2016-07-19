@@ -90,6 +90,7 @@ Route::group(['middleware' => 'web'] , function(){
 
     Route::get('usershome/History/{question_id}/{version_no}','QuestionController@version');
 
+    Route::get('usershome/Restore/{question_id}/{version_no}', ['as'=>'restore', 'uses'=>'QuestionController@restore']);
      
     //Route::post('register', 'Auth\AuthController@postRegister');
 

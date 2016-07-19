@@ -1,3 +1,25 @@
+@font-face {
+font-family: Open Sans;
+src: url("/fonts/OpenSans-Light.ttf") format("opentype");
+}
+
+@font-face {
+font-family: Open Sans;
+src: url("/fonts/OpenSans-LightItalic.ttf") format("opentype");
+}
+
+@font-face {
+font-family: Open Sans;
+src: url("/fonts/OpenSans-Regular.ttf") format("opentype");
+}
+
+
+
+
+
+
+
+
 @-moz-keyframes blinker {
     0% {
         opacity: 1.0;
