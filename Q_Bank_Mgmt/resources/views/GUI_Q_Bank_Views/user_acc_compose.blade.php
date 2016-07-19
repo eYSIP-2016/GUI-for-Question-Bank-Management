@@ -172,8 +172,9 @@
 					<!----------Upload Images---------->
 					{!! Form::label('Q_diagram','Diagram') !!}
 
-			        	{!! Form::file('Q_diagram',array('class'=>'form-control')) !!}
+			        	{!! Form::file('Q_diagram',array('class'=>'form-control','id'=>'Q_diagram','onchange'=>'openFile(event)')) !!}
 				        {!! Form::hidden('remove_image','',array('id'=>'remove_image')) !!}
+				        
 				</div>
 
 
@@ -186,26 +187,26 @@
 
 					<div class="col-md-3" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
 						{!! Form::label('difficulty','Difficulty') !!}<br>	
-								{!! Form::radio('difficulty','1',array('required'=>'required','id'=>'easy')) !!}Easy<br>
+								{!! Form::radio('difficulty','1',array('required'=>'required','id'=>'difficulty')) !!}Easy<br>
 
-								{!! Form::radio('difficulty','2',array('id'=>'medium')) !!}Medium<br>
+								{!! Form::radio('difficulty','2',array('id'=>'difficulty')) !!}Medium<br>
 
-								{!! Form::radio('difficulty','3',array('id'=>'hard')) !!}Hard<br>
+								{!! Form::radio('difficulty','3',array('id'=>'difficulty')) !!}Hard<br>
 					</div>
 
 					<div class="col-md-6" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
 						{!! Form::label('timeRequired','Time Required') !!}<br>
 						<div class="indent_left">
-							{!!Form::number('timeRequired','',array('required'=>'required','min'=>'30','class'=>'form-control','placeholder'=>'in seconds'))!!}
+							{!!Form::number('timeRequired','',array('required'=>'required','min'=>'30','class'=>'form-control','placeholder'=>'in seconds','id'=>'timeRequired'))!!}
 						</div>
 					</div>
 
 					<div class="col-md-3">
 						{!! Form::label('category','Pick a Category') !!}<br>
 						<div class="indent_left">
-							{!! Form::radio('category','1',array('required'=>'required')) !!}Quantitative<br>
-							{!! Form::radio('category','2') !!}Electronics<br>
-							{!! Form::radio('category','3') !!}Programming<br>
+							{!! Form::radio('category','1',array('required'=>'required','id'=>'category')) !!}Quantitative<br>
+							{!! Form::radio('category','2',array('id'=>'category')) !!}Electronics<br>
+							{!! Form::radio('category','3',array('id'=>'category')) !!}Programming<br>
 						</div>
 					</div>
 
@@ -222,8 +223,57 @@
 						<li style="display:inline;padding:20px;">
 							{!! Form::reset('Reset',array('class'=>'btn btn-default')) !!}
 						</li>
+						<li>
+							{!! Form::button('Preview', array( 'onclick'=>"makeQuestionPreview()",'class'=>'btn btn-default','data-toggle'=>'modal','data-target'=>'#previewModal')) !!}
+						</li>
 					</ul>
 				</center>
 				
+				<div id="previewModal" class="modal fade" role="dialog">
+				  	<div class="modal-dialog modal-lg">
+					    <!-- Modal content-->
+					    <div class="modal-content">
+					      	<div class="modal-header">
+					        <button type="button" class="close" data-dismiss="modal">&times;</button>
+					    </div>
+					    <div class="modal-body">
+					        <div class="w3-card-4" style="border-radius:0px;" >
+								<div class="w3-container" style="padding:10px;">
+									
+									<div class="q_header">
+										<ul>
+											<li>Category:<div class=level_and_time><div id="category_container"></div>
+											</div></li>
+											<li>Difficulty level:<div class=level_and_time><div id="difficulty_container"></div></div></li>
+											<li>Expected Solving time:<div class=level_and_time><div id="time_container"></div></div></li>
+										</ul><br>
+									</div>
+
+									<div id="description_container"></div>
+
+									<div class="image_list">
+										<ul>
+											<li><img id="diagram_preview" src="#"></li>
+											<li><div id="equation_container"></div></li>
+											<li><div id="code_container"></div></li>
+										</ul>
+									</div>
+
+									<div id="options_list">
+										
+									</div>
+									<hr>
+									<div class="w3-container" style="background:white;">
+										<div id="tag_container"></div>
+									</div>
+								</div>
+							</div>
+					    </div>
+					      	<div class="modal-footer">
+					        	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					      	</div>
+					    </div>
+					</div>
+				</div>
 			{!! Form::close() !!}
 	@stop

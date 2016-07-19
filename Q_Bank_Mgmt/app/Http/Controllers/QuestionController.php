@@ -35,7 +35,7 @@ class QuestionController extends Controller
         $date = date("Y-m-d",$time);
 
  		$question = new q_table();
- 		$user = Auth::id();
+ 		$user = 1;
  		$question->created_by = $user;
  		$question->last_edited_by = $user;
 
