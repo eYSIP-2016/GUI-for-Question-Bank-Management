@@ -390,6 +390,7 @@
 
 				<?php
 					$options = App\options::where('q_id','=',$question->question_id)->lists('description','option_no');
+					$correct_ans = App\options::where('q_id','=',$question->question_id)->distinct()->lists('correct_ans','option_no');
 
 					$count_option = $options->count();
 				?>

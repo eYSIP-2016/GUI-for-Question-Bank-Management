@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class options extends Model
 {
     //
-    protected $primaryKey = 'options_id';
+    protected $primaryKey = 'option_id';
 }

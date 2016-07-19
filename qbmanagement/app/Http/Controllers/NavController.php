@@ -117,7 +117,8 @@ class NavController extends Controller
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
-                                 'q_tables.q_id AS question_id');
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision');
 
             $results = $questions->count();
 
@@ -133,6 +134,7 @@ class NavController extends Controller
             $tags =  tags::lists('name','id');
 
             $revision = DB::table('revisions')->where('action','updated')->distinct()->lists('row_id');
+            
             $questions = DB::table('q_tables')
                         ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
@@ -154,6 +156,7 @@ class NavController extends Controller
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
                                  'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision',
                                  'q_tables.version AS version')
                         ->where('q_tables.created_by','=',$user)
                         ->whereIn('q_id',$revision);
@@ -196,7 +199,9 @@ class NavController extends Controller
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
-                                 'q_tables.q_id AS question_id')->where('q_tables.created_by','=',$user);
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision')
+                        ->where('q_tables.created_by','=',$user);
 
             $results = $questions->count();
             $questions = $questions->paginate(4);

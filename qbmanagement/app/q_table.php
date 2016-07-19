@@ -9,7 +9,6 @@ use Sofa\Revisionable\Revisionable; // interface
 
 class q_table extends Model implements Revisionable
 {
-
     use RevisionableTrait;         
 
     protected $revisionable=[
@@ -17,12 +16,12 @@ class q_table extends Model implements Revisionable
     'description_id',
     'diagram_id',
     'exp_id',
-    'code_id',/**
+    'code_id',
     'options',
-    'tag_revision',  **/
+    'tag_revision',
     'difficulty',
-    'time'
-    //,last_edited_by  
+    'time',
+    'last_edited_by'  
     ];
 
     //Using Revisionable Presenter for presenting the label  { Its optional}
@@ -64,5 +63,5 @@ class q_table extends Model implements Revisionable
     {
         return $this->hasOne('App\category','key','category');
     }
-    
+
 }

@@ -123,7 +123,7 @@ class QuestionController extends Controller
 
         if (!empty(Request::get('no_questions'))) {
         	# code...
-        	$question->options = 1;
+        	$question->options = 0;
         }
 
 
@@ -131,9 +131,9 @@ class QuestionController extends Controller
         $q_description = new q_description();
 
         $q_description->description = Request::get('Q_desc');
-        $description_image_URL = "https://latex.codecogs.com/gif.latex?int%20x=a+b;";//Request::get('hidden_desc_url');
+        $description_image_URL =/** "https://latex.codecogs.com/gif.latex?int%20x=a+b;";**/Request::get('hidden_desc_url');
         $name = 'question'.$date.$time.'.png';
-        $path = storage_path().'/images/Question/'.$name;
+        $path = storage_path().'/images/'.$name;
         file_put_contents($path, file_get_contents($description_image_URL));
 
         $path = URL::to('/').'/images/'.$name;
@@ -167,6 +167,8 @@ class QuestionController extends Controller
 	            $option->option_no = $i;
 	            $option->description = $text;
 	            $option->correct_ans = $answer;
+
+                $option->revision = 0;
 	            $option->save();
 	        }
 	         
@@ -193,9 +195,11 @@ class QuestionController extends Controller
 
  		$search_tags = Request::get('tags');
 
+        $tags = tags::lists('name','id');
+
  		$question_from_tags = q_tag_relation::whereIn('tag_id',$search_tags)->lists('q_id');
 
- 		$question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('q_id');
+ 		$question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('description_id');
 
  		$option = 'Browse';
 
@@ -210,6 +214,7 @@ class QuestionController extends Controller
                         ->leftJoin('category AS category','q_tables.category','=','category.key')
                         ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
+                                 'q_tables.tag_revision AS tag_revision',
                                  'q_tables.options AS option',
                                  'difficulty.name AS difficulty',
                                  'category.name AS category',
@@ -257,6 +262,7 @@ class QuestionController extends Controller
                         ->leftJoin('category AS category','q_tables.category','=','category.key')
                         ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
+                                 'q_tables.tag_revision AS tag_revision',
                                  'q_tables.options AS option',
                                  'difficulty.name AS difficulty',
                                  'category.name AS category',
@@ -276,7 +282,7 @@ class QuestionController extends Controller
 
         	$questions = $questions->paginate(4);
 
-        return view('users.usershome',compact('option','tags','questions','results'));
+        return view('users.home',compact('option','tags','questions','results'));
  	}
 
 
@@ -301,6 +307,7 @@ class QuestionController extends Controller
 	                        ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
 	                        ->leftJoin('category AS category','q_tables.category','=','category.key')
 	                        ->select('diagrams.path AS diagram',
+                                     'q_tables.tag_revision AS tag_revision',
 	                                 'q_tables.options AS option',
 	                                 'q_tables.time AS time',
 	                                 'difficulty.name AS difficulty',
@@ -342,6 +349,7 @@ class QuestionController extends Controller
                         ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->select('diagrams.path AS diagram',
                                  'q_tables.options AS option',
+                                 'q_tables.tag_revision AS tag_revision',
                                  'q_tables.difficulty AS difficulty',
                                  'q_tables.category AS category',
                                  'q_tables.time AS time',
@@ -387,56 +395,80 @@ class QuestionController extends Controller
         /*********************Updating options**************************/
 
 
-       	$answer = Request::get('answer');
+        $answer = Request::get('answer');
 
-       	$option_no = Request::get('no_questions');
+        $options_changed = 0;
 
-		$count_initial = options::where('q_id','=',$question_id)
-        				->count();		
+        $revisions = options::where('q_id',$question_id)->max('revision');
 
-		$descs = DB::table('options')
-						->where('q_id',$question_id)
-						->lists('description','option_no');
+        $current_option_count = Request::get('no_questions');
 
-		DB::table('options')
-					->where('q_id',$question_id)
-					->delete();
+        if (!is_null($question->option)) {
+            # code...
+            $count_initial = options::where('q_id','=',$question->question_id)
+                                    ->where('revision',$question->option)
+                                    ->count();  
 
-
-        if (!empty($option_no)) {
-        	
-			for ($i = 1 ; $i <= $option_no ; $i++ ) {
-			 	$name_option = 'member'.$i;
-				$text = Request::get($name_option);
-
-				$option = new options();
-
-				$option->q_id = $question_id;//take value from Question table
-		        $option->option_no = $i;
-		        $option->description = $text;
-		        $option->correct_ans = $answer;
-		        $option->save();
-                $question->options = 1;
-		        /**DB::table('q_tables')
-        			->where('q_id',$question_id)
-        			->update(['options'=>1]);   **/
-		        if($option_no === $count_initial){
-			        if (strcmp($descs[$i-1],$text)!==0) {
-			        	$changed_flag = 1;
-			        }
-		    	}
-		    	else{
-		    		$changed_flag = 1;
-		    	}
-			}
+            $descs = DB::table('options')
+                        ->where('q_id',$question_id)
+                        ->where('revision',$question->option)
+                        ->lists('description','option_no');
         }
         else{
-        	if(empty($count_initial)||$count_initial===0){
-        		//do nothing
-        	}
-        	else{
-        		$changed_flag = 1;
-        	}
+            $count_initial = 0;
+        }
+
+        
+
+        if($count_initial===0){
+            if($current_option_count!==0){
+                $options_changed = 1;
+            }
+            else{
+                //do nothing
+            }
+        }
+
+        else{
+            if($current_option_count === $count_initial){
+
+                for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
+                    $name_option = 'member'.$i;
+                    $text = Request::get($name_option);
+
+                    if (strcmp($descs[$i-1],$text)!==0) {
+                        $options_changed = 1;
+                    }
+                    else{
+                        //do nothing
+                    }
+                }
+            }
+            else{
+                $options_changed = 1;
+            }
+        }
+
+
+        if ($options_changed===1) {
+            
+            for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
+                $name_option = 'member'.$i;
+                $text = Request::get($name_option);
+
+                $option = new options();
+
+                $option->q_id = $question_id; //take value from Question table
+                $option->option_no = $i;
+                $option->description = $text;
+                $option->correct_ans = $answer;
+                $option->revision = $revisions+1;
+                $option->save();
+            }
+            $question->options = $revisions+1;
+        }
+        else{
+            //do nothing
         }
 
         /********************Updating Equations********************/
@@ -540,7 +572,11 @@ class QuestionController extends Controller
 
         /********************Update tags**********************/
         $tags_new = Request::get('tags');
+
+        $current_tag_revision = q_tag_relation::where('q_id',$question_id)->max('tag_revision');
+
 		$q_tags = q_tag_relation::where('q_id',$question_id)
+                                ->where('tag_revision',$question->tag_revision)
 								->get()
 								->lists('tag_id','key')
 								->all();
@@ -552,18 +588,19 @@ class QuestionController extends Controller
 		}
 
 		else{
-			DB::table('q_tag_relations')
-				->where('q_id',$question_id)
-				->delete();
 
 			foreach(Request::get('tags') as $selected_tag){
 		        $tag_R = new q_tag_relation();
 
 		        $tag_R->q_id = $question_id;
 		        $tag_R->tag_id = $selected_tag;
+                $tag_R->tag_revision = $current_tag_revision + 1;
 
 		    	$tag_R -> save();
         	}
+            $question->tag_revision = $current_tag_revision + 1;
+
+            //update tagrevision in qtables
 		}
 
 		/***********************Update difficuty************************/
@@ -639,9 +676,10 @@ class QuestionController extends Controller
         $difficulty = DB::table('difficulty')->where('key',$version->old('difficulty'))->value('name');
         $time = $version->old('time');
         $updated_by = $version->old('last_edited_by');
+        $option =$version->old('options');
+        $q_tag_relation =$version->old('q_tag_relation');
 
         $question = DB::table('q_tables')
-                        ->where('q_tables.q_id',$question_id)
                         ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
@@ -660,13 +698,15 @@ class QuestionController extends Controller
                                  'equations.exp_image AS equation',
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
-                                 'reviewer.name AS reviewer')
+                                 'reviewer.name AS reviewer',
+                                 'q_tables.tag_revision AS tag_revision')
+                        ->where('q_tables.q_id',$question_id)
                         ->first();
                         
 
 
 
-        return view('users.version',compact('question','category','description','diagram','equation','code','difficulty','time','version_no','updated_by'));
+        return view('users.version',compact('question','category','description','diagram','equation','code','difficulty','time','version_no','updated_by','option','q_tag_relation'));
                 
     }
 
@@ -683,9 +723,12 @@ class QuestionController extends Controller
         $question_old->diagram_id =$version->old('diagram_id');
         $question_old->exp_id =$version->old('exp_id');
         $question_old->code_id=$version->old('code_id');
+        $question_old->options=$version->old('options');
+        $question_old->q_tag_relation=$version->old('');
         $question_old->difficulty=$version->old('difficulty');
         $question_old->time=$version->old('time');
-        $question_old->version=$version_no;
+        $question_old->version=$version->old('q_tag_relation');
+
         //updating it in the databaase\
         $question_old->disableRevisioning(); //to disable the revision on restore
         $question_old->save();
