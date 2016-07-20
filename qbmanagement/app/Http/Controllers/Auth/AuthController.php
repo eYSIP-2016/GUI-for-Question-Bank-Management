@@ -374,4 +374,61 @@ class AuthController extends Controller
 
         return Redirect::back();
     }
+
+
+
+        public function editOrPickQuestion($action, $question_id){
+        if($action ==="Edit"|| $action==="Pick" || $action==="Modify"){
+            $symbol_group = DB::table('math_symbols_group')->get();
+            $symbols_1 = DB::table('maths_symbols')->where('type','1')->get();
+            $symbols_2 = DB::table('maths_symbols')->where('type','2')->get();
+            $symbols_3 = DB::table('maths_symbols')->where('type','3')->get();
+            $symbols_4 = DB::table('maths_symbols')->where('type','4')->get();
+            $symbols_5 = DB::table('maths_symbols')->where('type','5')->get();
+            $symbols_6 = DB::table('maths_symbols')->where('type','6')->get();
+
+            $tags =  tags::lists('name','id');
+
+            $question = DB::table('q_tables')
+                            ->where('q_tables.q_id','=',$question_id)
+                            ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
+                            ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
+                            ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
+                            ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                            ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
+                            ->leftJoin('category AS category','q_tables.category','=','category.key')
+                            ->select('diagrams.path AS diagram',
+                                     'q_tables.tag_revision AS tag_revision',
+                                     'q_tables.options AS option',
+                                     'q_tables.time AS time',
+                                     'difficulty.name AS difficulty',
+                                     'category.name AS category',
+                                     'q_descriptions.description AS description',
+                                     'equations.exp_latex AS equation',
+                                     'codes.code_description AS code',
+                                     'q_tables.q_id AS question_id',
+                                     'q_tables.options AS opt_used')->first();
+
+            $options =DB::table('options')->where('q_id','=',$question->question_id)
+                                        ->where('revision',$question->opt_used)
+                                        ->lists('description','option_no');  
+
+            $count = count($options);
+            $options_used = $question->opt_used;
+            if (!is_null($options_used)) {
+
+                $option_object = options::where('q_id',$question_id)->where('revision',$options_used)->first();
+                $correct_ans = $option_object->correct_ans;
+
+                return view('admin.edit',compact('question','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','tags','correct_ans','action','options','count'));
+            }
+            else{
+                return view('admin.edit',compact('question','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','tags','action'));
+            }
+            
+        }
+        else{
+            App::abort(403, 'Unauthorized action.');
+        }
+    }
 }

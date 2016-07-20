@@ -172,7 +172,7 @@
 					<!----------Upload Images---------->
 					{!! Form::label('Q_diagram','Diagram') !!}
 
-			        	{!! Form::file('Q_diagram',array('class'=>'form-control')) !!}
+			        	{!! Form::file('Q_diagram',array('class'=>'form-control','onchange'=>'openFile(event)')) !!}
 				        {!! Form::hidden('remove_image','',array('id'=>'remove_image')) !!}
 				</div>
 
@@ -223,8 +223,57 @@
 						<li style="display:inline;padding:20px;">
 							{!! Form::reset('Reset',array('class'=>'btn btn-default')) !!}
 						</li>
+						<li>{!! Form ::button('Preview',array('onclick'=>"makeQuestionPreview()",'class'=>'btn btn-default','data-toggle'=>'modal','data-target'=>'#previewModal'))!!}</li>
 					</ul>
 				</center>
 				
 			{!! Form::close() !!}
+
+			<div id="previewModal" class="modal fade" role="dialog">
+				  	<div class="modal-dialog modal-lg">
+					    <!-- Modal content-->
+					    <div class="modal-content">
+					      	<div class="modal-header">
+					        <button type="button" class="close" data-dismiss="modal">&times;</button>
+					    </div>
+					    <div class="modal-body">
+					        <div class="w3-card-4" style="border-radius:0px;" >
+								<div class="w3-container" style="padding:10px;">
+									
+									<div class="q_header">
+										<ul>
+											<li>Category:<div class=level_and_time><div id="category_container"></div>
+											</div></li>
+											<li>Difficulty level:<div class=level_and_time><div id="difficulty_container"></div></div></li>
+											<li>Expected Solving time:<div class=level_and_time><div id="time_container"></div></div></li>
+										</ul><br>
+									</div>
+
+									<div id="description_container"></div>
+
+									<div class="image_list">
+										<ul>
+											<li><img id="diagram_preview" src="#"></li>
+											<li><div id="equation_container"></div></li>
+											<li><div id="code_container"></div></li>
+										</ul>
+									</div>
+
+									<div id="options_list">
+										
+									</div>
+									<hr>
+									<div class="w3-container" style="background:white;">
+										<div id="tag_container"></div>
+									</div>
+								</div>
+							</div>
+					    </div>
+					      	<div class="modal-footer">
+					        	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					      	</div>
+					    </div>
+					</div>
+				</div>
+
 	@stop

@@ -278,21 +278,13 @@
 						Symbols <span class="glyphicon glyphicon-gbp"></span>
 					</a>
 		</div>
-    		<?php 
-       		    if(strcmp($action,"Edit") ==0)
-				    $url = "/usershome/Home" ;
-				else
-				    $url = "/usershome/Review" ;
-			?>
-
-			{!! Form::open(['url'=>$url.'/'.$action.'/'.$question->question_id,'files' => true]) !!}
+			{!! Form::open(['url'=>'/adminhome/Home/'.$action.'/'.$question->question_id,'files' => true]) !!}
 			<div class="form-group">
 					
 					{!! Form::label('Q_desc','Description') !!}
 				    
 				    {!! Form::textarea('Q_desc',$question->description,array('rows'=>'10','cols'=>'700','class'=>'form-control','required'=>'required','onkeyup'=>"drawText('Q_desc','desc_preview','canvas_id','question','hidden_desc_url_id')")) !!}
 				    
-				    {!!Form::hidden('action',$action) !!}
 				    {!!  Form::hidden('hidden_desc_url','',array('id'=>'hidden_desc_url_id')) !!}
 
 				<img id="desc_preview">
@@ -400,7 +392,7 @@
 				{!! Form::label('no_questions','Options') !!}<br>
 				<div class="row">
 					<div class="col-md-9">
-						{!! Form::number('no_questions',$count_option,array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
+						{!! Form::number('no_questions',$count,array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
 					</div>
 
 					<div class="col-md-1">
@@ -554,8 +546,8 @@
 								{!! Form::submit('Submit',array('id'=>'checkBtn','class'=>'btn btn-primary')) !!}
 							</li>
 							<li style="display:inline;padding:20px;">
-							   {{ link_to($url ,'Cancel',array('class' => 'btn btn-warning') ,$secure =null) }}
-                            </li>
+							{{ link_to('/usershome/Home', 'Cancel',array('class' => 'btn btn-warning') ,$secure =null) }}
+                        	</li>
 							<li style="display:inline;padding:20px;">
 								{!! Form::reset('Reset',array('class'=>'btn btn-default')) !!}
 							</li>

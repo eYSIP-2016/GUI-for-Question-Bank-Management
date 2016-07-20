@@ -19,7 +19,11 @@
 	<hr>
   
 	<div class="results">
-		{{$results}} questions
+		@if($results == 0)
+		    No Questions for Review
+		@else
+		    {{$results}} Questions to be reviewed
+		@endif
 	</div>
 
 	@foreach($review_questions as $question)

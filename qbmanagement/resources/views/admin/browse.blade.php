@@ -65,9 +65,9 @@
           </ul>
         </div>
         <hr>
-        <div class="w3-container" style="background:white padding:10px";>
+        <div class="w3-container" style="background:white;">
           <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-8">
             <?php 
               $question_id = $question->q_id;
               $q_tags = App\q_tag_relation::
@@ -81,11 +81,18 @@
             @endforeach
             </div>
             
-            <div class="col-md-2">
-              <button type="button" class="btn btn-default btn-sm" style="float:right;">
-                      <span class="glyphicon glyphicon-hand-up"></span> Pick
-                  </button>
+            <div class="col-md-4">
+              <div class="actions_buttons">
+                <ul>
+                  <li>{{ Html::link('/adminhome/Home/Edit/'.$question->question_id,'Edit', array('class'=>'btn btn-primary btn-sm')) }}</li>
+                  <li>{{ Form::open(array('method' => 'DELETE', 'route' => array('question.destroy', $question->question_id))) }} 
+                      {{ Form::submit('Delete', array('class'=> 'btn btn-danger btn-sm')) }} 
+                      {{ Form::close() }}
+                  </li>
+                </ul>
+              </div>
             </div>
+
           </div>  
         </div>
         </div>

@@ -8,6 +8,7 @@ use App\Http\Requests;
 
 use Illuminate\Support\Facades\URL;
 
+use App\User;
 use App\q_description;
 use DB;
 use App\q_table;
@@ -24,6 +25,7 @@ use Auth;
 use Sofa\Revisionable\Laravel\RevisionableTrait; // trait
 use Sofa\Revisionable\Revisionable;
 use Redirect;
+
 
 class QuestionController extends Controller 
 {
@@ -318,16 +320,21 @@ class QuestionController extends Controller
 	                                 'q_tables.q_id AS question_id',
 	                                 'q_tables.options AS opt_used')->first();
 
-	        $options_used = $question->opt_used;
-	        if ($options_used===1) {
+            $options =DB::table('options')->where('q_id','=',$question->question_id)
+                                        ->where('revision',$question->opt_used)
+                                        ->lists('description','option_no');  
 
-	        	$option_object = options::where('q_id',$question_id)->first();
+            $count_option = count($options);
+	        $options_used = $question->opt_used;
+	        if (!is_null($options_used)) {
+
+	        	$option_object = options::where('q_id',$question_id)->where('revision',$options_used)->first();
 		        $correct_ans = $option_object->correct_ans;
 
-		        return view('users.editOrPickView',compact('question','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','tags','correct_ans','action'));
+		        return view('users.editOrPickView',compact('question','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','tags','count_option','correct_ans','action','options'));
 	        }
 	        else{
-	        	return view('users.editOrPickView',compact('question','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','tags','action'));
+	        	return view('users.editOrPickView',compact('question','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','tags','action','count_option','options'));
 	        }
 	        
     	}
@@ -466,6 +473,7 @@ class QuestionController extends Controller
                 $option->save();
             }
             $question->options = $revisions+1;
+            $changed_flag = 1;
         }
         else{
             //do nothing
@@ -473,8 +481,8 @@ class QuestionController extends Controller
 
         /********************Updating Equations********************/
         $new_equation = Request::get('Q_exp');
-        if($new_equation != ""){
-            if(strcmp($new_equation, $questions->equation)!==0){
+        if(strcmp($new_equation, $questions->equation)!==0){
+            if($new_equation != ""){
             	$equation = new equations();
 	 		
 	 		    $equation->exp_latex = $new_equation;
@@ -494,17 +502,20 @@ class QuestionController extends Controller
         		->where('q_id',$question_id)
         		->update(['exp_id'=>$eq_id]);
             **/
-        	   $changed_flag = 1;
-                }
-        }
-        else{
+        	   
+            }
+            else{
              $question->exp_id = null;
-            }  
+            }
+
+            $changed_flag = 1;   //question changed
+        }
+         
 
         /*********************Updating Codes************************/
         $code_description = Request::get('Q_code');
- 		if($new_equation != ""){
- 		    if (strcmp($code_description, $questions->code)!==0) {
+ 		if (strcmp($code_description, $questions->code)!==0){
+ 		    if($new_equation != ""){
 			     $code = new code();
 
     	 		$code->code_description = $code_description;
@@ -525,22 +536,22 @@ class QuestionController extends Controller
         		->where('q_id',$question_id)
         		->update(['exp_id'=>$eq_id]);
             **/
-        	    $changed_flag = 1;
+        	    
             }
-        }
-        else{
+            else{
                 $question->code_id = null;
+            }
+            $changed_flag = 1;
         }
+        
 
         /*********************updating diagrams*********************/
         $image_removed = Request::get('remove_image');
-        if ($image_removed===0) {
+        if ($image_removed==='0') {
         	# code...
-        	if(is_null($questions->diagram)||empty($questions->diagram)){
-        		//do nothing
-        	}
+        	
 
-        	else if(!is_null(Request::file('Q_diagram'))){
+             if(!empty(Request::file('Q_diagram'))){
 		 			if (Request::file('Q_diagram')->isValid()){
 		 			$diagram = new diagram();
 		            $file = Request::file('Q_diagram');
@@ -560,7 +571,7 @@ class QuestionController extends Controller
 		        }
 	    	}
 
-        	else if(!empty($questions->diagram)){
+        	else if(!is_null($questions->diagram)){
                 $question->diagram_id = null;
         		/**DB::table('q_tables')
         			->where('q_id',$question->question_id)
@@ -572,9 +583,6 @@ class QuestionController extends Controller
         	else{
         		//do nothing
         	}
-        }
-        else{
-        	//do nothing
         }
 
         /********************Update tags**********************/
@@ -606,7 +614,7 @@ class QuestionController extends Controller
 		    	$tag_R -> save();
         	}
             $question->tag_revision = $current_tag_revision + 1;
-
+                 $changed_flag = 1;
             //update tagrevision in qtables
 		}
 
@@ -648,17 +656,33 @@ class QuestionController extends Controller
         }
 
 
-        if($changed_flag ===1){
+        if($changed_flag ==1){
             $question->last_edited_by=$user;
             $question->version = $question->getRevisionsCountAttribute() + 1;
             $question->save();
-        	/**DB::table('q_tables')
+            /**DB::table('q_tables')
         			->where('q_id',$question->question_id)
         			->update(['last_edited_by'=>$user]);
             **/
         }
+        elseif($changed_flag ==0)
+        {
+            $question->disableRevisioning();
+            $question->save();
+        }
 
-        return redirect('usershome/Home');
+        
+
+        $action = Request::get('action');
+        if(strcmp($action,"Edit")==0)
+            return redirect('usershome/Home');
+        elseif(strcmp($action,"Modify")==0){
+
+            DB::table('reviews')->where('q_id',$question_id)
+            ->where('u_id',$user)
+            ->update(['reviewed'=>1]);
+            return redirect('usershome/Review');
+        }
         /********END*****/
 	}
 
@@ -680,11 +704,16 @@ class QuestionController extends Controller
         $diagram = DB::table('diagrams')->where('diagram_id',$version->old('diagram_id'))->value('path');
         $equation = DB::table('equations')->where('exp_id',$version->old('exp_id'))->value('exp_image');
         $code = DB::table('codes')->where('code_id',$version->old('code_id'))->value('code_image_path');
+
+        $option =$version->old('options');
+
+        $q_tag_relation =$version->old('tag_revision');
+
         $difficulty = DB::table('difficulty')->where('key',$version->old('difficulty'))->value('name');
         $time = $version->old('time');
-        $updated_by = $version->old('last_edited_by');
-        $option =$version->old('options');
-        $q_tag_relation =$version->old('q_tag_relation');
+
+        $updated_by = User::where('id',$version->old('last_edited_by'))->value('name');
+        
         
         $question = DB::table('q_tables')
                         ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
@@ -731,11 +760,11 @@ class QuestionController extends Controller
         $question_old->exp_id =$version->old('exp_id');
         $question_old->code_id=$version->old('code_id');    
         $question_old->options=$version->old('options');
-        $question_old->q_tag_relation=$version->old('q_tag_relation');
+        $question_old->tag_revision=$version->old('tag_revision');
         $question_old->difficulty=$version->old('difficulty');
         $question_old->time=$version->old('time');
-        $question_old->version=$version->old('q_tag_relation');
-
+        $question_old->version=$version_no;
+        $question_old->last_edited_by=$version->old('last_edited_by');
         //updating it in the databaase\
         $question_old->disableRevisioning(); //to disable the revision on restore
         $question_old->save();
