@@ -98,6 +98,19 @@ class AuthController extends Controller
         ]);
     }
 
+
+    public function showRegistrationForm()
+    {
+        if (property_exists($this, 'registerView')) {
+            return view($this->registerView);
+        }
+        return view('admin.register');
+    }
+
+
+
+
+
     /**
      * Create a new user instance after a valid registration.
      *
@@ -220,21 +233,27 @@ class AuthController extends Controller
 
                 $tags =  tags::lists('name','id');
                 $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
                         ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
+                        ->leftJoin('category AS category','q_tables.category','=','category.key')
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
                                  'q_tables.options AS option',
-                                 'q_tables.difficulty AS difficulty',
+                                 'difficulty.name AS difficulty',
+                                 'category.name AS category',
                                  'q_tables.time AS time',
                                  'q_descriptions.description AS desc',
                                  'equations.exp_image AS equation',
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
-                                 'reviewer.name AS reviewer')->orderBy('q_tables.updated_at','desc');
+                                 'reviewer.name AS reviewer',
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision');
 
                 $results = $questions->count();
 
@@ -253,21 +272,27 @@ class AuthController extends Controller
 
                 //fetching new questions created 
                 $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
-                        ->leftJoin('users AS editor','q_tables.last_edited_by','=','editor.id')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
+                        ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
+                        ->leftJoin('category AS category','q_tables.category','=','category.key')
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
                                  'q_tables.options AS option',
-                                 'q_tables.difficulty AS difficulty',
+                                 'difficulty.name AS difficulty',
+                                 'category.name AS category',
                                  'q_tables.time AS time',
                                  'q_descriptions.description AS desc',
                                  'equations.exp_image AS equation',
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
-                                 'editor.name AS editor')
+                                 'reviewer.name AS editor',
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision')
                         ->whereIn('q_tables.q_id',$r_q_id)                        
                         ->orderBy('q_tables.updated_at','desc');
 
@@ -279,9 +304,7 @@ class AuthController extends Controller
                                      'reviews.alloted',
                                      'reviews.reviewed')
                             ->where('reviews.reviewed',0);
-                
-                
-                
+                                
                 $results = $questions->count();
                 
                 $reviews = $reviews->get();

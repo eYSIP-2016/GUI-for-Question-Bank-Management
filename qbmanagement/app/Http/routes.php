@@ -103,6 +103,7 @@ Route::group(['middleware' => 'web'] , function(){
     //Route::post('register', 'Auth\AuthController@postRegister');
 
     Route::post('auth/register', 'Auth\AuthController@postRegister');
+    Route::get('auth/register','Auth\AuthController@showRegistrationForm');
 
     Route::auth();
 

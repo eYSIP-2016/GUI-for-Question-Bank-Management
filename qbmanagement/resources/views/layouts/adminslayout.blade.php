@@ -2,26 +2,26 @@
 <html>
 	<head>
 	<!-- Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+	
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="/css/sol.css">
+
+	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+
+	<meta charset="utf-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<!-- jQuery library -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 
 	<!-- Latest compiled JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
-	  <meta charset="utf-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1">
-	  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	  <!-- Latest compiled and minified CSS -->
-	  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/css/bootstrap-select.min.css">
 
-	  <!-- Latest compiled and minified JavaScript -->
-	  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.10.0/js/bootstrap-select.min.js"></script>
-
-	  <link rel="stylesheet" href="/css/sol.css">
-      <script type="text/javascript" src="/css/sol.js"></script>
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	  
+    <script type="text/javascript" src="/css/sol.js"></script>
 
 
 	  <style type="text/css">
@@ -95,7 +95,7 @@
 			color: grey;
 			font-style: italic;
 			margin-left: 10px;
-			padding-bottom: 15px;
+			padding-bottom: 20px;
 		}
 
 		.q_header ul{
@@ -132,8 +132,124 @@
 			padding-bottom: 20px;
 		}
 
-	  </style>
-		<title>{{$option}}</title>
+		.actions_buttons {
+			font-size: 10px;
+			padding-bottom: 0px;
+		}
+
+		.actions_buttons ul{
+			list-style-type: none;
+			float:right;
+		}
+
+		.actions_buttons li{
+			display: inline-block;
+		}
+
+		.indent_left{
+			margin-left: 14px;
+			height: 100px;
+		}
+
+		.radio-container{
+		  display: block;
+		  position: absolute;
+		  margin: auto;
+		  height: auto;
+		  background:#222222;
+		  width: auto;
+		  padding: 0;
+		}
+
+		.radio-container ul{
+		  list-style: none;
+		  height: 100%;
+		  width: 100%;
+		  margin: 0;
+		  padding: 0;
+		}
+
+
+		.radio-container ul li{
+		  color: #AAAAAA;
+		  display: block;
+		  position: relative;
+		  float: left;
+		  width: 100%;
+		  height: 30px;
+		  border-bottom: 1px solid #111111;
+		}
+
+		.radio-container ul li input[type=radio]{
+		  position: absolute;
+		  visibility: hidden;
+		}
+
+		.radio-container ul li label{
+		  display: block;
+		  position: relative;
+		  font-weight: 300;
+		  font-size: 15px;
+		  padding: 5px 5px 5px 60px;
+		  margin: 0px auto;
+		  height: 7px;
+		  z-index: 9;
+		  cursor: pointer;
+		  -webkit-transition: all 0.25s linear;
+		}
+
+		.radio-container ul li:hover label{
+			color: #FFFFFF;
+		}
+
+		.radio-container ul li .check{
+		  display: block;
+		  position: absolute;
+		  border: 1px solid #AAAAAA;
+		  border-radius: 100%;
+		  height: 25px;
+		  width: 25px;
+		  top: 3px;
+		  left: 2px;
+			z-index: 5;
+			transition: border .25s linear;
+			-webkit-transition: border .25s linear;
+		}
+
+		.radio-container ul li:hover .check {
+		  border: 5px solid #FFFFFF;
+		}
+
+		.radio-container ul li .check::before {
+		  display: block;
+		  position: absolute;
+		  content: '';
+		  border-radius: 100%;
+		  height: 15px;
+		  width: 15px;
+		  top: 5px;
+		  left: 5px;
+		  margin: auto;
+		  transition: background 0.25s linear;
+		  -webkit-transition: background 0.25s linear;
+		}
+
+		.radio-container input[type=radio]:checked ~ .check {
+		  border: 5px solid #0DFF92;
+		}
+
+		.radio-container input[type=radio]:checked ~ .check::before{
+		  background: #0DFF92;
+		}
+
+		.radio-container input[type=radio]:checked ~ label{
+		  color: #0DFF92;
+		}
+
+		
+
+	  </style>		
+	  <title>{{$option}}</title>
 
 		<script type="text/javascript">
 
@@ -325,7 +441,7 @@
 	<nav class="navbar navbar-inverse">
 	  <div class="container-fluid">
 	    <div class="navbar-header">
-	      <a class="navbar-brand" href="#">Username</a>
+	      <a class="navbar-brand" href="/adminhome">{{ Auth::user()->name }}</a>
 	    </div>
 	    <ul class="nav navbar-nav navbar-right">
 	      <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> logout</a></li>
