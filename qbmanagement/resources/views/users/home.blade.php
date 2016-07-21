@@ -1,6 +1,4 @@
-
 @extends('users.usershome')
-
 	@section('home')
 		<h1><i>My Questions</i></h1><br>
 		{!! Form::open(['url'=>'usershome/Home']) !!}
@@ -51,9 +49,11 @@
 					</ul>
 				</div>
 
-				@if($question->option=='1')
+				@if(!is_null($question->option))
 					<?php
-						$options = App\options::where('q_id','=',$question->q_id)->lists('description','option_id');
+						$options = App\options::where('q_id','=',$question->q_id)
+								->where('revision',$question->option)
+								->lists('description','option_id');
 					?>
 
 					<ol style="list-style-type:lower-alpha;">
@@ -78,6 +78,7 @@
 							$question_id = $question->q_id;
 							$q_tags = App\q_tag_relation::
 										where('q_id','=',$question_id)
+										->where('tag_revision',$question->tag_revision)
 										->leftJoin('tags','q_tag_relations.tag_id','=','tags.id')
 										->lists('tags.name','tags.id');
 						?>
@@ -91,7 +92,6 @@
 								<ul>
 									<li>{{ Html::link('/usershome/Home/Edit/'.$question->question_id,'Edit', array('class'=>'btn btn-primary btn-sm')) }}</li>
 									<li>{{ Html::link('/usershome/Home/Pick/'.$question->question_id,'Pick', array('class'=>'btn btn-default btn-sm')) }}</li>
-									<!--li>{{ Html::link('/usershome/Delete/'.$question->question_id,'Delete', array('class'=>'btn btn-danger btn-sm')) }}</li-->
 									<li>{{ Form::open(array('method' => 'DELETE', 'route' => array('question.destroy', $question->question_id))) }} 
                                         {{ Form::submit('Delete', array('class'=> 'btn btn-danger btn-sm')) }} 
                                         {{ Form::close() }}

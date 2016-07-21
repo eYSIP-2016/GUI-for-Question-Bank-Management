@@ -148,7 +148,7 @@
       <div class="col-sm-8">
       <div class="w3-card-4" style="border-radius:0px;" ></br></br>
         <header class="w3-container w3-light-grey">
-          </br></br><center><h3><i><p>Current version of Question</p></i></h3></center></br></br>
+          </br></br><center><h3><i><p>Current Question</p></i></h3></center></br></br>
         </header></br>
         <div class="w3-container">
           <div class="q_header">
@@ -171,10 +171,12 @@
               @endif
             </ul>
           </div>
-          @if($question->option=='1')
+          @if(!is_null($question->option))
             <?php
-              $options = App\options::where('q_id','=',$question->q_id)->lists('description','option_id');
-            ?> 
+              $options = App\options::where('q_id','=',$question->q_id)
+                  ->where('revision',$question->option)
+                  ->lists('description','option_id');
+            ?>
             <ol style="list-style-type:lower-alpha;">
               @foreach($options as $key => $value)
                 <li>{{ $value }}</li><br>
@@ -190,10 +192,11 @@
             <div class="row">
               <div class="col-md-10">
                 <?php 
-                  $question_id = $question->q_id;
-                  $q_tags = App\q_tag_relation::where('q_id','=',$question_id)
-                            ->leftJoin('tags','q_tag_relations.tag_id','=','tags.id')
-                            ->lists('tags.name','tags.id');
+                    $question_id = $question->q_id;
+                    $q_tags = App\q_tag_relation::where('q_id','=',$question_id)
+                              ->where('tag_revision',$question->tag_revision)
+                              ->leftJoin('tags','q_tag_relations.tag_id','=','tags.id')
+                              ->lists('tags.name','tags.id');
                 ?>
                 @foreach($q_tags as $key => $value)
                   <span class="label label-info">{{ $value }}</span>
@@ -246,10 +249,12 @@
               @endif
             </ul>
           </div>
-          @if($question->option=='1')
+          @if(!is_null($option))
             <?php
-              $options = App\options::where('q_id','=',$question->q_id)->lists('description','option_id');
-            ?> 
+              $options = App\options::where('q_id','=',$question->q_id)
+                  ->where('revision',$option)
+                  ->lists('description','option_id');
+            ?>
             <ol style="list-style-type:lower-alpha;">
               @foreach($options as $key => $value)
                 <li>{{ $value }}</li><br>

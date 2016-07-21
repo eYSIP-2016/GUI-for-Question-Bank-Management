@@ -98,6 +98,19 @@ class AuthController extends Controller
         ]);
     }
 
+
+    public function showRegistrationForm()
+    {
+        if (property_exists($this, 'registerView')) {
+            return view($this->registerView);
+        }
+        return view('admin.register');
+    }
+
+
+
+
+
     /**
      * Create a new user instance after a valid registration.
      *
@@ -220,21 +233,27 @@ class AuthController extends Controller
 
                 $tags =  tags::lists('name','id');
                 $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
                         ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
+                        ->leftJoin('category AS category','q_tables.category','=','category.key')
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
                                  'q_tables.options AS option',
-                                 'q_tables.difficulty AS difficulty',
+                                 'difficulty.name AS difficulty',
+                                 'category.name AS category',
                                  'q_tables.time AS time',
                                  'q_descriptions.description AS desc',
                                  'equations.exp_image AS equation',
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
-                                 'reviewer.name AS reviewer')->orderBy('q_tables.updated_at','desc');
+                                 'reviewer.name AS reviewer',
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision');
 
                 $results = $questions->count();
 
@@ -253,21 +272,27 @@ class AuthController extends Controller
 
                 //fetching new questions created 
                 $questions = DB::table('q_tables')
-                        ->leftJoin('q_descriptions','q_tables.q_id','=','q_descriptions.q_id')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
                         ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
                         ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
-                        ->leftJoin('users AS editor','q_tables.last_edited_by','=','editor.id')
-                        ->select('q_tables.diagram_path AS diagram',
+                        ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
+                        ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
+                        ->leftJoin('category AS category','q_tables.category','=','category.key')
+                        ->select('diagrams.path AS diagram',
                                  'q_tables.q_id AS q_id',
                                  'q_tables.options AS option',
-                                 'q_tables.difficulty AS difficulty',
+                                 'difficulty.name AS difficulty',
+                                 'category.name AS category',
                                  'q_tables.time AS time',
                                  'q_descriptions.description AS desc',
                                  'equations.exp_image AS equation',
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
-                                 'editor.name AS editor')
+                                 'reviewer.name AS editor',
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision')
                         ->whereIn('q_tables.q_id',$r_q_id)                        
                         ->orderBy('q_tables.updated_at','desc');
 
@@ -279,9 +304,7 @@ class AuthController extends Controller
                                      'reviews.alloted',
                                      'reviews.reviewed')
                             ->where('reviews.reviewed',0);
-                
-                
-                
+                                
                 $results = $questions->count();
                 
                 $reviews = $reviews->get();
@@ -350,5 +373,62 @@ class AuthController extends Controller
         }
 
         return Redirect::back();
+    }
+
+
+
+        public function editOrPickQuestion($action, $question_id){
+        if($action ==="Edit"|| $action==="Pick" || $action==="Modify"){
+            $symbol_group = DB::table('math_symbols_group')->get();
+            $symbols_1 = DB::table('maths_symbols')->where('type','1')->get();
+            $symbols_2 = DB::table('maths_symbols')->where('type','2')->get();
+            $symbols_3 = DB::table('maths_symbols')->where('type','3')->get();
+            $symbols_4 = DB::table('maths_symbols')->where('type','4')->get();
+            $symbols_5 = DB::table('maths_symbols')->where('type','5')->get();
+            $symbols_6 = DB::table('maths_symbols')->where('type','6')->get();
+
+            $tags =  tags::lists('name','id');
+
+            $question = DB::table('q_tables')
+                            ->where('q_tables.q_id','=',$question_id)
+                            ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
+                            ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
+                            ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
+                            ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                            ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
+                            ->leftJoin('category AS category','q_tables.category','=','category.key')
+                            ->select('diagrams.path AS diagram',
+                                     'q_tables.tag_revision AS tag_revision',
+                                     'q_tables.options AS option',
+                                     'q_tables.time AS time',
+                                     'difficulty.name AS difficulty',
+                                     'category.name AS category',
+                                     'q_descriptions.description AS description',
+                                     'equations.exp_latex AS equation',
+                                     'codes.code_description AS code',
+                                     'q_tables.q_id AS question_id',
+                                     'q_tables.options AS opt_used')->first();
+
+            $options =DB::table('options')->where('q_id','=',$question->question_id)
+                                        ->where('revision',$question->opt_used)
+                                        ->lists('description','option_no');  
+
+            $count = count($options);
+            $options_used = $question->opt_used;
+            if (!is_null($options_used)) {
+
+                $option_object = options::where('q_id',$question_id)->where('revision',$options_used)->first();
+                $correct_ans = $option_object->correct_ans;
+
+                return view('admin.edit',compact('question','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','tags','correct_ans','action','options','count'));
+            }
+            else{
+                return view('admin.edit',compact('question','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','tags','action'));
+            }
+            
+        }
+        else{
+            App::abort(403, 'Unauthorized action.');
+        }
     }
 }

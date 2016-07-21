@@ -54,7 +54,44 @@ class NavController extends Controller
             return view('users.compose',compact('option','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','equations','tags'));
         }
         elseif ($option==="Review") {
-            return view('users.review',compact('option'));   
+
+            $user = Auth::id();
+            $tags = tags::lists('name','id');
+
+            $review_q_id = DB::table('reviews')
+                            ->where('reviewed',0)
+                            ->where('alloted',1)
+                            ->where('u_id',$user)
+                            ->lists('q_id');
+
+
+            $review_questions = DB::table('q_tables')
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
+                        ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
+                        ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
+                        ->leftJoin('users AS creator','q_tables.created_by','=','creator.id')
+                        ->leftJoin('users AS reviewer','q_tables.last_edited_by','=','reviewer.id')
+                        ->leftJoin('difficulty AS difficulty','q_tables.difficulty','=','difficulty.key')
+                        ->leftJoin('category AS category','q_tables.category','=','category.key')
+                        ->select('diagrams.path AS diagram',
+                                 'q_tables.q_id AS q_id',
+                                 'q_tables.options AS option',
+                                 'difficulty.name AS difficulty',
+                                 'category.name AS category',
+                                 'q_tables.time AS time',
+                                 'q_descriptions.description AS desc',
+                                 'equations.exp_image AS equation',
+                                 'codes.code_image_path AS code',
+                                 'creator.name AS creator',
+                                 'reviewer.name AS reviewer',
+                                 'q_tables.q_id AS question_id')
+                        ->whereIn('q_tables.q_id',$review_q_id);
+
+            $results = $review_questions->count();
+            $review_questions = $review_questions->paginate(4);
+            return view('users.review',compact('option','review_questions','tags','results'));
+
         }
 
         elseif ($option==="Browse") {
@@ -80,7 +117,8 @@ class NavController extends Controller
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
-                                 'q_tables.q_id AS question_id');
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision');
 
             $results = $questions->count();
 
@@ -96,6 +134,7 @@ class NavController extends Controller
             $tags =  tags::lists('name','id');
 
             $revision = DB::table('revisions')->where('action','updated')->distinct()->lists('row_id');
+            
             $questions = DB::table('q_tables')
                         ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
                         ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
@@ -117,6 +156,7 @@ class NavController extends Controller
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
                                  'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision',
                                  'q_tables.version AS version')
                         ->where('q_tables.created_by','=',$user)
                         ->whereIn('q_id',$revision);
@@ -159,7 +199,9 @@ class NavController extends Controller
                                  'codes.code_image_path AS code',
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
-                                 'q_tables.q_id AS question_id')->where('q_tables.created_by','=',$user);
+                                 'q_tables.q_id AS question_id',
+                                 'q_tables.tag_revision AS tag_revision')
+                        ->where('q_tables.created_by','=',$user);
 
             $results = $questions->count();
             $questions = $questions->paginate(4);

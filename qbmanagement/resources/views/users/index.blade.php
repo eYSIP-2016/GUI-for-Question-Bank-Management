@@ -37,7 +37,18 @@
 <center>
 	{{ link_to('register', 'Add User',array('class' => 'btn btn-info') ,$secure =null) }}
 </center>
+<?php 
+ 
+ $str1 = "tushar shah is good ";
+ $str2 = null;
+ $str3 = "Tushar Shah is Good" ;
 
+ echo strcmp($str1,$str2);
+ echo strcasecmp($str1,$str3);
+ echo strcmp($str1,$str3);
+$a = Auth::user()->email;
+ echo "test:".strcmp("tusharshahsp@gmail.com",$a);
+?>
 
 </br>
 </br>

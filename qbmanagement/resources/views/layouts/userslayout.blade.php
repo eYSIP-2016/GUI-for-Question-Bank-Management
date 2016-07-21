@@ -253,6 +253,133 @@
 
 		<script type="text/javascript">
 
+			var openFile = function(event) {
+			    var input = event.target;
+
+			    var reader = new FileReader();
+			    reader.onload = function(){
+			      var dataURL = reader.result;
+			      var output = document.getElementById('diagram_preview');
+			      output.src = dataURL;
+			    };
+			    reader.readAsDataURL(input.files[0]);
+			  };
+
+function makeQuestionPreview(){
+				//make category Preview
+					var category_container = document.getElementById("category_container");
+					// Clear previous contents of the container
+				    while (category_container.hasChildNodes()) {
+				        category_container.removeChild(category_container.lastChild);
+				    }
+				   	var category = document.getElementById("category").value;
+				   	if (category==="1") {
+				   		category_container.appendChild(document.createTextNode("Quantitative"));
+				   	}
+				   	if (category==="2") {
+				   		category_container.appendChild(document.createTextNode("Electronics"));
+				   	}
+				   	if (category==="3") {
+				   		category_container.appendChild(document.createTextNode("Programming"));
+				   	}
+
+				//make difficulty Preview
+					var difficulty_container = document.getElementById("difficulty_container");
+					// Clear previous contents of the container
+				    while (difficulty_container.hasChildNodes()) {
+				        difficulty_container.removeChild(difficulty_container.lastChild);
+				    }
+				   	var difficulty = document.getElementById("difficulty").value;
+				   	if (difficulty==="1") {
+				   		difficulty_container.appendChild(document.createTextNode("Quantitative"));
+				   	}
+				   	if (difficulty==="2") {
+				   		difficulty_container.appendChild(document.createTextNode("Electronics"));
+				   	}
+				   	if (difficulty==="3") {
+				   		difficulty_container.appendChild(document.createTextNode("Programming"));
+				   	}
+
+				//make difficulty Preview
+					var time_container = document.getElementById("time_container");
+					// Clear previous contents of the container
+				    while (time_container.hasChildNodes()) {
+				        time_container.removeChild(time_container.lastChild);
+				    }
+				   	var time = document.getElementById("timeRequired").value;
+				   	time_container.appendChild(document.createTextNode(time));
+
+				//make description Preview
+					var description_container = document.getElementById("description_container");
+					// Clear previous contents of the container
+				    while (description_container.hasChildNodes()) {
+				        description_container.removeChild(description_container.lastChild);
+				    }
+				   	var description = document.getElementById("Q_desc").value;
+				   	description_container.appendChild(document.createTextNode(description));
+
+				//make equation Preview
+					var equation_container = document.getElementById("equation_container");
+					// Clear previous contents of the container
+				    while (equation_container.hasChildNodes()) {
+				        equation_container.removeChild(equation_container.lastChild);
+				    }
+				   	var equation_path = document.getElementById("hidden_exp_url_id").value;
+				   	var equation = document.createElement("img");
+		                equation.src = equation_path;
+				   	equation_container.appendChild(equation);
+
+				//make code Preview
+					var code_container = document.getElementById("code_container");
+					// Clear previous contents of the container
+				    while (code_container.hasChildNodes()) {
+				        code_container.removeChild(code_container.lastChild);
+				    }
+				   	var code_path = document.getElementById("hidden_code_url_id").value;
+				   	var code = document.getElementById("Q_code").value;
+				   	if (code!=="") {
+				   		var code = document.createElement("img");
+		                code.src = code_path;
+				   		code_container.appendChild(code);
+				   	}
+				   	
+
+				//make options preview
+					var option_text,member_name;
+					var number = document.getElementById("no_questions").value;
+					var options_container = document.getElementById("options_list");
+					while (options_container.hasChildNodes()) {
+				        options_container.removeChild(options_container.lastChild);
+				    }
+					for (i=1;i<=number;i++){
+		                // Append a node with a random text
+		                member_name = "member"+i;
+		                option_text = document.getElementById(member_name).value;
+		                options_container.appendChild(document.createTextNode(i+". "+option_text));
+		                options_container.appendChild(document.createElement("br"));
+		            }
+
+		        //make tags Preview
+		        	var tags = []; 
+					$("#my-select option:selected").each(function(i, selected){ 
+					  tags[i] = $(selected).text(); 
+					});
+		        	var tag_container = document.getElementById("tag_container");
+		        	while (tag_container.hasChildNodes()) {
+				        tag_container.removeChild(tag_container.lastChild);
+				    }
+		        	for (i=0;i<tags.length;i++){
+		                // Append a node with a random text
+		                var span = document.createElement("span");
+		                span.className = "label label-info";
+		               	span.appendChild(document.createTextNode(tags[i]));
+		               	tag_container.appendChild(span);
+				   		tag_container.appendChild(document.createTextNode(" "));
+
+		            }
+				}		
+
+
 			$(function () {
 		    	$('#myTab a:last').tab('show')
 		  	})
@@ -414,6 +541,7 @@
 		                input.name = "member" + i;
 		                input.required = "required";
 		                input.class = "form-control";
+		                input.id = "member" + i;
 		                container.appendChild(input);
 		                // Append a line break 
 		                container.appendChild(document.createElement("br"));
@@ -442,10 +570,10 @@
 	<nav class="navbar navbar-inverse">
 	  <div class="container-fluid">
 	    <div class="navbar-header">
-	      <a class="navbar-brand" href="#">Username</a>
+	      <a class="navbar-brand" href="#">{{ Auth::user()->name }}</a>
 	    </div>
 	    <ul class="nav navbar-nav navbar-right">
-	      <li><a href="#"><span class="glyphicon glyphicon-log-out"></span> logout</a></li>
+	      <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> logout</a></li>
 	    </ul>
 	  </div>
 	</nav>

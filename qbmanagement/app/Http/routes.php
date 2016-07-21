@@ -73,6 +73,7 @@ Route::group(['middleware' => 'web'] , function(){
         return $response;
     });
    
+    Route::post('usershome/Home','QuestionController@getUsersQuestions');
 
     Route::post('usershome/Compose','QuestionController@create');
 
@@ -80,15 +81,25 @@ Route::group(['middleware' => 'web'] , function(){
 
     Route::get('usershome/Home/{action}/{question_id}','QuestionController@editOrPickQuestion');
 
+    Route::get('adminhome/Home/{action}/{question_id}','Auth\AuthController@editOrPickQuestion');
+
+    Route::post('usershome/Review/Modify/{question_id}','QuestionController@makeChanges');
+
+    Route::get('usershome/Review/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
     Route::get('usershome/Browse/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
+    Route::post('usershome/Home/Pick/{question_id}','QuestionController@create');
 
     Route::post('usershome/Home/Edit/{question_id}','QuestionController@makeChanges');
     
-    Route::delete('usershome/Home/Delete/{question_id}',['as' => 'question.destroy','uses' => 'QuestionController@delete']);
-    
-    Route::post('usershome/Home/Pick/{question_id}','QuestionController@create');
+    Route::post('admminhome/Home/Edit/{question_id}','Auth\AuthController@makeChanges');
 
+    Route::post('usershome/Review/Modify/{question_id}','QuestionController@makeChanges');
+    
     Route::post('usershome/Browse/Pick/{question_id}','QuestionController@create');
+
+    Route::delete('usershome/Home/Delete/{question_id}',['as' => 'question.destroy','uses' => 'QuestionController@delete']);
 
     Route::get('usershome/History/{question_id}/{version_no}','QuestionController@version');
 
@@ -97,6 +108,7 @@ Route::group(['middleware' => 'web'] , function(){
     //Route::post('register', 'Auth\AuthController@postRegister');
 
     Route::post('auth/register', 'Auth\AuthController@postRegister');
+    Route::get('auth/register','Auth\AuthController@showRegistrationForm');
 
     Route::auth();
 

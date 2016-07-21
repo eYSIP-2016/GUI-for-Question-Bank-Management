@@ -1,32 +1,15 @@
 @extends('admin.adminhome')
 
 	@section('browse')
-    <head> <h2><i>Browse</i></h2><br></head>
-
-
-		{!! Form::open(['url'=>'adminhome/Browse']) !!}
-    <div class="form-group">
-      <div class="row">
-        <div class="col-md-10">
-          {!! Form::text('search_item','',array('placeholder'=>'Search','class'=>'form-control')) !!}
-        </div>
-        <div class="col-md-2">
-          {!! Form::submit('Submit',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
-        </div>
-      </div>
-      <br>
-      {!! Form::select('tags[]',$tags,null,array('id'=>'my-select','multiple'=>'multiple')) !!}
-      {{ Html::linkAction('Auth\AuthController@sendOption','Refresh',['Browse']) }}     
-    </div>
-  {!! Form::close() !!}
-  <hr>
+    <head> <h1><i>Browse</i></h1><br></head>
+  
   <div class="results">
-    {{$results}} results
+    {{$results}} Questions
   </div>
   @foreach($questions as $question)
 
-    <div class="card" style="border-radius:0px;" >
-      <div class="card-block">
+    <div class="w3-card-4" style="border-radius:0px;" >
+      <div class="w3-container"  style="padding:20px">
         <div class="q_header">
           <ul>
             <li>Difficulty level:<div class=level_and_time>{{ $question->difficulty }}</div></li>
@@ -60,9 +43,11 @@
           </ul>
         </div>
 
-        @if($question->option=='1')
+        @if(!is_null($question->option))
           <?php
-            $options = App\options::where('q_id','=',$question->q_id)->lists('description','option_id');
+            $options = App\options::where('q_id','=',$question->q_id)
+                ->where('revision',$question->option)
+                ->lists('description','option_id');
           ?>
 
           <ol style="list-style-type:lower-alpha;">
@@ -79,14 +64,15 @@
             <li>Updated By: {{ $question->reviewer }} </li> 
           </ul>
         </div>
-
-        <div class="card-footer" style="background:white;">
+        <hr>
+        <div class="w3-container" style="background:white;">
           <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-8">
             <?php 
               $question_id = $question->q_id;
               $q_tags = App\q_tag_relation::
                     where('q_id','=',$question_id)
+                    ->where('tag_revision',$question->tag_revision)
                     ->leftJoin('tags','q_tag_relations.tag_id','=','tags.id')
                     ->lists('tags.name','tags.id');
             ?>
@@ -95,16 +81,23 @@
             @endforeach
             </div>
             
-            <div class="col-md-2">
-              <button type="button" class="btn btn-default btn-sm" style="float:right;">
-                      <span class="glyphicon glyphicon-hand-up"></span> Pick
-                  </button>
+            <div class="col-md-4">
+              <div class="actions_buttons">
+                <ul>
+                  <li>{{ Html::link('/adminhome/Home/Edit/'.$question->question_id,'Edit', array('class'=>'btn btn-primary btn-sm')) }}</li>
+                  <li>{{ Form::open(array('method' => 'DELETE', 'route' => array('question.destroy', $question->question_id))) }} 
+                      {{ Form::submit('Delete', array('class'=> 'btn btn-danger btn-sm')) }} 
+                      {{ Form::close() }}
+                  </li>
+                </ul>
+              </div>
             </div>
+
           </div>  
         </div>
         </div>
-      </div>
-  @endforeach   
-  {!! $questions->render() !!}
+      </div></br>
+  @endforeach
 
-	@stop
+  {!! $questions->render() !!}
+@stop

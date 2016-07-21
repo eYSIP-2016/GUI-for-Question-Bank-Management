@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class options extends Model
+class category extends Model
 {
     //
-    protected $primaryKey = 'option_id';
+    protected $primaryKey = 'key';
 }

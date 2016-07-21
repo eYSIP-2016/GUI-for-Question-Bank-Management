@@ -9,7 +9,9 @@
     </br>
         <head><h4><legend>Add Tags</legend></h4></head>
       
-        <div class="w3-container">
+        <div class="panel panel-default">
+                <div class="panel-heading">Add a New Tag</div>
+                <div class="panel-body">
             <form class="form-horizontal" role="form" method="POST" action="/tags" >
             
             {!! Form::model(new App\tags, ['route' => ['tags.store']]) !!}
@@ -33,12 +35,12 @@
                         </button>
                     </div>
                 </div>
-            </form>
+            </form></div>
         </div></br></br></br></br>
     </div>
 
 
-    <head><h4><legend>View or Remove Tags</legend></h4></head>
+    <head><h4><legend>View or Delete</legend></h4></head>
     <table class="table table-striped table-bordered table-hover tablecondensed"> 
         <thead> 
             <tr><th>No.</th> 
