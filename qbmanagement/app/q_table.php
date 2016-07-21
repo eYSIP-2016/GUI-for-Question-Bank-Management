@@ -21,7 +21,7 @@ class q_table extends Model implements Revisionable
     'tag_revision',
     'difficulty',
     'time',
-    'last_edited_by'  
+    'last_edited_by'
     ];
 
     //Using Revisionable Presenter for presenting the label  { Its optional}

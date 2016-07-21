@@ -81,11 +81,15 @@ Route::group(['middleware' => 'web'] , function(){
 
     Route::get('usershome/Home/{action}/{question_id}','QuestionController@editOrPickQuestion');
 
-    Route::get('adminhome/Home/{action}/{question_id}','Auth\AuthController@editOrPickQuestion');
+    Route::get('adminhome/Browse/{action}/{question_id}','Auth\AuthController@editOrPickQuestion');
 
     Route::post('usershome/Review/Modify/{question_id}','QuestionController@makeChanges');
 
+    Route::get('usershome/Review/Reviewed/{question_id}','QuestionController@reviewed');
+
+    
     Route::get('usershome/Review/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
 
     Route::get('usershome/Browse/{action}/{question_id}','QuestionController@editOrPickQuestion');
 
@@ -93,7 +97,7 @@ Route::group(['middleware' => 'web'] , function(){
 
     Route::post('usershome/Home/Edit/{question_id}','QuestionController@makeChanges');
     
-    Route::post('admminhome/Home/Edit/{question_id}','Auth\AuthController@makeChanges');
+    Route::post('adminhome/Browse/Edit/{question_id}','Auth\AuthController@makeChanges');
 
     Route::post('usershome/Review/Modify/{question_id}','QuestionController@makeChanges');
     

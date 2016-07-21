@@ -97,9 +97,7 @@
             </div>
             
             <div class="col-md-2">
-              <button type="button" class="btn btn-default btn-sm" style="float:right;">
-                      <span class="glyphicon glyphicon-hand-up"></span> Pick
-                  </button>
+              {{ Html::link('/usershome/Browse/Pick/'.$question->question_id,'Pick', array('class'=>'btn btn-default btn-sm','style' => 'float:right')) }}
             </div>
           </div>  
         </div>

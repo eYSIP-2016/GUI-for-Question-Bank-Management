@@ -400,7 +400,16 @@
 				{!! Form::label('no_questions','Options') !!}<br>
 				<div class="row">
 					<div class="col-md-9">
+
+						@if($count_option > 0)
+
 						{!! Form::number('no_questions',$count_option,array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
+
+						@else
+
+						{!! Form::number('no_questions','',array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
+
+						@endif
 					</div>
 
 					<div class="col-md-1">
@@ -426,7 +435,7 @@
 							{!! Form::radio('answer',$key) !!}{{$key}}
 							@endif
 						@endforeach
-						
+
 				@endif
 				</div><br>
 
@@ -478,6 +487,7 @@
 				<?php 
 						$question_id = $question->question_id;
 						$q_tags = App\q_tag_relation::where('q_id','=',$question_id)
+									->where('tag_revision',$question->tag_revision)
 									->leftJoin('tags','q_tag_relations.tag_id','=','tags.id')
 									->lists('tags.id')->all();
 				?>
@@ -513,13 +523,13 @@
 					</div>
 
 					<div class="col-md-6" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
-						<!-----------------Category tags------------------>						
+						<!-----------------Time------------------>						
 						{!! Form::label('timeRequired','Time Required') !!}
 						<div class="indent_left">
-						{!! Form::number('timeRequired',$question->time,array('required'=>'required','min'=>'30','placeholder'=>'in seconds')) !!}
+						{!! Form::number('timeRequired',$question->time,array('required'=>'required','min'=>'30','placeholder'=>'in  seconds')) !!}
 						</div>
 					</div>
-
+						<!-----------------Category tags------------------>					
 					<div class="col-md-3">
 						{!! Form::label('category','Category') !!}<br>
 						<div class="indent_left">							
