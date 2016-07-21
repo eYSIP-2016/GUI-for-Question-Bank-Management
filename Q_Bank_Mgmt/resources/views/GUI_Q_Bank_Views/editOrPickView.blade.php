@@ -389,14 +389,19 @@
 
 
 				<?php
-					$options = App\options::where('q_id','=',$question->question_id)->lists('description','option_no');
+					$options = App\options::where('q_id','=',$question->question_id)->where('revision',$question->opt_used)->lists('description','option_no');
 
 					$count_option = $options->count();
 				?>
+				
 				{!! Form::label('no_questions','Options') !!}<br>
 				<div class="row">
 					<div class="col-md-9">
-						{!! Form::number('no_questions',$options->count(),array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
+						@if($count_option!==0)
+							{!! Form::number('no_questions',$options->count(),array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
+						@else
+							{!! Form::number('no_questions','',array( 'min'=>'2','max' => '6','id'=>'no_questions','class'=>'form-control','onkeyup'=>"makeOptions()",'placeholder'=>'Pick a Number between 2 and 6')) !!}
+						@endif
 					</div>
 
 					<div class="col-md-1">
@@ -453,9 +458,9 @@
 					<!----------Upload Images---------->
 					{!! Form::label('Q_diagram','Diagram') !!}
 
-			        @if(is_null($question->diagram)||empty($question->diagram))
+			        @if(is_null($question->diagram))
 			        	{!! Form::file('Q_diagram',array('class'=>'form-control')) !!}
-				        {!! Form::hidden('remove_image','',array('id'=>'remove_image')) !!}
+				        {!! Form::hidden('remove_image','0',array('id'=>'remove_image')) !!}
 				    @else
 				    	{!! Form::file('Q_diagram',array('disabled'=>'false','class'=>'form-control')) !!}
 						<a onclick="refresh('image-container')">

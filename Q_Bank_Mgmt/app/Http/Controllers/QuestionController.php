@@ -133,7 +133,7 @@ class QuestionController extends Controller
         $q_description->description = Request::get('Q_desc');
         $description_image_URL = Request::get('hidden_desc_url');
         $name = 'question'.$date.$time.'.png';
-        $path = storage_path().'/images/Question/'.$name;
+        $path = storage_path().'/images/'.$name;
         file_put_contents($path, file_get_contents($description_image_URL));
 
         $path = URL::to('/').'/images/'.$name;
@@ -396,6 +396,7 @@ class QuestionController extends Controller
         $revisions = options::where('q_id',$question_id)->max('revision');
 
        	$current_option_count = Request::get('no_questions');
+        Log::info('check ' .$current_option_count);
 
         if (!is_null($question->option)) {
             # code...
@@ -403,10 +404,10 @@ class QuestionController extends Controller
                                     ->where('revision',$question->option)
                                     ->count();  
 
-            $descs = DB::table('options')
+            $descs = DB::table('options')->select('description','option_no')
                         ->where('q_id',$question_id)
                         ->where('revision',$question->option)
-                        ->lists('description','option_no');
+                        ->get();
         }
 		else{
             $count_initial = 0;
@@ -430,7 +431,7 @@ class QuestionController extends Controller
                     $name_option = 'member'.$i;
                     $text = Request::get($name_option);
 
-                    if (strcmp($descs[$i-1],$text)!==0) {
+                    if (strcmp($descs[$i-1]['description'],$text)!==0) {
                         $options_changed = 1;
                     }
                     else{
@@ -444,8 +445,8 @@ class QuestionController extends Controller
         }
 
 
-        if ($options_changed===1) {
-        	
+        if ($options_changed===1&&!empty($current_option_count)) {
+        	Log::info('Count '.$current_option_count);
 			for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
 			 	$name_option = 'member'.$i;
 				$text = Request::get($name_option);
@@ -462,6 +463,13 @@ class QuestionController extends Controller
             DB::table('q_tables')
                     ->where('q_id',$question_id)
                     ->update(['options'=>$revisions+1]);
+            $changed_flag = 1;
+        }
+        elseif ($options_changed===1&&empty($current_option_count)) {
+            # code...
+            DB::table('q_tables')
+                    ->where('q_id',$question_id)
+                    ->update(['options'=>null]);
             $changed_flag = 1;
         }
         else{
@@ -524,13 +532,9 @@ class QuestionController extends Controller
 
         /*********************updating diagrams*********************/
         $image_removed = Request::get('remove_image');
-        if ($image_removed===0) {
+        if ($image_removed==="0") {
         	# code...
-        	if(is_null($question->diagram)||empty($question->diagram)){
-        		//do nothing
-        	}
-
-        	else if(!is_null(Request::file('Q_diagram'))){
+        	if(!empty(Request::file('Q_diagram'))){
 		 			if (Request::file('Q_diagram')->isValid()){
 		 			$diagram = new diagram();
 		            $file = Request::file('Q_diagram');
@@ -544,12 +548,12 @@ class QuestionController extends Controller
 		            $diagram->save();
 		            DB::table('q_tables')
         				->where('q_id',$question->question_id)
-        				->update(['diagram'=>$diagram->getKey()]);    
+        				->update(['diagram_id'=>$diagram->getKey()]);    
         			$changed_flag = 1;
 		        }
 	    	}
 
-        	else if(!empty($question->diagram)){
+        	else if(!is_null($question->diagram)){
         		DB::table('q_tables')
         			->where('q_id',$question->question_id)
         			->update(['diagram_id'=>null]);
@@ -577,7 +581,7 @@ class QuestionController extends Controller
 	 	
 		$compare = array_diff($tags_new, $q_tags);
 
-		if(empty($compare) && is_null($compare)){
+		if(empty($compare)){
 			//do nothing
 		}
 
