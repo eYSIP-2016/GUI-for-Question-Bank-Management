@@ -21,10 +21,10 @@ Route::group(['middleware' => 'web'] , function(){
         {
             if ( Auth::user()->user_type_id == 1)
                 
-                return redirect('adminhome');
+                return redirect('adminhome/');
             else 
                 return
-                  redirect('usershome');
+                  redirect('usershome/');
         } 
         else{
               return view('auth.login');
@@ -37,7 +37,8 @@ Route::group(['middleware' => 'web'] , function(){
     Route::get('usershome/', [ 'middleware' => 'auth',
     'as' => 'usershome', function () {
     $option="";
-    return view('users.usershome',compact('option'));
+    return redirect('/usershome/Home');
+    //return view('users.usershome',compact('option'));
 
     }]);
 
@@ -45,7 +46,8 @@ Route::group(['middleware' => 'web'] , function(){
     Route::get('adminhome/', [ 'middleware' => 'adm',
     'as' => 'adminhome', function () {
     $option="";
-    return view('admin.adminhome',compact('option'));
+    return redirect('/adminhome/New_questions');
+    //return view('admin.adminhome',compact('option'));
 
     }]);
 

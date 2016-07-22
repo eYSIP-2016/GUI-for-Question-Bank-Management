@@ -281,8 +281,11 @@
     		<?php 
        		    if(strcmp($action,"Edit") ==0)
 				    $url = "/usershome/Home" ;
+				elseif(strcmp($action,"Pick")==0)
+
+				    $url = "/usershome/Browse" ;
 				else
-				    $url = "/usershome/Review" ;
+					$url = "/usershome/Review"
 			?>
 
 			{!! Form::open(['url'=>$url.'/'.$action.'/'.$question->question_id,'files' => true]) !!}

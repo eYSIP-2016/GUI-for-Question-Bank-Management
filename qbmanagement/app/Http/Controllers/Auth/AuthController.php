@@ -134,7 +134,7 @@ class AuthController extends Controller
             'password' => bcrypt($data['password']),
         ]);  **/
 
-        //return Auth::user();
+        return Auth::user();
     }
 
     public function postRegister(Request $request)
