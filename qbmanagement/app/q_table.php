@@ -61,7 +61,12 @@ class q_table extends Model implements Revisionable
     /***For Category***/
     public function category()
     {
-        return $this->hasOne('App\category','key','category');
+        return $this->hasOne('App\category','category','key');
+    }
+
+    public function review()
+    {
+        return $this->hasMany('App\review','q_id','q_id');
     }
 
 }

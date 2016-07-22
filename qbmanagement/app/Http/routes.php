@@ -20,6 +20,7 @@ Route::group(['middleware' => 'web'] , function(){
         if ( Auth::check() ) // use Auth::check to check if there is any authorised user
         {
             if ( Auth::user()->user_type_id == 1)
+                
                 return redirect('adminhome');
             else 
                 return

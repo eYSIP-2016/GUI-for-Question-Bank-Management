@@ -8,7 +8,7 @@
 					{!! Form::text('search_item','',array('placeholder'=>'Search','class'=>'form-control')) !!}
 				</div>
 				<div class="col-md-2">
-					{!! Form::submit('Submit',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
+					{!! Form::submit('Search',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
 				</div>
 			</div>
 			<br>

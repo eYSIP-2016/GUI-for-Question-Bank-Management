@@ -150,7 +150,15 @@ class QuestionController extends Controller
 
         $question->save();
 
- 		$q_id = $question->getKey();
+        $q_id = $question->getKey();
+
+        DB::table('reviews')->insert([
+        ['q_id' => $q_id ,'u_id' => 1],
+        ['q_id' => $q_id , 'u_id' => 2]
+        ]);
+
+
+ 		
 
  
 
@@ -742,7 +750,7 @@ class QuestionController extends Controller
         $r_question_id = $question_id;
         $r_version_no =$version_no;
         $question_old = q_table::find($question_id);
-        $version = $question_old->revisionVersion($version_no);
+        $version = $question_old->revisionVersion($version_no-1);
         
 
         $user = Auth::id();            
@@ -800,7 +808,7 @@ class QuestionController extends Controller
     public function revise($question_id,$version_no){
 
         $question_old = q_table::find($question_id);         //fetching question
-        $version = $question_old->revisionVersion($version_no);  //fetching version 
+        $version = $question_old->revisionVersion($version_no-1);  //fetching version 
 
         //storing the values in the question field
         $question_old->category = $version->old('category');  

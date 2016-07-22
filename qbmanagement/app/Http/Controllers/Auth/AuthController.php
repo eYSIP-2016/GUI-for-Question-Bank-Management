@@ -24,6 +24,7 @@ use App\options;
 use File;
 use App\revision;
 use Request;
+use Log;
 
 
 
@@ -221,7 +222,7 @@ class AuthController extends Controller
     protected function sendOption($option){
         if( Auth::check()){
             if($option==="Users"){
-                $users = User::where('user_type_id', '=', 0)->paginate(2);
+                $users = User::where('user_type_id', '=', 0)->paginate(10);
                 return view('admin.users',compact('option','users'));
             }
             else if ($option==="Tags") {
@@ -329,15 +330,31 @@ class AuthController extends Controller
 
         $users = DB::table('users')->where('user_type_id' , 0)->lists('id');  //key,column_id
         $reviews = DB::table('reviews')->where('alloted',0)->distinct()->lists('q_id');
-        //$review = DB::table('review')->lists('q_id');
+
         shuffle($users);
         shuffle($reviews);
-        //$shuffled_questions = $questions->shuffle();
-        //$shuffled_questions->all();
-        $u = count($users);
-        $q = count($reviews);
-    
         
+        $u_count = count($users);
+        //$q = count($reviews);
+
+
+
+    
+        for($n=0;$n<$u_count;$n++) //Alloting questions created by every user 
+        {
+            
+
+            $question = DB::table('q_tables')->where('created_by',$users[$n])->whereIn('q_id',$reviews)->lists('q_id');   //retreiving questions created by nth user
+
+            $user = DB::table('users')->where('user_type_id',0)->where('id','<>',$users[$n])->lists('id');    //retrieving all other users except nth user
+
+            shuffle($user);         //shuffling the sequence of users in array
+            shuffle($question);     //shuffling the sequence of questions in array
+
+            $q = count($question);
+            $u = count($user);
+
+            //Log::info('users: '.$u1.' questions: '.$q1);
         
         for($i=0,$j=1,$x=0; $i<$j ; $j++,$i++)   //diagonally  incrementing j,i in upper triangular matrix such that "j<i"
         {
@@ -357,20 +374,21 @@ class AuthController extends Controller
            else {
             
             DB::table('reviews')            
-            ->where('q_id',$reviews[$x])
+            ->where('q_id',$question[$x])
             ->where('u_id',1)   
-            ->update(['u_id' => $users[$i] ,'alloted' => 1]);
+            ->update(['u_id' => $user[$i] ,'alloted' => 1]);
             // xth question should be alloted to ith reviewer
 
             DB::table('reviews')            
-            ->where('q_id',$reviews[$x])
+            ->where('q_id',$question[$x])
             ->where('u_id',2)     
-            ->update(['u_id' => $users[$j] , 'alloted' => 1]); 
+            ->update(['u_id' => $user[$j] , 'alloted' => 1]); 
 
               
             // xth question should be alloted to jth reviewer
             $x++;
             }
+        }
         }
 
         return Redirect::back();

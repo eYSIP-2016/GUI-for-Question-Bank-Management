@@ -1,7 +1,7 @@
 @extends('admin.adminhome')
 
 	@section('users')
-    <h2><i>Users</i></h2></br></br>
+    <h1><i>Users</i></h1></br></br>
 
 
     <head><h4><legend>Add Users</legend></h4></head>
