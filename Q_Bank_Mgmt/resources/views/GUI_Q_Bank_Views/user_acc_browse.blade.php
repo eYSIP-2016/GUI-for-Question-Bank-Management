@@ -9,18 +9,20 @@
 					{!! Form::text('search_item','',array('placeholder'=>'Search','class'=>'form-control')) !!}
 				</div>
 				<div class="col-md-2">
-					{!! Form::submit('Submit',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
+					{!! Form::submit('Search',array('class'=>'btn btn-primary')) !!}
+					<a href="{{ url('testhome/Browse')}}">
+						<h6><span class="glyphicon glyphicon-refresh"></span></h6>
+					</a>	
 				</div>
 			</div>
-			<br>
-			{!! Form::select('tags[]',$tags,null,array('id'=>'my-select','multiple'=>'multiple')) !!}
-			{{ Html::linkAction('NavController@sendOption','Refresh',['Browse']) }}			
+				
 		</div>
 	{!! Form::close() !!}
 	<hr>
 	<div class="results">
 		{{$results}} questions
 	</div>
+	<?php $count=1; ?>
 	@foreach($questions as $question)
 
 		<div class="w3-card-4">
@@ -32,7 +34,10 @@
 						<li>Expected Solving time:<div class=level_and_time>{{ $question->time }}</div></li>
 					</ul>
 				</div><br>
-				{{ $question->desc }}<br>
+				<?php $descs = explode("\n", $question->desc)?>  
+				@foreach($descs as $desc)
+					{{$desc}}<br>
+				@endforeach<br>
 				
 				<div class="image_list">
 					<ul>
@@ -104,6 +109,7 @@
    			</div>
    		</div>
    		<br>
+   		<?php $count = $count + 1;?>
 	@endforeach		
 	{!! $questions->render() !!}
 @stop

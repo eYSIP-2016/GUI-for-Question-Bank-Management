@@ -8,12 +8,12 @@
 					{!! Form::text('search_item','',array('placeholder'=>'Search','class'=>'form-control')) !!}
 				</div>
 				<div class="col-md-2">
-					{!! Form::submit('Submit',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
+					{!! Form::submit('Search',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
+					<a href="{{ url('testhome/Browse')}}">
+				<h5><span class="glyphicon glyphicon-refresh"></span></h5>
+			</a>	
 				</div>
 			</div>
-			<br>
-			{!! Form::select('tags[]',$tags,null,array('id'=>'my-select','multiple'=>'multiple')) !!}
-			{{ Html::linkAction('NavController@sendOption','Reset',['Home']) }}			
 		</div>
 	{!! Form::close() !!}
 	<hr>
