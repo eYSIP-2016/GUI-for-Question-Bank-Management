@@ -479,6 +479,7 @@
 				<?php 
 						$question_id = $question->question_id;
 						$q_tags = App\q_tag_relation::where('q_id','=',$question_id)
+									->where('tag_revision',$question->tag_revision)
 									->leftJoin('tags','q_tag_relations.tag_id','=','tags.id')
 									->lists('tags.id')->all();
 				?>

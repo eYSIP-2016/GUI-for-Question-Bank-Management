@@ -192,15 +192,14 @@ class QuestionController extends Controller
 
  		$search_string = Request::get('search_item'); 
 
- 		$search_tags = Request::get('tags');
-
- 		$question_from_tags = q_tag_relation::whereIn('tag_id',$search_tags)->lists('q_id');
+ 		$question_from_tags = q_tag_relation::
+                        leftJoin('tags','q_tag_relations.tag_id','=','tags.id')
+                        ->where('tags.name','LIKE','%'.$search_string.'%')
+                        ->lists('q_id');
 
  		$question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('description_id');
 
  		$option = 'Browse';
-
- 		$tags =  tags::lists('name','id');
         	
         $questions = DB::table('q_tables')
                         ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
@@ -231,19 +230,20 @@ class QuestionController extends Controller
 
         	$questions = $questions->paginate(4);
 
-        return view('GUI_Q_Bank_Views.user_acc_browse',compact('option','tags','questions','results'));
+        return view('GUI_Q_Bank_Views.user_acc_browse',compact('option','questions','results'));
  	}
 
  	public function getUsersQuestions(){
- 		$search_string = Request::get('search_item'); 
+        $search_string = Request::get('search_item');
 
- 		$search_tags = Request::get('tags');
-
- 		$user = '2';
+ 		$user = 2;
 
  		$tags =  tags::lists('name','id');
 
- 		$question_from_tags = q_tag_relation::whereIn('tag_id',$search_tags)->lists('q_id');
+ 		$question_from_tags = q_tag_relation::
+                        leftJoin('tags','q_tag_relations.tag_id','=','tags.id')
+                        ->where('tags.name','LIKE','%'.$search_string.'%')
+                        ->lists('q_id');
 
  		$question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('description_id');
 
@@ -265,16 +265,30 @@ class QuestionController extends Controller
                                  'category.name AS category',
                                  'q_tables.time AS time',
                                  'q_descriptions.description AS desc',
+                                 'q_tables.created_by AS created_by',
                                  'equations.exp_image AS equation',
                                  'codes.code_image_path AS code',
                                  'q_tables.q_id AS question_id',
                                  'creator.name AS creator',
                                  'reviewer.name AS reviewer',
                                  'q_tables.tag_revision AS tag_revision')
-                        ->whereIn('q_tables.q_id',$question_from_tags)
-                        ->where('q_tables.created_by','=',$user)
-                        ->orWhereIn('q_tables.description_id',$question_from_description)
-                        ->orderBy('q_tables.updated_at','desc');
+                        ->where('created_by','=',$user)
+                        ->where(function ($query) {
+                            $search_string = Request::get('search_item');
+                            $question_from_tags = q_table::
+                                        leftJoin('q_tag_relations','q_tables.q_id','=','q_tag_relations.q_id')
+                                        ->leftJoin('tags','q_tag_relations.tag_id','=','tags.id')
+                                        ->where('q_tables.tag_revision','q_tag_relations.tag_revision')
+                                        ->where('tags.name','LIKE','%'.$search_string.'%')
+                                        ->lists('q_tag_relations.q_id');
+
+                            $question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('description_id');
+                            
+                            $query->whereIn('q_tables.q_id',$question_from_tags)
+                                  ->orWhereIn('q_tables.description_id',$question_from_description);
+                        })->orderBy('q_tables.updated_at','desc');
+
+            $questions = $questions;
 
         	$results = $questions->count();
 
@@ -396,7 +410,6 @@ class QuestionController extends Controller
         $revisions = options::where('q_id',$question_id)->max('revision');
 
        	$current_option_count = Request::get('no_questions');
-        Log::info('check ' .$current_option_count);
 
         if (!is_null($question->option)) {
             # code...
@@ -404,19 +417,17 @@ class QuestionController extends Controller
                                     ->where('revision',$question->option)
                                     ->count();  
 
-            $descs = DB::table('options')->select('description','option_no')
+            $descs = DB::table('options')
                         ->where('q_id',$question_id)
                         ->where('revision',$question->option)
-                        ->get();
+                        ->lists('description','option_no');
         }
 		else{
             $count_initial = 0;
         }
 
-        
-
         if($count_initial===0){
-            if($current_option_count!==0){
+            if($current_option_count!=0){
                 $options_changed = 1;
             }
             else{
@@ -425,13 +436,11 @@ class QuestionController extends Controller
         }
 
         else{
-            if($current_option_count === $count_initial){
-
+            if($current_option_count == $count_initial){
                 for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
                     $name_option = 'member'.$i;
                     $text = Request::get($name_option);
-
-                    if (strcmp($descs[$i-1]['description'],$text)!==0) {
+                    if (strcmp($descs[$i],trim($text))!==0) {
                         $options_changed = 1;
                     }
                     else{
@@ -446,7 +455,7 @@ class QuestionController extends Controller
 
 
         if ($options_changed===1&&!empty($current_option_count)) {
-        	Log::info('Count '.$current_option_count);
+        	
 			for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
 			 	$name_option = 'member'.$i;
 				$text = Request::get($name_option);
@@ -578,8 +587,15 @@ class QuestionController extends Controller
 								->get()
 								->lists('tag_id','key')
 								->all();
-	 	
-		$compare = array_diff($tags_new, $q_tags);
+	 	if(sizeof($q_tags)>sizeof($tags_new)){
+            $compare = array_diff($q_tags, $tags_new);
+        }
+		else{
+            $compare = array_diff($tags_new, $q_tags);
+        }
+        Log::info('check tags 1'.print_r($tags_new,true));
+        Log::info('check tags 2'.print_r($q_tags,true));
+        Log::info('check tags 3'.print_r($compare,true));
 
 		if(empty($compare)){
 			//do nothing
