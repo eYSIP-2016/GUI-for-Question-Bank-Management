@@ -2,12 +2,6 @@
 
 @section('content')
 <body>
-<nav class="navbar navbar-inverse">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          </br></br>
-      </div>
-    </nav></br>
 <div class="container">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">

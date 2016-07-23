@@ -8,7 +8,7 @@
     <div class="panel panel-default">
                 <div class="panel-heading">Register a New User</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/register') }}">
+                    <form class="form-horizontal" role="form" method="POST" action="{{ url('auth/register/') }}">
                         {{ csrf_field() }}
 
                         <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
@@ -120,7 +120,6 @@
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->created_at }}</td>
                         <td>{{ $user->updated_at }}</td>
-                        <!--td>{{ link_to_route('users.edit', 'Edit',array($user->id), array('class' => 'btn btn-info')) }}</td-->
                         <td> {{ Form::open(array('method' => 'DELETE', 'route' => array('users.destroy', $user->id))) }} 
                         {{ Form::submit('Delete', array('class'=> 'btn btn-secondary')) }} 
                         {{ Form::close() }}

@@ -30,14 +30,15 @@ class NavController extends Controller
     //
 
 
-
+    //calling middleware
    public function __construct()
     {
         
         $this->middleware('auth');
     } 
 
-
+    //sending option to views
+    
     public function sendOption($option){
         if( Auth::check()){
     	if($option==="Compose"){
@@ -201,7 +202,7 @@ class NavController extends Controller
                                  'reviewer.name AS reviewer',
                                  'q_tables.q_id AS question_id',
                                  'q_tables.tag_revision AS tag_revision')
-                        ->where('q_tables.created_by','=',$user);
+                        ->where('q_tables.created_by',$user);
 
             $results = $questions->count();
             $questions = $questions->paginate(4);

@@ -4,15 +4,20 @@
     
     <head> <h1><i>Tags</i></h1><br></head>
 
-    
+
 
     </br>
         <head><h4><legend>Add Tags</legend></h4></head>
       
         <div class="panel panel-default">
                 <div class="panel-heading">Add a New Tag</div>
+                        @if (session('status'))
+                            <div class="alert alert-success">
+                                {{ session('status') }}
+                            </div>
+                        @endif
                 <div class="panel-body">
-            <form class="form-horizontal" role="form" method="POST" action="/tags" >
+            <form class="form-horizontal" role="form" method="POST" action="/adminhome/Tags/Add" >
             
             {!! Form::model(new App\tags, ['route' => ['tags.store']]) !!}
                 {{ csrf_field() }}

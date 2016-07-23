@@ -13,6 +13,8 @@
 
 
 
+    
+Route::auth();    
 
 Route::group(['middleware' => 'web'] , function(){
 
@@ -21,46 +23,102 @@ Route::group(['middleware' => 'web'] , function(){
         {
             if ( Auth::user()->user_type_id == 1)
                 
-                return redirect('adminhome/');
+                return redirect('adminhome');
             else 
                 return
-                  redirect('usershome/');
+                  redirect('usershome');
         } 
         else{
               return view('auth.login');
         }
     //return Redirect::to('testhome');
+
+
     }]);
 
+/******************Routes for Admin************************************/    
+
+    Route::get('adminhome/', [ 'middleware' => 'adm',
+            'as' => 'adminhome', function () {
+            return redirect('adminhome/New_questions');
+        }]);
+    
+    Route::get('adminhome/submitforreview', ['as' => 'adminhomesubmit','uses' => 'Auth\AuthController@distribute']);
+
+    Route::get('adminhome/{option}',[ 'middleware' => 'adm' ,'as' => 'adminshome', 'uses' =>'Auth\AuthController@sendOption']);
+
+    Route::get('adminhome/Browse/{action}/{question_id}','Auth\AuthController@editOrPickQuestion');
+
+    Route::post('adminhome/Browse/Edit/{question_id}','Auth\AuthController@makeChanges');
+
+
+    Route::get('auth/register','Auth\AuthController@showRegistrationForm');
+
+    Route::post('auth/register', 'Auth\AuthController@postRegister');
+
+    Route::delete('adminhome/Users/Delete/{users}',['as' => 'users.destroy','uses' => 'Auth\AuthController@destroy']);
+
+    Route::post('adminhome/Tags/Add',['as' => 'tags.store' , 'uses' => 'tagsController@store']);
+   
+    Route::delete('adminhome/Tags/Delete/{tags}',['as' => 'tags.destroy' , 'uses' => 'tagsController@destroy']);
+
+
+
+
+
+
+/*********************************Routes for Users***************************************/
 
 
     Route::get('usershome/', [ 'middleware' => 'auth',
     'as' => 'usershome', function () {
-    $option="";
-    return redirect('/usershome/Home');
-    //return view('users.usershome',compact('option'));
+    return redirect('usershome/Home');
 
     }]);
 
-
-    Route::get('adminhome/', [ 'middleware' => 'adm',
-    'as' => 'adminhome', function () {
-    $option="";
-    return redirect('/adminhome/New_questions');
-    //return view('admin.adminhome',compact('option'));
-
-    }]);
+    Route::post('usershome/Home','QuestionController@getUsersQuestions');
 
 
-    Route::get('adminhome/submitforreview', ['as' => 'adminhomesubmit','uses' => 'Auth\AuthController@distribute']);
+    Route::get('usershome/Home/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
+    Route::post('usershome/Home/Edit/{question_id}','QuestionController@makeChanges');
+    
+
+    Route::post('usershome/Home/Pick/{question_id}','QuestionController@create');
+
 
     Route::get('usershome/{option}',[ 'middleware' => 'auth' ,'as' => 'usershome', 'uses' =>'NavController@sendOption']);
+
+    Route::post('usershome/Compose','QuestionController@create');
+
     
-    Route::get('adminhome/{option}',[ 'middleware' => 'adm' ,'as' => 'adminshome', 'uses' =>'Auth\AuthController@sendOption']);
+    Route::post('usershome/Browse','QuestionController@getSearchResults');
 
 
-    Route::post('/','NavController@createEquation');
-    
+    Route::get('usershome/Browse/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
+    Route::post('usershome/Browse/Pick/{question_id}','QuestionController@create');
+
+
+
+    Route::get('usershome/Review/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
+    Route::get('usershome/Review/Reviewed/{question_id}','QuestionController@reviewed');
+
+
+    Route::post('usershome/Review/Modify/{question_id}','QuestionController@makeChanges');
+
+
+    Route::get('usershome/History/{question_id}/{version_no}','QuestionController@version');
+
+    Route::get('usershome/Restore/{question_id}/{version_no}', ['as'=>'restore', 'uses'=>'QuestionController@revise']);
+
+    Route::delete('usershome/Home/Delete/{question_id}',['as' => 'question.destroy','uses' => 'QuestionController@delete']);
+
+
+/*************************Routes to get files******************************************/ 
+
+   
     Route::get('images/{filename}', function ($filename)
     {
         $path = storage_path() . '/images/' . $filename;
@@ -76,53 +134,7 @@ Route::group(['middleware' => 'web'] , function(){
         return $response;
     });
    
-    Route::post('usershome/Home','QuestionController@getUsersQuestions');
-
-    Route::post('usershome/Compose','QuestionController@create');
-
-    Route::post('usershome/Browse','QuestionController@getSearchResults');
-
-    Route::get('usershome/Home/{action}/{question_id}','QuestionController@editOrPickQuestion');
-
-    Route::get('adminhome/Browse/{action}/{question_id}','Auth\AuthController@editOrPickQuestion');
-
-    Route::post('usershome/Review/Modify/{question_id}','QuestionController@makeChanges');
-
-    Route::get('usershome/Review/Reviewed/{question_id}','QuestionController@reviewed');
-
     
-    Route::get('usershome/Review/{action}/{question_id}','QuestionController@editOrPickQuestion');
-
-
-    Route::get('usershome/Browse/{action}/{question_id}','QuestionController@editOrPickQuestion');
-
-    Route::post('usershome/Home/Pick/{question_id}','QuestionController@create');
-
-    Route::post('usershome/Home/Edit/{question_id}','QuestionController@makeChanges');
-    
-    Route::post('adminhome/Browse/Edit/{question_id}','Auth\AuthController@makeChanges');
-
-    Route::post('usershome/Review/Modify/{question_id}','QuestionController@makeChanges');
-    
-    Route::post('usershome/Browse/Pick/{question_id}','QuestionController@create');
-
-    Route::delete('usershome/Home/Delete/{question_id}',['as' => 'question.destroy','uses' => 'QuestionController@delete']);
-
-    Route::get('usershome/History/{question_id}/{version_no}','QuestionController@version');
-
-    Route::get('usershome/Restore/{question_id}/{version_no}', ['as'=>'restore', 'uses'=>'QuestionController@revise']);
-     
-    //Route::post('register', 'Auth\AuthController@postRegister');
-
-    Route::post('auth/register', 'Auth\AuthController@postRegister');
-    Route::get('auth/register','Auth\AuthController@showRegistrationForm');
-
-    Route::auth();
-
-    Route::get('/home', 'HomeController@index');
-
-    Route::resource('users','Auth\AuthController');
-
 
     Route::get('{folder}/{filename}', function ($folder, $filename)
     {
@@ -143,14 +155,6 @@ Route::group(['middleware' => 'web'] , function(){
             abort(404);
         }
     });
-
-
-    
-
-    //Route::group(['middleware' => 'adm'], function()
-    //{
-       Route::resource('tags','tagsController');
-     //});
 
 });
 

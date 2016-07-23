@@ -436,6 +436,12 @@
         </script>
 </head>
 <body>
+<nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          </br></br>
+      </div>
+</nav></br>
 @yield('content')
 </body>
 </html>

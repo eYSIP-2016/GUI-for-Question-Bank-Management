@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
-//use Venturecraft\Revisionable\RevisionableTrait;
+
 use App\User;
 use App\tags;
 use Validator;
@@ -25,6 +25,9 @@ use File;
 use App\revision;
 use Request;
 use Log;
+use Illuminate\Http\Request as Request1;
+use URL;
+
 
 
 
@@ -101,6 +104,8 @@ class AuthController extends Controller
     }
 
 
+    //function to Direct admin to show registration form 
+
     public function showRegistrationForm()
     {
         if (property_exists($this, 'registerView')) {
@@ -127,17 +132,13 @@ class AuthController extends Controller
         $user->email = $data['email'];
         $user->password = bcrypt($data['password']);
         $user->save();
-        /**User::create([
-            'name' => $data['name'],
-            'username' => $data['username'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-        ]);  **/
-
         return Auth::user();
     }
 
-    public function postRegister(Request $request)
+
+    //function to submit the details of user 
+
+    public function postRegister(Request1 $request)
     {
     // Handle authorization
     $validator = $this->validator($request->all());
@@ -147,75 +148,12 @@ class AuthController extends Controller
             );
         }
         $this->create($request->all());
-        return Redirect::route('adminhome');
+        return redirect('adminhome/Users');
     } 
-
-
-/**
-    protected function authenticated()
-   {
-        if(Auth::user()->user_type_id == 1) {
-            return redirect('home');
-        }
-
-        return redirect('questions');
-    }**/
-
-
-    protected function index() { 
-        //$users = User::all(); 
-        $users = User::where('user_type_id', '=', 0)->paginate(10);
-        //$users_id = DB::table('users')->where('user_type_id', 0)->lists('id');  //key,column_id
-        //shuffle($users_id);
-       // $tags = User::find(25)->tags;
-       /** $user1=User::find(19);   //right query for user
-        $user2=User::where('id',19)->value('version');//right qusery to retrieve value
-        $n = $user2 -1;
-        $u_id =User::where('user_type_id', '=', 0)->lists('id');
-        $revisions = revision::where('u_id',19)->where('version',((int)$user2-1));
-        $a = $user1->revisionHistory->where('version',$user2 - 1);    //right query for latest modification
-        $history1 = $user1->revisionHistory->where('old_value','bala@gmail.com');
-        $a2 = count($revisions);
-        $a1 = count($a);
-        //$user1->revisionHistory->where('revisionable_id',19)->first()->delete();
-        $users1 = User::onlyTrashed()->get();  // to retrieve the soft deleted file
-        //$users = DB::table('users')->where('user_type_id', '=', 0)->get();
-        
-        **/
-        //$users = User::paginate(2);
-        return view('users.index', compact('users'/**,'tags','users1','a','a1','a2','u_id','revisions','history1','user2')**/));
-        //return View::make('user.index', compact('users'));       //this also works just put "use View" on top
-    }
-
-    public function edit($id){
-
-
-        $user = User::find($id);             //find a user from User model(extracted from db) with this id
-        if (is_null($user)){                 //if not found return to same page
-            return Redirect::route('users.index'); 
-        } 
-        return view('users.edit', compact('user')); 
-    }
-
-    public function update($id){            //method to update a user in user model
-        $input = Input::all();  
-
-        // input specifies the values from the web
-        // $validation = Validator::make($input, User::$rules); 
-        //if ($validation->passes()){ 
-            $user = User::find($id);              // it finds the row with $id and stores it in the user variable
-            $user->name=Input::get('name'); 
-            $user->username=Input::get('username'); 
-            $user->email=Input::get('email') ;  
-            $user->save();           // update the value stored in database with input values from user values
-            return Redirect::route('users.index', $id); 
-       // } 
-        //return Redirect::route('users.edit', $id) ->withInput() ->withErrors($validation) ->with('message', 'There were validation errors.'); 
-    }
 
     public function destroy($id) {        //it calls the method delete
         User::find($id)->delete();        //fine user with a value in id and delete it from user model
-        return Redirect::route('users.index'); 
+        return Redirect::back(); 
     } 
     
 
@@ -266,7 +204,7 @@ class AuthController extends Controller
             }
 
             else if ($option==="New_questions") {
-//displaying new questions in the view                
+                //displaying new questions in the view                
 
                 $r_q_id = DB::table('reviews')->where('reviewed',0)->distinct()->lists('q_id');
                 //$reviews = DB::table('review')->where('reviewed',0)->get();
@@ -325,7 +263,7 @@ class AuthController extends Controller
         }
     }
 
-
+/************************Distribution algorithm to distribute questions for review************/
     public function distribute(){
 
         $users = DB::table('users')->where('user_type_id' , 0)->lists('id');  //key,column_id
@@ -335,12 +273,8 @@ class AuthController extends Controller
         shuffle($reviews);
         
         $u_count = count($users);
-        //$q = count($reviews);
 
-
-
-    
-        for($n=0;$n<$u_count;$n++) //Alloting questions created by every user 
+            for($n=0;$n<$u_count;$n++) //Alloting questions created by every user 
         {
             
 
@@ -395,9 +329,12 @@ class AuthController extends Controller
     }
 
 
+/*****************function for admin to edit and modify the question*****************/
 
-        public function editOrPickQuestion($action, $question_id){
-        if($action ==="Edit"|| $action==="Pick" || $action==="Modify"){
+    public function editOrPickQuestion($action, $question_id){
+        
+
+        if($action ==="Edit"){
             $symbol_group = DB::table('math_symbols_group')->get();
             $symbols_1 = DB::table('maths_symbols')->where('type','1')->get();
             $symbols_2 = DB::table('maths_symbols')->where('type','2')->get();
@@ -433,6 +370,7 @@ class AuthController extends Controller
                                         ->lists('description','option_no');  
 
             $count = count($options);
+
             $options_used = $question->opt_used;
             if (!is_null($options_used)) {
 
@@ -452,7 +390,12 @@ class AuthController extends Controller
         }
 
 
-        public function makeChanges($question_id){
+
+/****************************modification by admin****************************/
+
+
+
+    public function makeChanges($question_id){
         $time = time();
         $date = date("Y-m-d",$time);
         $user = Auth::id();
@@ -500,10 +443,7 @@ class AuthController extends Controller
             $description_id = $q_description->getKey();
             
             $question->description_id = $description_id ;
-            /**DB::table('q_tables')
-                ->where('q_id',$question->question_id)
-                ->update(['description_id'=>$description_id]);
-            **/
+        
             $changed_flag = 1;
         }
 
@@ -606,12 +546,7 @@ class AuthController extends Controller
                $equation->save();
 
                $eq_id = $equation->getKey();
-                $question->exp_id = $eq_id;
-            /**DB::table('q_tables')
-                ->where('q_id',$question_id)
-                ->update(['exp_id'=>$eq_id]);
-            **/
-               
+                $question->exp_id = $eq_id;               
             }
             else{
              $question->exp_id = null;
@@ -640,12 +575,7 @@ class AuthController extends Controller
 
                 $code->save();
                 $code_id = $code->getKey();
-                $question->code_id = $code_id;
-            /**DB::table('q_tables')
-                ->where('q_id',$question_id)
-                ->update(['exp_id'=>$eq_id]);
-            **/
-                
+                $question->code_id = $code_id; 
             }
             else{
                 $question->code_id = null;
@@ -673,20 +603,14 @@ class AuthController extends Controller
                     $diagram->path = $path.'/images/'.$name;
                     $diagram->save();
                     $question->diagram_id = $diagram->getKey();
-                    /**DB::table('q_tables')
-                        ->where('q_id',$question->question_id)
-                        ->update(['diagram'=>$diagram->getKey()]); **/    
+
                     $changed_flag = 1;
                 }
             }
 
             else if(!is_null($questions->diagram)){
                 $question->diagram_id = null;
-                /**DB::table('q_tables')
-                    ->where('q_id',$question->question_id)
-                    ->update(['diagram_id'=>null]);
-                **/
-                $changed_flag = 1;
+
             }
 
             else{
@@ -733,10 +657,7 @@ class AuthController extends Controller
         if ($new_difficulty !== $question->difficulty) {
             # code...
             $question->difficulty = $new_difficulty;
-            /**DB::table('q_tables')
-                    ->where('q_id',$question->question_id)
-                    ->update(['difficulty'=>$new_difficulty]);
-            **/
+            
             $changed_flag = 1;
         }
 
@@ -746,10 +667,7 @@ class AuthController extends Controller
         if ($new_category !== $question->category) {
             # code...
             $question->category=$new_category;
-            /**DB::table('q_tables')
-                    ->where('q_id',$question->question_id)
-                    ->update(['category'=>$new_category]);
-            **/
+            
             $changed_flag = 1;
         }
 
@@ -758,8 +676,7 @@ class AuthController extends Controller
 
         if ($new_time !== $questions->time){
             $question->time=$new_time ;
-            /**DB::table('q_tables')->where('q_id',$question->question_id)->update(['time'=>$new_time]);
-            **/
+            
             $changed_flag = 1;
 
         }
@@ -769,10 +686,7 @@ class AuthController extends Controller
             $question->last_edited_by=$user;
             $question->version = $question->getRevisionsCountAttribute() + 1;
             $question->save();
-            /**DB::table('q_tables')
-                    ->where('q_id',$question->question_id)
-                    ->update(['last_edited_by'=>$user]);
-            **/
+            
         }
         elseif($changed_flag ==0)
         {

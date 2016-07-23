@@ -257,9 +257,7 @@ class QuestionController extends Controller
 
  		$tags =  tags::lists('name','id');
 
- 		$question_from_tags = q_tag_relation::whereIn('tag_id',$search_tags)->lists('q_id');
-
- 		$question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('description_id');
+ 		
 
  		$option = 'Home';
         
@@ -284,10 +282,21 @@ class QuestionController extends Controller
                                  'codes.code_image_path AS code',
                                  'q_tables.q_id AS question_id',
                                  'creator.name AS creator',
-                                 'reviewer.name AS reviewer')
-                        ->whereIn('q_tables.q_id',$question_from_tags)
-                        ->where('q_tables.created_by','=',$user)
-                        ->orWhereIn('q_tables.description_id',$question_from_description)
+                                 'reviewer.name AS reviewer',
+                                 'q_tables.created_by AS created_by')
+                        ->where('created_by','=',$user)
+                        ->where(function($query){
+                            $search_string = Request::get('search_item');
+
+                            $search_tags = Request::get('tags');
+                            
+                            $question_from_tags = q_tag_relation::whereIn('tag_id',$search_tags)->lists('q_id');
+
+                            $question_from_description = q_description::where('description','LIKE','%'.$search_string.'%')->lists('description_id');
+
+                            $query->whereIn('q_tables.q_id',$question_from_tags)
+                                  ->orWhereIn('q_tables.description_id',$question_from_description);
+                        })
                         ->orderBy('q_tables.updated_at','desc');
 
         	$results = $questions->count();
@@ -426,10 +435,7 @@ class QuestionController extends Controller
             $description_id = $q_description->getKey();
             
             $question->description_id = $description_id ;
-        	/**DB::table('q_tables')
-        		->where('q_id',$question->question_id)
-        		->update(['description_id'=>$description_id]);
-            **/
+    
         	$changed_flag = 1;
         }
 
@@ -542,10 +548,7 @@ class QuestionController extends Controller
 
 	           $eq_id = $equation->getKey();
                 $question->exp_id = $eq_id;
-        	/**DB::table('q_tables')
-        		->where('q_id',$question_id)
-        		->update(['exp_id'=>$eq_id]);
-            **/
+        	
         	   
             }
             else{
@@ -576,10 +579,7 @@ class QuestionController extends Controller
 	            $code->save();
 	            $code_id = $code->getKey();
                 $question->code_id = $code_id;
-			/**DB::table('q_tables')
-        		->where('q_id',$question_id)
-        		->update(['exp_id'=>$eq_id]);
-            **/
+			
         	    
             }
             else{
@@ -608,19 +608,14 @@ class QuestionController extends Controller
 		            $diagram->path = $path.'/images/'.$name;
 		            $diagram->save();
                     $question->diagram_id = $diagram->getKey();
-		            /**DB::table('q_tables')
-        				->where('q_id',$question->question_id)
-        				->update(['diagram'=>$diagram->getKey()]); **/    
+		               
         			$changed_flag = 1;
 		        }
 	    	}
 
         	else if(!is_null($questions->diagram)){
                 $question->diagram_id = null;
-        		/**DB::table('q_tables')
-        			->where('q_id',$question->question_id)
-        			->update(['diagram_id'=>null]);
-                **/
+        		
         		$changed_flag = 1;
         	}
 
@@ -672,10 +667,7 @@ class QuestionController extends Controller
         if ($new_difficulty !== $question->difficulty) {
         	# code...
             $question->difficulty = $new_difficulty;
-        	/**DB::table('q_tables')
-        			->where('q_id',$question->question_id)
-        			->update(['difficulty'=>$new_difficulty]);
-            **/
+        	
         	$changed_flag = 1;
         }
 
@@ -685,10 +677,7 @@ class QuestionController extends Controller
         if ($new_category !== $question->category) {
         	# code...
             $question->category=$new_category;
-        	/**DB::table('q_tables')
-        			->where('q_id',$question->question_id)
-        			->update(['category'=>$new_category]);
-            **/
+        	
         	$changed_flag = 1;
         }
 
@@ -697,8 +686,7 @@ class QuestionController extends Controller
 
         if ($new_time !== $questions->time){
         	$question->time=$new_time ;
-        	/**DB::table('q_tables')->where('q_id',$question->question_id)->update(['time'=>$new_time]);
-            **/
+        	
         	$changed_flag = 1;
 
         }
@@ -708,10 +696,7 @@ class QuestionController extends Controller
             $question->last_edited_by=$user;
             $question->version = $question->getRevisionsCountAttribute() + 1;
             $question->save();
-            /**DB::table('q_tables')
-        			->where('q_id',$question->question_id)
-        			->update(['last_edited_by'=>$user]);
-            **/
+            
         }
         elseif($changed_flag ==0)
         {
@@ -745,6 +730,9 @@ class QuestionController extends Controller
 
     
     /*******to show version*******/
+
+
+    
     public function version($question_id,$version_no){
         //check the question id and fetch all the revisions and if version no matches the version stored in the database retreive all the old values and do the join and display and new values and display the question ..provide the button at the bottom to restore or return back
         $r_question_id = $question_id;
@@ -756,20 +744,20 @@ class QuestionController extends Controller
         $user = Auth::id();            
         $tags =  tags::lists('name','id');
 
-        $category = DB::table('category')->where('key',$version->old('category'))->value('name');
-        $description = DB::table('q_descriptions')->where('description_id',$version->old('description_id'))->value('description');
-        $diagram = DB::table('diagrams')->where('diagram_id',$version->old('diagram_id'))->value('path');
-        $equation = DB::table('equations')->where('exp_id',$version->old('exp_id'))->value('exp_image');
-        $code = DB::table('codes')->where('code_id',$version->old('code_id'))->value('code_image_path');
+        $category = DB::table('category')->where('key',$version->new('category'))->value('name');
+        $description = DB::table('q_descriptions')->where('description_id',$version->new('description_id'))->value('description');
+        $diagram = DB::table('diagrams')->where('diagram_id',$version->new('diagram_id'))->value('path');
+        $equation = DB::table('equations')->where('exp_id',$version->new('exp_id'))->value('exp_image');
+        $code = DB::table('codes')->where('code_id',$version->new('code_id'))->value('code_image_path');
 
-        $option =$version->old('options');
+        $option =$version->new('options');
 
-        $q_tag_relation =$version->old('tag_revision');
+        $q_tag_relation =$version->new('tag_revision');
 
-        $difficulty = DB::table('difficulty')->where('key',$version->old('difficulty'))->value('name');
+        $difficulty = DB::table('difficulty')->where('key',$version->new('difficulty'))->value('name');
         $time = $version->old('time');
 
-        $updated_by = User::where('id',$version->old('last_edited_by'))->value('name');
+        $updated_by = User::where('id',$version->new('last_edited_by'))->value('name');
         
         
         $question = DB::table('q_tables')
@@ -811,18 +799,18 @@ class QuestionController extends Controller
         $version = $question_old->revisionVersion($version_no-1);  //fetching version 
 
         //storing the values in the question field
-        $question_old->category = $version->old('category');  
-        $question_old->description_id = $version->old('description_id');
-        $question_old->diagram_id =$version->old('diagram_id');
-        $question_old->exp_id =$version->old('exp_id');
-        $question_old->code_id=$version->old('code_id');    
-        $question_old->options=$version->old('options');
-        $question_old->tag_revision=$version->old('tag_revision');
-        $question_old->difficulty=$version->old('difficulty');
-        $question_old->time=$version->old('time');
+        $question_old->category = $version->new('category');  
+        $question_old->description_id = $version->new('description_id');
+        $question_old->diagram_id =$version->new('diagram_id');
+        $question_old->exp_id =$version->new('exp_id');
+        $question_old->code_id=$version->new('code_id');    
+        $question_old->options=$version->new('options');
+        $question_old->tag_revision=$version->new('tag_revision');
+        $question_old->difficulty=$version->new('difficulty');
+        $question_old->time=$version->new('time');
         $question_old->version=$version_no;
-        $question_old->last_edited_by=$version->old('last_edited_by');
-        //updating it in the databaase\
+        $question_old->last_edited_by=$version->new('last_edited_by');
+        //updating it in the databaase
         $question_old->disableRevisioning(); //to disable the revision on restore
         $question_old->save();
 

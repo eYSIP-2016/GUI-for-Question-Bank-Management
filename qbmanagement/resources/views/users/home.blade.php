@@ -33,7 +33,7 @@
 						<li>Expected Solving time:<div class=level_and_time>{{ $question->time }}</div></li>
 					</ul><br>
 				</div>
-				{{ $question->desc }}<br>
+				<pre style="background:white ; border:0">{{ $question->desc }}</pre>
 				
 				<div class="image_list">
 					<ul>

@@ -16,6 +16,16 @@ class tagsController extends Controller
 {
     
 
+    //Middleware for the controller
+
+    public function __construct()
+    {
+        
+        $this->middleware('adm');
+    }
+
+    //validation rules
+
     protected $rules = [
                 'name' => ['required','min:3'],
                 ];
@@ -31,9 +41,7 @@ class tagsController extends Controller
     
  
     
-    public function index(){
-
-    }
+    //Function to store the tags
 
      public function store(Request $request)
 	{
@@ -48,17 +56,22 @@ class tagsController extends Controller
         $input = Input::only('name');
         tags::create($input);
         
-       // $string = "http://localhost:8000/adminhome/Tags?page=".$tags->lastPage();
-        return Redirect::back();
+        \Session::flash('flash_message','Office successfully deleted');
+       
+        return redirect('adminhome/Tags')->with('status', 'Tag Added');
 	}
+
+
+    //Function to delete the tags
     
     public function destroy(Request $request,$id)
     {    
-        //$this->validate($request,$this->rules); 
-    //it calls the method delete
+    
         tags::find($id)->delete(); 
+
+        \Session::flash('flash_message','Office successfully deleted');
                      //fine user with a value in id and delete it from user model
-        return Redirect::back();
+        return redirect('adminhome/Tags');//->with('status', 'Tag deleted');
        
     } 
 }
