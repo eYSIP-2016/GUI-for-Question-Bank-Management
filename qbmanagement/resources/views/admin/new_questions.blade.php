@@ -1,7 +1,7 @@
 @extends('admin.adminhome')
 
 	@section('new_questions')
-	<h2><i>New Questions<i></h2>
+	<h1><i>New Questions<i></h1>
 	   
     </br></br>
     <center>
@@ -19,8 +19,8 @@
     </div>
     @foreach($questions as $question)
 
-        <div class="card" style="border-radius:0px;" >
-            <div class="card-header">
+        <div class="w3-card-4" style="border-radius:0px;" >
+            <div class="w3-container" style="padding:20px">
             Alloted to :
             <?php 
                 $question_id = $question->q_id; 
@@ -49,7 +49,7 @@
                 @endif
             @endforeach
       </div>
-      <div class="card-block">
+      <div class="w3-container" style="padding:20px">
         <div class="q_header">
           <ul>
             <li>Difficulty level:<div class=level_and_time>{{ $question->difficulty }}</div></li>
@@ -102,7 +102,7 @@
           </ul>
         </div>
 
-        <div class="card-footer" style="background:white;">
+        <div class="w3-container" style="padding:20px">
           <div class="row">
             <div class="col-md-10">
             <?php 
@@ -121,7 +121,7 @@
           </div>  
         </div>
        </div>
-      </div>
+      </div></br>
   @endforeach   
      {!! $questions->render() !!}
   @stop

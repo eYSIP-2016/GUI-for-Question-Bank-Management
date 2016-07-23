@@ -20,10 +20,11 @@ Route::group(['middleware' => 'web'] , function(){
         if ( Auth::check() ) // use Auth::check to check if there is any authorised user
         {
             if ( Auth::user()->user_type_id == 1)
-                return redirect('adminhome');
+                
+                return redirect('adminhome/');
             else 
                 return
-                  redirect('usershome');
+                  redirect('usershome/');
         } 
         else{
               return view('auth.login');
@@ -36,7 +37,8 @@ Route::group(['middleware' => 'web'] , function(){
     Route::get('usershome/', [ 'middleware' => 'auth',
     'as' => 'usershome', function () {
     $option="";
-    return view('users.usershome',compact('option'));
+    return redirect('/usershome/Home');
+    //return view('users.usershome',compact('option'));
 
     }]);
 
@@ -44,7 +46,8 @@ Route::group(['middleware' => 'web'] , function(){
     Route::get('adminhome/', [ 'middleware' => 'adm',
     'as' => 'adminhome', function () {
     $option="";
-    return view('admin.adminhome',compact('option'));
+    return redirect('/adminhome/New_questions');
+    //return view('admin.adminhome',compact('option'));
 
     }]);
 
@@ -81,11 +84,15 @@ Route::group(['middleware' => 'web'] , function(){
 
     Route::get('usershome/Home/{action}/{question_id}','QuestionController@editOrPickQuestion');
 
-    Route::get('adminhome/Home/{action}/{question_id}','Auth\AuthController@editOrPickQuestion');
+    Route::get('adminhome/Browse/{action}/{question_id}','Auth\AuthController@editOrPickQuestion');
 
     Route::post('usershome/Review/Modify/{question_id}','QuestionController@makeChanges');
 
+    Route::get('usershome/Review/Reviewed/{question_id}','QuestionController@reviewed');
+
+    
     Route::get('usershome/Review/{action}/{question_id}','QuestionController@editOrPickQuestion');
+
 
     Route::get('usershome/Browse/{action}/{question_id}','QuestionController@editOrPickQuestion');
 
@@ -93,7 +100,7 @@ Route::group(['middleware' => 'web'] , function(){
 
     Route::post('usershome/Home/Edit/{question_id}','QuestionController@makeChanges');
     
-    Route::post('admminhome/Home/Edit/{question_id}','Auth\AuthController@makeChanges');
+    Route::post('adminhome/Browse/Edit/{question_id}','Auth\AuthController@makeChanges');
 
     Route::post('usershome/Review/Modify/{question_id}','QuestionController@makeChanges');
     

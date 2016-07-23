@@ -7,7 +7,7 @@ use Request;
 use App\Http\Requests;
 
 use Illuminate\Support\Facades\URL;
-
+use App;
 use App\User;
 use App\q_description;
 use DB;
@@ -25,6 +25,8 @@ use Auth;
 use Sofa\Revisionable\Laravel\RevisionableTrait; // trait
 use Sofa\Revisionable\Revisionable;
 use Redirect;
+use Log;
+use App\review;
 
 
 class QuestionController extends Controller 
@@ -148,7 +150,15 @@ class QuestionController extends Controller
 
         $question->save();
 
- 		$q_id = $question->getKey();
+        $q_id = $question->getKey();
+
+        DB::table('reviews')->insert([
+        ['q_id' => $q_id ,'u_id' => 1],
+        ['q_id' => $q_id , 'u_id' => 2]
+        ]);
+
+
+ 		
 
  
 
@@ -290,9 +300,18 @@ class QuestionController extends Controller
 
  	public function editOrPickQuestion($action, $question_id){
  		if($action ==="Edit"|| $action==="Pick" || $action==="Modify"){
-	 		$symbol_group = DB::table('math_symbols_group')->get();
-	    	$symbols_1 = DB::table('maths_symbols')->where('type','1')->get();
-	        $symbols_2 = DB::table('maths_symbols')->where('type','2')->get();
+            $user = Auth::id();
+            $creator_id = q_table::where('q_id',$question_id)->value('created_by');
+
+            $reviewer_id1 = review::where('q_id',$question_id)->where('reviewed',0)->orderBy('u_id', 'asc')->select('u_id')->first();       
+            $reviewer_id2 = review::where('q_id',$question_id)->where('reviewed',0)->orderBy('u_id', 'desc')->select('u_id')->first();
+        
+            
+            if((strcmp($action,"Edit")==0 && ($user==$creator_id)) || (strcmp($action,"Modify")==0 && ($user==$reviewer_id1->user_id || $user==$reviewer_id2->user_id)) || (strcmp($action,"Pick") ==0))
+            {
+	 		    $symbol_group = DB::table('math_symbols_group')->get();
+	    	    $symbols_1 = DB::table('maths_symbols')->where('type','1')->get();
+	            $symbols_2 = DB::table('maths_symbols')->where('type','2')->get();
 	        $symbols_3 = DB::table('maths_symbols')->where('type','3')->get();
 	        $symbols_4 = DB::table('maths_symbols')->where('type','4')->get();
 	        $symbols_5 = DB::table('maths_symbols')->where('type','5')->get();
@@ -326,6 +345,7 @@ class QuestionController extends Controller
 
             $count_option = count($options);
 	        $options_used = $question->opt_used;
+
 	        if (!is_null($options_used)) {
 
 	        	$option_object = options::where('q_id',$question_id)->where('revision',$options_used)->first();
@@ -336,17 +356,32 @@ class QuestionController extends Controller
 	        else{
 	        	return view('users.editOrPickView',compact('question','symbol_group','symbols_1','symbols_2','symbols_3','symbols_4','symbols_5','symbols_6','tags','action','count_option','options'));
 	        }
+
+        }else{
+            if(strcmp($action,"Edit")==0)
+                return redirect('usershome/Home');
+            elseif(strcmp($action,"Modify")==0)
+                return redirect('usershome/Review');
+            
+        }
 	        
     	}
+
     	else{
     		App::abort(403, 'Unauthorized action.');
     	}
 	}
 
 	public function makeChanges($question_id){
-		$time = time();
-        $date = date("Y-m-d",$time);
+		
         $user = Auth::id();
+        $action = Request::get('action');
+        $creator_id = q_table::where('q_id',$question_id)->value('created_by');
+        $reviewer_id1 = review::where('q_id',$question_id)->where('reviewed',0)->orderBy('u_id', 'asc')->select('u_id')->first();       
+        $reviewer_id2 = review::where('q_id',$question_id)->where('reviewed',0)->orderBy('u_id', 'desc')->select('u_id')->first();
+        if((strcmp($action,"Edit")==0 && ($user==$creator_id)) || (strcmp($action,"Modify")==0 && ($user==$reviewer_id->u_id || $user==$reviewer_id2->u_id))){
+        $time = time();
+        $date = date("Y-m-d",$time);    
         $question = q_table::find($question_id);
 		$questions = DB::table('q_tables')
  						->where('q_tables.q_id','=',$question_id)
@@ -409,41 +444,43 @@ class QuestionController extends Controller
         $revisions = options::where('q_id',$question_id)->max('revision');
 
         $current_option_count = Request::get('no_questions');
-
-        if (!is_null($question->option)) {
+        
+        if (!is_null($questions->option)) {
             # code...
-            $count_initial = options::where('q_id','=',$question->question_id)
-                                    ->where('revision',$question->option)
-                                    ->count();  
+            $count_initial = options::where('q_id','=',$questions->question_id)
+                                    ->where('revision',$questions->option)
+                                    ->count('q_id');  
 
             $descs = DB::table('options')
                         ->where('q_id',$question_id)
-                        ->where('revision',$question->option)
+                        ->where('revision',$questions->option)
                         ->lists('description','option_no');
         }
         else{
+
             $count_initial = 0;
         }
 
+         Log::info('Initial: '.$count_initial.'Current: '.$current_option_count);
         
-
-        if($count_initial===0){
-            if($current_option_count!==0){
-                $options_changed = 1;
+         if($count_initial == 0){
+            if($current_option_count != 0)
+                {
+                    $options_changed = 1;
             }
             else{
                 //do nothing
             }
-        }
+        }else{
 
-        else{
-            if($current_option_count === $count_initial){
+          if($current_option_count == $count_initial){
 
                 for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
                     $name_option = 'member'.$i;
                     $text = Request::get($name_option);
-
-                    if (strcmp($descs[$i-1],$text)!==0) {
+                    
+                    Log::info($descs);
+                    if (strcmp($descs[$i],trim($text))!==0) {
                         $options_changed = 1;
                     }
                     else{
@@ -457,7 +494,7 @@ class QuestionController extends Controller
         }
 
 
-        if ($options_changed===1) {
+        if ($options_changed===1 && !empty($current_option_count)) {
             
             for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
                 $name_option = 'member'.$i;
@@ -471,9 +508,16 @@ class QuestionController extends Controller
                 $option->correct_ans = $answer;
                 $option->revision = $revisions+1;
                 $option->save();
+                
             }
-            $question->options = $revisions+1;
             $changed_flag = 1;
+            $question->options = $revisions+1;
+        }
+        elseif($options_changed === 1 &&empty($current_option_count))
+        {   
+            $changed_flag = 1;
+            $question->options = null;         
+
         }
         else{
             //do nothing
@@ -596,12 +640,16 @@ class QuestionController extends Controller
 								->lists('tag_id','key')
 								->all();
 	 	
-		$compare = array_diff($tags_new, $q_tags);
+        if(sizeof($q_tags)>sizeof($tags_new)){
+		    $compare = array_diff( $q_tags,$tags_new);
+        }
+        else{
+            $compare = array_diff($tags_new,$q_tags);
+        }
 
-		if(empty($compare) && is_null($compare)){
+		if(empty($compare)){
 			//do nothing
 		}
-
 		else{
 
 			foreach(Request::get('tags') as $selected_tag){
@@ -614,7 +662,7 @@ class QuestionController extends Controller
 		    	$tag_R -> save();
         	}
             $question->tag_revision = $current_tag_revision + 1;
-                 $changed_flag = 1;
+            $changed_flag = 1;
             //update tagrevision in qtables
 		}
 
@@ -668,12 +716,11 @@ class QuestionController extends Controller
         elseif($changed_flag ==0)
         {
             $question->disableRevisioning();
-            $question->save();
         }
 
         
 
-        $action = Request::get('action');
+        
         if(strcmp($action,"Edit")==0)
             return redirect('usershome/Home');
         elseif(strcmp($action,"Modify")==0){
@@ -683,8 +730,18 @@ class QuestionController extends Controller
             ->update(['reviewed'=>1]);
             return redirect('usershome/Review');
         }
+    }
+    else{
+        if(strcmp($action,"Edit")==0)
+            return redirect('usershome/Home');
+        elseif(strcmp($action,"Modify")==0){
+            return redirect('usershome/Review');
+        }
         /********END*****/
+    
 	}
+
+}
 
     
     /*******to show version*******/
@@ -693,7 +750,7 @@ class QuestionController extends Controller
         $r_question_id = $question_id;
         $r_version_no =$version_no;
         $question_old = q_table::find($question_id);
-        $version = $question_old->revisionVersion($version_no);
+        $version = $question_old->revisionVersion($version_no-1);
         
 
         $user = Auth::id();            
@@ -751,7 +808,7 @@ class QuestionController extends Controller
     public function revise($question_id,$version_no){
 
         $question_old = q_table::find($question_id);         //fetching question
-        $version = $question_old->revisionVersion($version_no);  //fetching version 
+        $version = $question_old->revisionVersion($version_no-1);  //fetching version 
 
         //storing the values in the question field
         $question_old->category = $version->old('category');  
@@ -776,6 +833,13 @@ class QuestionController extends Controller
     public function delete($question_id){
         $question = q_table::find($question_id);
         $question->delete();
+        return Redirect::back();
+    }
+
+    public function reviewed($question_id){
+        $review = review::where('q_id',$question_id)
+                    ->where('u_id',Auth::id())
+                    ->update(['reviewed'=>1]);
         return Redirect::back();
     }
 

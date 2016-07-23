@@ -9,7 +9,7 @@
           {!! Form::text('search_item','',array('placeholder'=>'Search','class'=>'form-control')) !!}
         </div>
         <div class="col-md-2">
-          {!! Form::submit('Submit',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
+          {!! Form::submit('Search',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
         </div>
       </div>
       <br>
@@ -38,7 +38,12 @@
           Version:
           @for($i=1;$i<=$count;$i++)
             @if($i != $question->version)
-              {{ link_to('usershome/History/'.$question->q_id.'/'.$i,$i,array('class' => 'label label-primary ') ,$secure =null) }} 
+              @if($i == 1)
+                <?php $h = $i+1; ?>
+                {{ link_to('usershome/History/'.$question->q_id.'/'.$h,$i,array('class' => 'label label-primary ') ,$secure =null) }} 
+              @else
+                {{ link_to('usershome/History/'.$question->q_id.'/'.$i,$i,array('class' => 'label label-primary ') ,$secure =null) }}
+              @endif
             @else
                <span class="label label-default">{{$i}}</span>
             @endif

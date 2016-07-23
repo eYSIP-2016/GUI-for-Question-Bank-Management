@@ -13,7 +13,7 @@ use Auth;
 use View;
 use Input;
 use Redirect;
-use Illuminate\Http\Request;
+use App\Http\Requests;
 use DB;
 use App\q_description;
 use App\q_table;
@@ -23,6 +23,8 @@ use App\equations;
 use App\options;
 use File;
 use App\revision;
+use Request;
+use Log;
 
 
 
@@ -132,7 +134,7 @@ class AuthController extends Controller
             'password' => bcrypt($data['password']),
         ]);  **/
 
-        //return Auth::user();
+        return Auth::user();
     }
 
     public function postRegister(Request $request)
@@ -220,7 +222,7 @@ class AuthController extends Controller
     protected function sendOption($option){
         if( Auth::check()){
             if($option==="Users"){
-                $users = User::where('user_type_id', '=', 0)->paginate(2);
+                $users = User::where('user_type_id', '=', 0)->paginate(10);
                 return view('admin.users',compact('option','users'));
             }
             else if ($option==="Tags") {
@@ -328,15 +330,31 @@ class AuthController extends Controller
 
         $users = DB::table('users')->where('user_type_id' , 0)->lists('id');  //key,column_id
         $reviews = DB::table('reviews')->where('alloted',0)->distinct()->lists('q_id');
-        //$review = DB::table('review')->lists('q_id');
+
         shuffle($users);
         shuffle($reviews);
-        //$shuffled_questions = $questions->shuffle();
-        //$shuffled_questions->all();
-        $u = count($users);
-        $q = count($reviews);
-    
         
+        $u_count = count($users);
+        //$q = count($reviews);
+
+
+
+    
+        for($n=0;$n<$u_count;$n++) //Alloting questions created by every user 
+        {
+            
+
+            $question = DB::table('q_tables')->where('created_by',$users[$n])->whereIn('q_id',$reviews)->lists('q_id');   //retreiving questions created by nth user
+
+            $user = DB::table('users')->where('user_type_id',0)->where('id','<>',$users[$n])->lists('id');    //retrieving all other users except nth user
+
+            shuffle($user);         //shuffling the sequence of users in array
+            shuffle($question);     //shuffling the sequence of questions in array
+
+            $q = count($question);
+            $u = count($user);
+
+            //Log::info('users: '.$u1.' questions: '.$q1);
         
         for($i=0,$j=1,$x=0; $i<$j ; $j++,$i++)   //diagonally  incrementing j,i in upper triangular matrix such that "j<i"
         {
@@ -356,20 +374,21 @@ class AuthController extends Controller
            else {
             
             DB::table('reviews')            
-            ->where('q_id',$reviews[$x])
+            ->where('q_id',$question[$x])
             ->where('u_id',1)   
-            ->update(['u_id' => $users[$i] ,'alloted' => 1]);
+            ->update(['u_id' => $user[$i] ,'alloted' => 1]);
             // xth question should be alloted to ith reviewer
 
             DB::table('reviews')            
-            ->where('q_id',$reviews[$x])
+            ->where('q_id',$question[$x])
             ->where('u_id',2)     
-            ->update(['u_id' => $users[$j] , 'alloted' => 1]); 
+            ->update(['u_id' => $user[$j] , 'alloted' => 1]); 
 
               
             // xth question should be alloted to jth reviewer
             $x++;
             }
+        }
         }
 
         return Redirect::back();
@@ -427,8 +446,346 @@ class AuthController extends Controller
             }
             
         }
-        else{
+          else{
             App::abort(403, 'Unauthorized action.');
+          }
         }
+
+
+        public function makeChanges($question_id){
+        $time = time();
+        $date = date("Y-m-d",$time);
+        $user = Auth::id();
+        $question = q_table::find($question_id);
+        $questions = DB::table('q_tables')
+                        ->where('q_tables.q_id','=',$question_id)
+                        ->leftJoin('q_descriptions','q_tables.description_id','=','q_descriptions.description_id')
+                        ->leftJoin('equations','q_tables.exp_id','=','equations.exp_id')
+                        ->leftJoin('codes','q_tables.code_id','=','codes.code_id')
+                        ->leftJoin('diagrams','q_tables.diagram_id','=','diagrams.diagram_id')
+                        ->select('diagrams.path AS diagram',
+                                 'q_tables.options AS option',
+                                 'q_tables.tag_revision AS tag_revision',
+                                 'q_tables.difficulty AS difficulty',
+                                 'q_tables.category AS category',
+                                 'q_tables.time AS time',
+                                 'q_descriptions.description AS description',
+                                 'equations.exp_latex AS equation',
+                                 'codes.code_description AS code',
+                                 'q_tables.q_id AS question_id',
+                                 'equations.exp_id AS exp_id',
+                                 'codes.code_id AS code_id',
+                                 'q_tables.version AS version')->first();
+
+
+        /****************Update description*****************************/
+
+        $description = Request::get('Q_desc');
+
+        $changed_flag = 0;
+
+        if(strcmp($description, $questions->description)!==0){
+            $q_description = new q_description();
+
+            $q_description->description = Request::get('Q_desc');
+            $description_image_URL = Request::get('hidden_desc_url');
+            $name = 'question'.$date.$time.'.png';
+            $path = storage_path().'/images/Question/'.$name;
+            file_put_contents($path, file_get_contents($description_image_URL));
+
+            $path = URL::to('/').'/images/'.$name;
+            $q_description->image_path = $path;
+
+            $q_description->save();
+            $description_id = $q_description->getKey();
+            
+            $question->description_id = $description_id ;
+            /**DB::table('q_tables')
+                ->where('q_id',$question->question_id)
+                ->update(['description_id'=>$description_id]);
+            **/
+            $changed_flag = 1;
+        }
+
+
+        /*********************Updating options**************************/
+
+
+        $answer = Request::get('answer');
+
+        $options_changed = 0;
+
+        $revisions = options::where('q_id',$question_id)->max('revision');
+
+        $current_option_count = Request::get('no_questions');
+
+        if (!is_null($question->option)) {
+            # code...
+            $count_initial = options::where('q_id','=',$question->question_id)
+                                    ->where('revision',$question->option)
+                                    ->count();  
+
+            $descs = DB::table('options')
+                        ->where('q_id',$question_id)
+                        ->where('revision',$question->option)
+                        ->lists('description','option_no');
+        }
+        else{
+            $count_initial = 0;
+        }
+
+        
+
+        if($count_initial===0){
+            if($current_option_count!==0){
+                $options_changed = 1;
+            }
+            else{
+                //do nothing
+            }
+        }
+
+        else{
+            if($current_option_count === $count_initial){
+
+                for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
+                    $name_option = 'member'.$i;
+                    $text = Request::get($name_option);
+
+                    if (strcmp($descs[$i-1],$text)!==0) {
+                        $options_changed = 1;
+                    }
+                    else{
+                        //do nothing
+                    }
+                }
+            }
+            else{
+                $options_changed = 1;
+            }
+        }
+
+
+        if ($options_changed===1) {
+            
+            for ($i = 1 ; $i <= $current_option_count ; $i++ ) {
+                $name_option = 'member'.$i;
+                $text = Request::get($name_option);
+
+                $option = new options();
+
+                $option->q_id = $question_id; //take value from Question table
+                $option->option_no = $i;
+                $option->description = $text;
+                $option->correct_ans = $answer;
+                $option->revision = $revisions+1;
+                $option->save();
+            }
+            $question->options = $revisions+1;
+            $changed_flag = 1;
+        }
+        else{
+            //do nothing
+        }
+
+        /********************Updating Equations********************/
+        $new_equation = Request::get('Q_exp');
+        if(strcmp($new_equation, $questions->equation)!==0){
+            if($new_equation != ""){
+                $equation = new equations();
+            
+                $equation->exp_latex = $new_equation;
+            
+                $equation_URL = Request::get('hidden_exp_url');
+                $name = 'equation'.$date.$time.'.gif';
+                $path = storage_path().'/images/'.$name;
+               file_put_contents($path, file_get_contents($equation_URL));
+
+               $path = URL::to('/').'/images/'.$name;
+               $equation->exp_image = $path;
+               $equation->save();
+
+               $eq_id = $equation->getKey();
+                $question->exp_id = $eq_id;
+            /**DB::table('q_tables')
+                ->where('q_id',$question_id)
+                ->update(['exp_id'=>$eq_id]);
+            **/
+               
+            }
+            else{
+             $question->exp_id = null;
+            }
+
+            $changed_flag = 1;   //question changed
+        }
+         
+
+        /*********************Updating Codes************************/
+        $code_description = Request::get('Q_code');
+        if (strcmp($code_description, $questions->code)!==0){
+            if($new_equation != ""){
+                 $code = new code();
+
+                $code->code_description = $code_description;
+            
+                $code_URL = Request::get('hidden_code_url');
+                $name = 'code'.$date.$time.'.png';
+                $path = storage_path().'/images/'.$name;
+                file_put_contents($path, file_get_contents($code_URL));
+
+                $path = URL::to('/').'/images/'.$name;
+                $code->code_image_path = $path;
+
+
+                $code->save();
+                $code_id = $code->getKey();
+                $question->code_id = $code_id;
+            /**DB::table('q_tables')
+                ->where('q_id',$question_id)
+                ->update(['exp_id'=>$eq_id]);
+            **/
+                
+            }
+            else{
+                $question->code_id = null;
+            }
+            $changed_flag = 1;
+        }
+        
+
+        /*********************updating diagrams*********************/
+        $image_removed = Request::get('remove_image');
+        if ($image_removed==='0') {
+            # code...
+            
+
+             if(!empty(Request::file('Q_diagram'))){
+                    if (Request::file('Q_diagram')->isValid()){
+                    $diagram = new diagram();
+                    $file = Request::file('Q_diagram');
+                    $extension = Request::file('Q_diagram')->getClientOriginalExtension();
+                    $name = 'diagram'.$date.$time.'.'.$extension;
+                    $path = storage_path().'/images/'.$name;
+                    File::copy($file, $path);
+
+                    $path = URL::to('/');
+                    $diagram->path = $path.'/images/'.$name;
+                    $diagram->save();
+                    $question->diagram_id = $diagram->getKey();
+                    /**DB::table('q_tables')
+                        ->where('q_id',$question->question_id)
+                        ->update(['diagram'=>$diagram->getKey()]); **/    
+                    $changed_flag = 1;
+                }
+            }
+
+            else if(!is_null($questions->diagram)){
+                $question->diagram_id = null;
+                /**DB::table('q_tables')
+                    ->where('q_id',$question->question_id)
+                    ->update(['diagram_id'=>null]);
+                **/
+                $changed_flag = 1;
+            }
+
+            else{
+                //do nothing
+            }
+        }
+
+        /********************Update tags**********************/
+        $tags_new = Request::get('tags');
+
+        $current_tag_revision = q_tag_relation::where('q_id',$question_id)->max('tag_revision');
+
+        $q_tags = q_tag_relation::where('q_id',$question_id)
+                                ->where('tag_revision',$question->tag_revision)
+                                ->get()
+                                ->lists('tag_id','key')
+                                ->all();
+        
+        $compare = array_diff($tags_new, $q_tags);
+
+        if(empty($compare) && is_null($compare)){
+            //do nothing
+        }
+
+        else{
+
+            foreach(Request::get('tags') as $selected_tag){
+                $tag_R = new q_tag_relation();
+
+                $tag_R->q_id = $question_id;
+                $tag_R->tag_id = $selected_tag;
+                $tag_R->tag_revision = $current_tag_revision + 1;
+
+                $tag_R -> save();
+            }
+            $question->tag_revision = $current_tag_revision + 1;
+                 $changed_flag = 1;
+            //update tagrevision in qtables
+        }
+
+        /***********************Update difficuty************************/
+        $new_difficulty = Request::get('difficulty');
+
+        if ($new_difficulty !== $question->difficulty) {
+            # code...
+            $question->difficulty = $new_difficulty;
+            /**DB::table('q_tables')
+                    ->where('q_id',$question->question_id)
+                    ->update(['difficulty'=>$new_difficulty]);
+            **/
+            $changed_flag = 1;
+        }
+
+        /***********************Update Category************************/
+        $new_category = Request::get('category');
+
+        if ($new_category !== $question->category) {
+            # code...
+            $question->category=$new_category;
+            /**DB::table('q_tables')
+                    ->where('q_id',$question->question_id)
+                    ->update(['category'=>$new_category]);
+            **/
+            $changed_flag = 1;
+        }
+
+        /*********************Update Time******************************/
+        $new_time = Request::get('timeRequired');
+
+        if ($new_time !== $questions->time){
+            $question->time=$new_time ;
+            /**DB::table('q_tables')->where('q_id',$question->question_id)->update(['time'=>$new_time]);
+            **/
+            $changed_flag = 1;
+
+        }
+
+
+        if($changed_flag ==1){
+            $question->last_edited_by=$user;
+            $question->version = $question->getRevisionsCountAttribute() + 1;
+            $question->save();
+            /**DB::table('q_tables')
+                    ->where('q_id',$question->question_id)
+                    ->update(['last_edited_by'=>$user]);
+            **/
+        }
+        elseif($changed_flag ==0)
+        {
+            $question->disableRevisioning();
+            $question->save();
+        }
+
+        
+            return redirect('adminhome/Browse');
+        
+        /********END*****/
     }
+
+    
+
 }

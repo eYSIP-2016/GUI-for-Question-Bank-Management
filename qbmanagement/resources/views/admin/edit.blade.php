@@ -278,7 +278,7 @@
 						Symbols <span class="glyphicon glyphicon-gbp"></span>
 					</a>
 		</div>
-			{!! Form::open(['url'=>'/adminhome/Home/'.$action.'/'.$question->question_id,'files' => true]) !!}
+			{!! Form::open(['url'=>'/adminhome/Browse/'.$action.'/'.$question->question_id,'files' => true]) !!}
 			<div class="form-group">
 					
 					{!! Form::label('Q_desc','Description') !!}
@@ -546,7 +546,7 @@
 								{!! Form::submit('Submit',array('id'=>'checkBtn','class'=>'btn btn-primary')) !!}
 							</li>
 							<li style="display:inline;padding:20px;">
-							{{ link_to('/usershome/Home', 'Cancel',array('class' => 'btn btn-warning') ,$secure =null) }}
+							{{ link_to('/adminhome/Browse', 'Cancel',array('class' => 'btn btn-warning') ,$secure =null) }}
                         	</li>
 							<li style="display:inline;padding:20px;">
 								{!! Form::reset('Reset',array('class'=>'btn btn-default')) !!}

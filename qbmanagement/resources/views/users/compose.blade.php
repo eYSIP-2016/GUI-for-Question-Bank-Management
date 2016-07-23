@@ -195,7 +195,7 @@
 								{!! Form::radio('difficulty','3',array('id'=>'hard')) !!}Hard<br>
 					</div>
 					<div class="col-md-6" style="border-right-style:solid;border-right-color:#bbbbbb;border-right-width:1px;">
-						{!! Form::label('timeRequired','Time Required') !!}<br>
+						{!! Form::label('timeRequired','Expected Solving Time') !!}<br>
 						<div class="indent_left">
 							{!!Form::number('timeRequired','',array('required'=>'required','min'=>'30','class'=>'form-control','placeholder'=>'in seconds'))!!}
 						</div>

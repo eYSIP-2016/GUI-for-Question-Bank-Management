@@ -2,7 +2,7 @@
 
 	@section('tags')
     
-    <head> <h2><i>Tags</i></h2><br></head>
+    <head> <h1><i>Tags</i></h1><br></head>
 
     
 

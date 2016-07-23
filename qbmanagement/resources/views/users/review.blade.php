@@ -1,5 +1,7 @@
 @extends('users.usershome')
 	@section('review')
+
+
 		<h1><i>Questions For Review </i></h1><br>
 		{!! Form::open(['url'=>'usershome/Review']) !!}
 		<div class="form-group">
@@ -92,6 +94,7 @@
 							<div class="actions_buttons">
 								<ul>
 									<li>{{ Html::link('/usershome/Review/Modify/'.$question->question_id,'Modify', array('class'=>'btn btn-primary btn-sm')) }}</li>
+									<li>{{ Html::link('/usershome/Review/Reviewed/'.$question->question_id,'No Changes', array('class'=>'btn btn-primary btn-sm')) }}</li>
 								</ul>
 							</div>
 						</div>

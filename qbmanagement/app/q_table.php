@@ -21,7 +21,7 @@ class q_table extends Model implements Revisionable
     'tag_revision',
     'difficulty',
     'time',
-    'last_edited_by'  
+    'last_edited_by'
     ];
 
     //Using Revisionable Presenter for presenting the label  { Its optional}
@@ -61,7 +61,12 @@ class q_table extends Model implements Revisionable
     /***For Category***/
     public function category()
     {
-        return $this->hasOne('App\category','key','category');
+        return $this->hasOne('App\category','category','key');
+    }
+
+    public function review()
+    {
+        return $this->hasMany('App\review','q_id','q_id');
     }
 
 }

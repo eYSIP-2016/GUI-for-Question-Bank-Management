@@ -8,7 +8,7 @@
 					{!! Form::text('search_item','',array('placeholder'=>'Search','class'=>'form-control')) !!}
 				</div>
 				<div class="col-md-2">
-					{!! Form::submit('Submit',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
+					{!! Form::submit('Search',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
 				</div>
 			</div>
 			<br>
@@ -92,10 +92,7 @@
 								<ul>
 									<li>{{ Html::link('/usershome/Home/Edit/'.$question->question_id,'Edit', array('class'=>'btn btn-primary btn-sm')) }}</li>
 									<li>{{ Html::link('/usershome/Home/Pick/'.$question->question_id,'Pick', array('class'=>'btn btn-default btn-sm')) }}</li>
-									<li>{{ Form::open(array('method' => 'DELETE', 'route' => array('question.destroy', $question->question_id))) }} 
-                                        {{ Form::submit('Delete', array('class'=> 'btn btn-danger btn-sm')) }} 
-                                        {{ Form::close() }}
-                        			</li>
+									
 								</ul>
 							</div>
 						</div>

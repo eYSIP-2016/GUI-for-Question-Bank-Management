@@ -9,7 +9,7 @@
           {!! Form::text('search_item','',array('placeholder'=>'Search','class'=>'form-control')) !!}
         </div>
         <div class="col-md-2">
-          {!! Form::submit('Submit',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
+          {!! Form::submit('Search',array('class'=>'btn btn-primary','style'=>'width:100%')) !!}
         </div>
       </div>
       <br>
@@ -97,9 +97,7 @@
             </div>
             
             <div class="col-md-2">
-              <button type="button" class="btn btn-default btn-sm" style="float:right;">
-                      <span class="glyphicon glyphicon-hand-up"></span> Pick
-                  </button>
+              {{ Html::link('/usershome/Browse/Pick/'.$question->question_id,'Pick', array('class'=>'btn btn-default btn-sm','style' => 'float:right')) }}
             </div>
           </div>  
         </div>
