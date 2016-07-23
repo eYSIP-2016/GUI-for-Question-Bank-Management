@@ -200,7 +200,7 @@ sudo composer create-project laravel/laravel
 your-project --prefer-dist
   							    \end{minted}
   						\end{itemize}
-  					\item Conifiguring Apache :
+  					\item Configuring Apache :
   						\begin{itemize}
   							\item Ensure that the project folder has proper permissions. 
   							    \begin{minted}{c}
@@ -509,7 +509,7 @@ No Hardware has been used
                 \item \textit{Browse}
                     \begin{itemize}
                       \item Here the User can browse the entire Question Bank  
-                      \item Search queries sent from here are give results of the questions that satisfy the submitted queries
+                      \item Search queries sent from here, give results of the questions that satisfy the submitted queries
                     \end{itemize}
             \end{enumerate}
             
@@ -532,34 +532,22 @@ No Hardware has been used
                 \end{itemize}
             \item Algorithm :
                 \begin{itemize}
-                    \item The List of users who created question are fetched from the database 
-                    \item for each user all the questions are fetched which are to be reviewed
-                    \item The matrix is formed corresponding to the self-cartesian product of users who haven't created any question
-                    \item  step 1 foreach question, a pair((\(row_{m} , column_n{n}\)) refers to the index of users) in the upper triangular part of the matrix is allotted a question
-                    \item  step 2 if the pair in the upper triangular matrix is finished then shuffle the sequence of users and reform a matrix corresponding to the self-cartesian product and repeat step 2
-                    \item  step 3 if no of questions gets exhausted then break the current iteration and go to the outer loop
-                    \item iterate or end inner loop
-                    \item iterate or end outer loop
+                   \item The list of users who created the question is fetched from the database.
+                	\item The list of questions that are to be reviewed is fetched from the database.
+                	\item A matrix is created where the $(i, j)^{th}$ element corresponds to the pair of $i^{th}$ and $j^{th}$ reviewer.
+                	\item The upper triangular portion of this matrix is used to enumerate all possible unique pairs where both the reviewers are different.
+                	\item A pair of reviewers is chosen for each question using round robin algorithm on enumerated pairs generated in step 4.
+	
                 \end{itemize}
             \item Review :
                 \begin{itemize}
-                    \item Given to the users, the question  to be reviewed, the user might want to modify or might not want to modify
-                    \item If modified then there is a history on the update of the question and questions get removed from the reviewers list
-                    \item  If not modified then the reviewers submits no changes and the question gets removed
+                    \item The reviewer can optionally modify any question that has been assigned to him/her.
+                	\item If the user modifies the question then it is reflected in the version history of that question.
+                	\item If the user clicks on No Change button then the question is considered as - "reviewed without any modifications".
+                	\item After either of the steps 2 or 3 has been performed, the question is removed from the "To be Reviewed" list visible to the user.
+	
                 \end{itemize}
 
-            \end{enumerate}
-
-        \vspace{1in}
-        \item Review interface
-            \begin{enumerate}
-            \item Given to the users, the question  to be reviewed, the user might want to modify or might not want to modify
-            \item It contains the following button
-                            \begin{itemize}
-                                \item  No Change : On click of this button the question is reviewed without any change and flag of review is set
-                                \item  Modify : On click of this button the
-                                question is reviewed and modified if needed and the flag of review is set
-                            \end{itemize}
             \end{enumerate}
             
         \item History interface
@@ -603,11 +591,11 @@ New Question for review on Admin Panel \\
 \includegraphics[scale=0.35]{newquestions.png}	\\
 
 \vspace{2in}
-Allotted or not for review to users \\
+Indication for Review Allotment status \\
 \includegraphics[scale=0.45]{allotedreview.png}	\\
 
 \vspace{1in}
-Text to image conversion and options\\
+\newpage Text to image conversion and options\\
 \includegraphics[scale=0.3]{compose.png}	\\
 
 \vspace{2in}
@@ -619,7 +607,7 @@ Special Symbol keyboard\\
 \includegraphics[scale=0.4]{compose5.png}	\\
 
 \vspace{2in}
-Code to image conversion \\
+\newpage Code to image conversion \\
 \includegraphics[scale=0.45]{compose7.png}	\\
 
 \vspace{0.7in}
@@ -658,7 +646,7 @@ Picking a Question \\
     \begin{itemize}
         \item Interesting insights can be gained by performing mining operations on the data generated in the system
         
-        \item As every application has scope for improvement, studies can be done to develop various algorithms for distribution of questions in more \\selective manner and organized (as per categories or sub-categories, or difficulty level)
+        \item As every application has scope for improvement, studies can be done to develop various algorithms for distribution of questions in more selective and organized manner(as per categories or sub-categories, or difficulty level)
         
         \item The application has a coding window. APIs that give results of the code being typed and allow features such as auto-indentation can also be integrated into the existing system
         
@@ -677,18 +665,33 @@ Picking a Question \\
     \end{itemize}
 
 \begin{thebibliography}{li}
-    \begin{itemize}
-        \item Laravel-5.2 Documentation - \textif{https://laravel.com/docs/5.2}
-        \item Stackoverflow - \textif{https://http://stackoverflow.com/}
-        \item Laravel Tutorial - \textit{https://laracasts.com/series/laravel-5-from-scratch} 
-        \item Laracast discussion forum - \textif{https://laracasts.com/discuss}
-        \item Laravel Installation - \textif{https://www.howtoforge.com/tutorial/install-laravel-on-ubuntu-for-apache/}
-        \item w3schools web tutorials series - \textif{http://www.w3schools.com/}
-        \item \LaTeX equation maker API - \textif{https://www.codecogs.com/latex/eqneditor.php}
-        \item Laravel Revisionable - \textif{https://github.com/VentureCraft/revisionable}
-        \item Bootstrap tutorial - \textif{http://getbootstrap.com/getting-started/}
-    \end{itemize}
+
+	\bibitem{Laravel-5.2 Documentation}Laravel-5.2 Documentation\\
+	\href{https://laravel.com/docs/5.2}{Documentation Link}
+
+	\bibitem{Laravel Tutorial}Laravel Tutorial\\
+	 \href{https://laracasts.com/series/laravel-5-from-scratch}{Tutorial Link}
+
+	\bibitem{Laracast Discussion Forum}Laracast Discussion Forum\\
+	\href{https://laracasts.com/discuss}{Forum Link}
+
+	\bibitem{Laravel Installation}Laravel Installation\\
+	\href{https://www.howtoforge.com/tutorial/install-laravel-on-ubuntu-for-apache/}{Tutorial Link}
+
+	\bibitem{W3Schools Web Tutorials Series}W3Schools Web Tutorials Series\\
+	\href{http://www.w3schools.com/}{Tutorial Link}
+
+	\bibitem{\LaTeX equation maker API} \LaTeX equation maker API\\
+	\href{https://www.codecogs.com/latex/eqneditor.php}{Editor Link}
+
+	\bibitem{Laravel Revisionable}Laravel Revisionable \\
+	\href{https://github.com/VentureCraft/revisionable}{Github Link}
+
+	\bibitem{Bootstrap Tutorial}Bootstrap Tutorial \\
+	\href{http://getbootstrap.com/getting-started/}{Tutorial Link}
+
 \end{thebibliography}
+
 
 
 \end{document}
